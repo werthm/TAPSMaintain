@@ -74,6 +74,9 @@ void TMTAPSMaintain::Start()
         // create menu entry
         fMainWindow->GetModulesMenu()->AddEntry(name, id);
         
+        // connect Finished() signal
+        m->Connect("Finished", "TMTAPSMaintain", this, "StopModule(=kTRUE)");
+        
         printf("Module '%s' (ID %d) loaded.\n", name, id);
     }
     
@@ -103,10 +106,20 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
          printf("ERROR: Could not start module '%s' because module '%s' is still running!\n", 
                 mod->GetName(), fActiveModule->GetName());
     }
+    // check if needed ROOT was opened
+    else if (mod->NeedsRootInputFile() && !fFile)
+    {
+        Int_t retval;
+        new TGMsgBox(gClient->GetRoot(), fMainWindow, "Open ROOT input file", "This module needs a ROOT input file. "
+                     "Please open one and try again.", kMBIconStop, kMBOk, &retval, kFitWidth | kFitHeight, kTextLeft);
+    }
     else
     {
         printf("Starting module '%s'\n", mod->GetName());
-            
+        
+        // set ROOT file if necessary
+        if (mod->NeedsRootInputFile()) mod->SetRootInputFile(fFile);
+        
         // display module frame
         fMainWindow->LoadModuleFrame(mod->GetFrame());
         
@@ -115,13 +128,17 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
             
         // set active modules
         fActiveModule = mod;
+        
+        // start module
+        mod->Init();
     }
 }
 
 //______________________________________________________________________________ 
-void TMTAPSMaintain::StopModule()
+void TMTAPSMaintain::StopModule(Bool_t forced)
 {
-    // Stop the active module.
+    // Stop the active module. Don't ask the user when forced is kTRUE (used for
+    // completed module unloading). Default is kFALSE.
     
     if (!fActiveModule)
     {
@@ -129,6 +146,18 @@ void TMTAPSMaintain::StopModule()
     }
     else
     {
+        if (!forced)
+        {
+            // ask if user really want to stop the module
+            Int_t retval;
+            new TGMsgBox(gClient->GetRoot(), fMainWindow, "Stop running module?", "Do you really want to stop this module? "
+                     "The results of this module will NOT be saved!", kMBIconQuestion, 
+                     kMBYes | kMBNo, &retval, kFitWidth | kFitHeight, kTextLeft);
+        
+            // abort module stopping
+            if (retval == 2) return;
+        }
+        
         printf("Stopping module '%s'\n", fActiveModule->GetName());
         
         // unload frame
@@ -157,7 +186,7 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
         
         sprintf(cAbout,
                "TAPSMaintain\n"
-               "A Universal TAPS maintenance software\n\n"
+               "A Universal TAPS Maintenance Software\n\n"
                "Version %s\n"
                "Compiled on %s\n"
                "Linked to ROOT %s\n\n"

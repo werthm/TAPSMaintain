@@ -61,7 +61,7 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
         for (UInt_t j = 0; j < gTAPSLogo_width; j++)
         {
             // read pixel data
-            HEADER_PIXEL(fTAPSLogo_data, pix);
+            HEADER_PIXEL(fgTAPSLogo_data, pix);
             
             // convert to hex format
             sprintf(pixel, "#%02x%02x%02x", (UChar_t)pix[0], (UChar_t)pix[1], (UChar_t)pix[2]);

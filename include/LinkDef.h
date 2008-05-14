@@ -29,6 +29,7 @@
 #pragma link C++ class TMModuleLoader+; 
 #pragma link C++ class TMMainFrame+; 
 #pragma link C++ class TMModule+; 
+#pragma link C++ class TMSeqCalibModule+; 
 
 // Modules
 #pragma link C++ class TMCalibLED+; 

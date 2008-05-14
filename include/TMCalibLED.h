@@ -16,25 +16,30 @@
 #ifndef TAPSCalib_TMCalibLED
 #define TAPSCalib_TMCalibLED
 
-#include "TRootEmbeddedCanvas.h"
-#include "TCanvas.h"
+#include "TH1.h"
+#include "TText.h"
+#include "TLine.h"
 
-#include "TMModule.h"
+#include "TMSeqCalibModule.h"
 
 
-class TMCalibLED : public TMModule
+class TMCalibLED : public TMSeqCalibModule
 {
 
 private:
-    TRootEmbeddedCanvas* fEmbCanvas;            // the embedded canvas
-    TManvas* fCanvas;                           // the canvas
+    Double_t fLevel;                            // threshold level
+    TH1F* hClone;                               // histogram pointer used for cloning
+    
+    Double_t FindThreshold(TH1F* h);
 
 public:
-    TMCalibLED() : TMModule() { }
+    TMCalibLED() : TMSeqCalibModule() { }
     TMCalibLED(const Char_t* name, UInt_t id);
     virtual ~TMCalibLED();
-
-    virtual void Start();
+    
+    virtual void Init();
+    virtual void Process(Int_t index);
+    virtual void Quit();
 
     ClassDef(TMCalibLED, 0) // LED calibration module
 };
