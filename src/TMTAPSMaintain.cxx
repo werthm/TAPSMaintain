@@ -76,6 +76,16 @@ void TMTAPSMaintain::Start()
         
         // connect Finished() signal
         m->Connect("Finished", "TMTAPSMaintain", this, "StopModule(=kTRUE)");
+
+        // create configuration dialog if necessary
+        if (m->NeedsConfig())
+        {
+            // create config dialog
+            m->CreateConfigDialog(fMainWindow);
+
+            // make connection to start the module after dialog unloading
+            m->GetConfigDialogCloseButton()->Connect("Clicked()", "TMTAPSMaintain", this, "SetConfigAndStartModule()");
+        }
         
         printf("Module '%s' (ID %d) loaded.\n", name, id);
     }
@@ -119,19 +129,59 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
         
         // set ROOT file if necessary
         if (mod->NeedsRootInputFile()) mod->SetRootInputFile(fFile);
-        
-        // display module frame
-        fMainWindow->LoadModuleFrame(mod->GetFrame());
-        
-        // diplay module name
-        fMainWindow->SetStatusBar(mod->GetName(), 1);
+       
+        // start module configuration frame (if any)
+        // or start module directly without configuration
+        if (mod->NeedsConfig())
+        {
+            // connect frame and display it
+            TGTransientFrame* configDialog = mod->GetConfigDialog();
+            configDialog->MapSubwindows();
+            configDialog->Layout();
+            configDialog->ReparentWindow(gClient->GetRoot());
+            configDialog->SetSize(configDialog->GetDefaultSize());
+            configDialog->MapRaised();
             
-        // set active modules
-        fActiveModule = mod;
-        
-        // start module
-        mod->Init();
+            // set active modules
+            fActiveModule = mod;
+        }
+        else
+        {
+            // set active modules
+            fActiveModule = mod;
+            
+            // display module frame
+            fMainWindow->LoadModuleFrame(fActiveModule->GetFrame());
+                    
+            // diplay module name
+            fMainWindow->SetStatusBar(fActiveModule->GetName(), 1);
+                               
+            // start module
+            fActiveModule->Init();
+        }
     }
+}
+
+//______________________________________________________________________________ 
+void TMTAPSMaintain::SetConfigAndStartModule()
+{
+    // Unload the configuration dialog of a module and start it.
+
+    // unload the configuration dialog
+    fActiveModule->GetConfigDialog()->UnmapWindow();
+    fActiveModule->GetConfigDialog()->ReparentWindow(0);
+
+    // read the module configuration
+    fActiveModule->ReadConfig();
+
+    // display module frame
+    fMainWindow->LoadModuleFrame(fActiveModule->GetFrame());
+            
+    // diplay module name
+    fMainWindow->SetStatusBar(fActiveModule->GetName(), 1);
+                       
+    // start module
+    fActiveModule->Init();
 }
 
 //______________________________________________________________________________ 
@@ -163,6 +213,14 @@ void TMTAPSMaintain::StopModule(Bool_t forced)
         // unload frame
         fMainWindow->UnloadModuleFrame(fActiveModule->GetFrame());
         
+        // unload configuration frame
+        if (fActiveModule->NeedsConfig())
+        {
+            TGTransientFrame* configDialog = fActiveModule->GetConfigDialog();
+            configDialog->UnmapWindow();
+            configDialog->ReparentWindow(0);
+        }
+ 
         // clear module name in status bar
         fMainWindow->SetStatusBar("", 1);
             
@@ -238,6 +296,13 @@ Bool_t TMTAPSMaintain::OpenInputFile(const char* inFile)
 void TMTAPSMaintain::SelectAndOpenFile()
 {
     // Let the user select a file to open.
+    
+    // check if a module is active
+    if (fActiveModule)
+    {
+        printf("ERROR: Cannot open a new ROOT file while a module is still active!\n");
+        return;
+    }
     
     // configure the file choose dialog
     const char* kFileExt[] = {"ROOT files", "*.root", 0, 0};

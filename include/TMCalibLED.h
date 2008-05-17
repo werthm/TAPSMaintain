@@ -19,6 +19,7 @@
 #include "TH1.h"
 #include "TText.h"
 #include "TLine.h"
+#include "TGTableLayout.h"
 
 #include "TMSeqCalibModule.h"
 
@@ -38,6 +39,7 @@ public:
     virtual ~TMCalibLED();
     
     virtual void Init();
+    virtual void ReadConfig();
     virtual void Process(Int_t index);
     virtual void Quit();
 

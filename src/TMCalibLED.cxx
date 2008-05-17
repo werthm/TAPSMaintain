@@ -20,12 +20,28 @@ ClassImp(TMCalibLED)
 
 //______________________________________________________________________________
 TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
-    : TMSeqCalibModule(name, id, 1, kTRUE)
+    : TMSeqCalibModule(name, id, 1, kTRUE, kTRUE)
 {
     // Constructor.
     
     fLevel = 0.9;
     hClone = 0;
+
+    // create configuration dialog
+    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 3, 2));
+    fConfigFrame->AddFrame(new TGLabel(fConfigFrame, "LED Type:"), 
+                           new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+
+    fConfigFrame->AddFrame(new TGLabel(fConfigFrame, "x-Axis Range:"), 
+                           new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+
+    fConfigFrame->AddFrame(new TGLabel(fConfigFrame, "Threshold Level:"), 
+                           new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+
+
+
+
 }
 
 //______________________________________________________________________________
@@ -142,5 +158,12 @@ Double_t TMCalibLED::FindThreshold(TH1F* h)
     
     // return 0 if position was not found
     return 0;
+}
+
+//______________________________________________________________________________
+void TMCalibLED::ReadConfig()
+{
+    // Read the configuration made by the user in the config dialog.
+
 }
 

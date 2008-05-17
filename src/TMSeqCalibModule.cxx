@@ -10,6 +10,16 @@
 //                                                                      //
 // Abstract module for sequential element calibration.                  //
 //                                                                      //
+// To-do-list for creating a new module based on TMSeqCalibModule:      //
+//                                                                      //
+// PURE VIRTUAL METHODS                                                 //
+// The following methods are pure virtual and have to be implemented    //
+// by any subclass of TMSeqCalibModule:                                 //
+//                                                                      //
+// void Process(Int_t index): Element fitter method. Will be called for //
+//                            each element index. This method should    //
+//                            contain the main code of the module.      //
+//                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -19,8 +29,8 @@ ClassImp(TMSeqCalibModule)
 
 
 //______________________________________________________________________________
-TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile)
-    : TMModule(name, id, inNresults, needsROOTInputFile)
+TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile, Bool_t needsConfig)
+    : TMModule(name, id, inNresults, needsROOTInputFile, needsConfig)
 {
     // Constructor.
     
