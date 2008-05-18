@@ -45,8 +45,12 @@ public:
     void Start();
     void Quit();
     void HandleMenu(Int_t id);
+    
     void StartModule(TMModule* mod);
     void StopModule(Bool_t forced = kFALSE);
+    void ShowModuleError(const Char_t* msg) const;
+    void SaveModuleResults();
+    
     void SetConfigAndStartModule();
     Bool_t OpenInputFile(const char* inFile);
     void SelectAndOpenFile();

@@ -49,12 +49,16 @@ protected:
     TGTextButton* fPrev;                            // "Previous" button
     TGTextButton* fNext;                            // "Next" button
     TGTextButton* fQuit;                            // "Quit" button
+    
+    TGLabel* fInfo;                                 // Info label
 
 public:
     TMSeqCalibModule() : TMModule() { }
     TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile, Bool_t needsConfig);
     virtual ~TMSeqCalibModule();
 
+    void ShowCanvasInfo(Int_t event, Int_t px, Int_t py, TObject *selected);
+    
     void ProcessPreviousElement();
     void ProcessNextElement();
     void ProcessElement(Int_t index)

@@ -32,8 +32,8 @@ public:
     TMModuleLoader(UInt_t startID);
     virtual ~TMModuleLoader();
     
-    TList* GetModules() { return fModules; }
-    TMModule* GetModuleWithID(UInt_t id);
+    TList* GetModules() const { return fModules; }
+    TMModule* GetModuleWithID(UInt_t id) const;
 
     ClassDef(TMModuleLoader, 0) // Module loader class
 };

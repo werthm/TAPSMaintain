@@ -61,6 +61,10 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
     fEmbCanvas->MapSubwindows();
     fFrame->AddFrame(fEmbCanvas, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 1, 1, 1, 1));
     
+    // connect canvas info method
+    fCanvas->Connect("ProcessedEvent(Int_t, Int_t, Int_t, TObject*)", "TMSeqCalibModule", this, 
+                    "ShowCanvasInfo(Int_t, Int_t, Int_t, TObject*)");
+    
     // create control elements
     fControlFrame = new TGHorizontalFrame(fFrame, 50, 50, kFixedWidth);
     
@@ -72,9 +76,13 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
     fNext->Connect("Clicked()", "TMSeqCalibModule", this, "ProcessNextElement()");
     fControlFrame->AddFrame(fNext, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
     
-    fQuit = new TGTextButton(fControlFrame, "Quit");
+    fQuit = new TGTextButton(fControlFrame, "Save && Quit");
     fQuit->Connect("Clicked()", "TMSeqCalibModule", this, "Quit()");
     fControlFrame->AddFrame(fQuit, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
+
+    fInfo = new TGLabel(fControlFrame, "                                                                                           ");
+    fInfo->SetTextJustify(kTextLeft);
+    fControlFrame->AddFrame(fInfo, new TGLayoutHints(kLHintsLeft, 20, 8, 11, 8));
     
     fFrame->AddFrame(fControlFrame, new TGLayoutHints(kLHintsBottom | kLHintsExpandX));
 }
@@ -84,6 +92,14 @@ TMSeqCalibModule::~TMSeqCalibModule()
 {
     // Destructor.
     
+}
+
+//______________________________________________________________________________ 
+void TMSeqCalibModule::ShowCanvasInfo(Int_t event, Int_t px, Int_t py, TObject *selected)
+{
+    // Show canvas information in the info label.
+    
+    fInfo->SetText(selected->GetObjectInfo(px, py));
 }
 
 //______________________________________________________________________________

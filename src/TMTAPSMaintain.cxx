@@ -75,7 +75,13 @@ void TMTAPSMaintain::Start()
         fMainWindow->GetModulesMenu()->AddEntry(name, id);
         
         // connect Finished() signal
-        m->Connect("Finished", "TMTAPSMaintain", this, "StopModule(=kTRUE)");
+        m->Connect("Finished()", "TMTAPSMaintain", this, "StopModule(=kTRUE)");
+        
+        // connect Save() signal
+        m->Connect("Save()", "TMTAPSMaintain", this, "SaveModuleResults()");
+        
+        // connect ModuleError() signal
+        m->Connect("ModuleError(const Char_t*)", "TMTAPSMaintain", this, "ShowModuleError(const Char_t*)");
 
         // create configuration dialog if necessary
         if (m->NeedsConfig())
@@ -98,6 +104,18 @@ void TMTAPSMaintain::Start()
 void TMTAPSMaintain::Quit()
 {
     // Quit the TAPSMaintain application.
+    
+    // module still active: ask if user really want to quit
+    if (fActiveModule)
+    {
+        Int_t retval;
+        new TGMsgBox(gClient->GetRoot(), fMainWindow, "Module active", "Do you really want to quit and stop this module? "
+                     "The results of this module will NOT be saved!", kMBIconQuestion, 
+                     kMBYes | kMBNo, &retval, kFitWidth | kFitHeight, kTextLeft);
+    
+        // abort quiting
+        if (retval == 2) return;
+    }
     
     if (fMainWindow) delete fMainWindow;
     if (fModuleLoader) delete fModuleLoader;
@@ -136,10 +154,9 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
         {
             // connect frame and display it
             TGTransientFrame* configDialog = mod->GetConfigDialog();
-            configDialog->MapSubwindows();
-            configDialog->Layout();
             configDialog->ReparentWindow(gClient->GetRoot());
             configDialog->SetSize(configDialog->GetDefaultSize());
+            configDialog->MapSubwindows();
             configDialog->MapRaised();
             
             // set active modules
@@ -322,4 +339,41 @@ void TMTAPSMaintain::SelectAndOpenFile()
     // save current directory
     strcpy(fCurrentDir, fileInfo.fIniDir);
 }
+
+//______________________________________________________________________________ 
+void TMTAPSMaintain::ShowModuleError(const Char_t* msg) const
+{
+    // Show the error message emitted by a module.
+    
+    Int_t retval;
+    new TGMsgBox(gClient->GetRoot(), fMainWindow, "Module Error", msg, 
+                 kMBIconStop, kMBOk, &retval, kFitWidth | kFitHeight, kTextLeft);
+}
+
+//______________________________________________________________________________ 
+void TMTAPSMaintain::SaveModuleResults()
+{
+    // Open a file save dialog and call the module's SaveResult() method.
+
+    // check if module is active
+    if (!fActiveModule) return;
+
+    const char* kFileExt[] = {"All files", "*", 0, 0};
+    TGFileInfo fileInfo;
+    fileInfo.fFileTypes = kFileExt;
+    fileInfo.fIniDir = strdup((char *)fCurrentDir);
+
+    // show the dialog
+    new TGFileDialog(gClient->GetRoot(), fMainWindow, kFDSave, &fileInfo);
+
+    // save module results
+    if (fileInfo.fFilename)
+    {
+        fActiveModule->SaveResults(fileInfo.fFilename);
+    }
+
+    // save current directory
+    strcpy(fCurrentDir, fileInfo.fIniDir);
+}
+
 

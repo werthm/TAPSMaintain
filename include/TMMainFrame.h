@@ -67,7 +67,7 @@ public:
     void UnloadWelcomeFrame();
 
     void SetStatusBar(const Char_t* text, Int_t part) { fStatusBar->SetText(text, part); }
-    TGPopupMenu* GetModulesMenu() { return fModulesMenu; }
+    TGPopupMenu* GetModulesMenu() const { return fModulesMenu; }
     void Show();
     
     ClassDef(TMMainFrame, 0) // TAPSMaintain main window

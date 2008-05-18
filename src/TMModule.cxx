@@ -45,6 +45,12 @@
 // then be read out in the ReadConfig() method that is called right     //
 // after the dialog unloading before the module execution.              //
 //                                                                      //
+//                                                                      //
+// RESULT HEADER                                                        //
+// Every module should have a result header that is saved along with    //
+// the results to file. Set this header via the SetResultHeader() meth- //
+// od.                                                                  //
+//                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -65,6 +71,7 @@ TMModule::TMModule()
     fFile = 0;
     fNresults = 0;
     fResults = 0;
+    fResultHeader[0] = '\0';
     fFrame = 0;
     fConfigDialog = 0;
     fConfigFrame = 0;
@@ -82,6 +89,7 @@ TMModule::TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t need
     fNeedsConfig = needsConfig;
     fFile = 0;
     fNresults = inNresults;
+    fResultHeader[0] = '\0';
 
     // create result array
     fResults = new Double_t*[gTAPSSize];
@@ -102,7 +110,7 @@ TMModule::TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t need
     fOk = 0;
 
     // create config frame so subclasses can add their stuff to it
-    if (fNeedsConfig) fConfigFrame = new TGCompositeFrame(0, 400, 300, kVerticalFrame);
+    if (fNeedsConfig) fConfigFrame = new TGCompositeFrame(0, 200, 200, kVerticalFrame);
     else fConfigFrame = 0;
 }  
 
@@ -151,7 +159,7 @@ void TMModule::ClearResults()
 }
 
 //______________________________________________________________________________
-void TMModule::DumpResults(const Char_t* numberFormat)
+void TMModule::DumpResults(const Char_t* numberFormat) const
 {
     // Dump the results array to stdout. Use numberFormat to format the array
     // content.
@@ -176,6 +184,36 @@ void TMModule::DumpResults(const Char_t* numberFormat)
 }
 
 //______________________________________________________________________________
+void TMModule::SaveResults(const Char_t* filename) const
+{
+    // Save the results array to the file 'filename'. Use numberFormat to format the array
+    // content.
+    
+    // open output file
+    FILE* fout;
+    fout = fopen(filename, "w");
+    
+    // save module result header
+    fprintf(fout, fResultHeader);
+    fprintf(fout, "\n");
+    
+    // print array content
+    for (UInt_t i = 0; i < gTAPSSize; i++)
+    {
+        fprintf(fout, "%3d  ", i);
+        for (UInt_t j = 0; j < fNresults; j++)
+        {
+            fprintf(fout, "%9.7e  ", fResults[i][j]);
+        }
+        fprintf(fout, "\n");
+    }
+    
+    fclose(fout);
+    
+    printf("Saved results of module '%s' to file '%s'.\n", GetName(), filename);
+}
+
+//______________________________________________________________________________
 void TMModule::CreateConfigDialog(TGWindow* main)
 {
     // Create the config dialog of this module and attach it to the main
@@ -184,7 +222,7 @@ void TMModule::CreateConfigDialog(TGWindow* main)
     Char_t name[256];
 
     // create dialog window
-    if (!fConfigDialog) fConfigDialog = new TGTransientFrame(0, main, 400, 300);
+    if (!fConfigDialog) fConfigDialog = new TGTransientFrame(0, main, 400, 400);
     fConfigDialog->DontCallClose();
     sprintf(name, "Configuration for module '%s'", GetName());
     fConfigDialog->SetWindowName(name);

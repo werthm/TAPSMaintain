@@ -54,7 +54,7 @@ TMModuleLoader::~TMModuleLoader()
 }
 
 //______________________________________________________________________________
-TMModule* TMModuleLoader::GetModuleWithID(UInt_t id)
+TMModule* TMModuleLoader::GetModuleWithID(UInt_t id) const
 {
     // Return the module with the ID inID. If no such module exists return 0.
     

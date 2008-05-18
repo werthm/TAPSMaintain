@@ -24,24 +24,79 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
 {
     // Constructor.
     
-    fLevel = 0.9;
+    // set module result header
+    SetResultHeader("Results of the LED Calibration module\nFormat: element id, LED Threshold Channel\n");
+    
+    
     hClone = 0;
 
     // create configuration dialog
-    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 3, 2));
-    fConfigFrame->AddFrame(new TGLabel(fConfigFrame, "LED Type:"), 
-                           new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 6, 2));
     
-
-    fConfigFrame->AddFrame(new TGLabel(fConfigFrame, "x-Axis Range:"), 
-                           new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-
-    fConfigFrame->AddFrame(new TGLabel(fConfigFrame, "Threshold Level:"), 
-                           new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-
-
-
-
+    // LED type
+    TGLabel* l = new TGLabel(fConfigFrame, "LED Type:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+    fTypeCombo = new TGComboBox(fConfigFrame);
+    fTypeCombo->Connect("Selected(Int_t)", "TMCalibLED", this, "UpdateLEDType(Int_t)");
+    fTypeCombo->Resize(200, 22);
+    fTypeCombo->AddEntry("BaF2 LG LED 1", EType_LG_LED1);
+    fTypeCombo->AddEntry("BaF2 LG LED 2", EType_LG_LED2);
+    fTypeCombo->AddEntry("Manual", EType_MANUAL);
+    fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
+    
+    // Uncut histogram name
+    l = new TGLabel(fConfigFrame, "Uncut histogram name:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+    fUncut = new TGTextEntry(fConfigFrame);
+    fConfigFrame->AddFrame(fUncut, new TGTableLayoutHints(1, 2, 1, 2, kLHintsFillX | kLHintsRight, 5, 5, 2, 2));
+    
+    
+    // LED cut histogram name
+    l = new TGLabel(fConfigFrame, "LED cut histogram name:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+    fCut = new TGTextEntry(fConfigFrame);
+    fConfigFrame->AddFrame(fCut, new TGTableLayoutHints(1, 2, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 2, 2));
+    
+    
+    // x-Axis Range
+    l = new TGLabel(fConfigFrame, "x-Axis Range:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 3, 4, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+    fAxisRangeFrame = new TGHorizontalFrame(fConfigFrame);
+    fXAxisStart = new TGTextEntry(fAxisRangeFrame, "0");
+    fXAxisEnd = new TGTextEntry(fAxisRangeFrame, "300");
+    fXAxisStart->Resize(40, 22);
+    fXAxisEnd->Resize(40, 22);
+    fAxisRangeFrame->AddFrame(fXAxisStart, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 5, 5, 2, 2));
+    fAxisRangeFrame->AddFrame(new TGLabel(fAxisRangeFrame, "to"), new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
+    fAxisRangeFrame->AddFrame(fXAxisEnd, new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
+    fConfigFrame->AddFrame(fAxisRangeFrame, new TGTableLayoutHints(1, 2, 3, 4, kLHintsLeft, 0, 0, 0, 0));
+    
+    
+    // Threshold level
+    l = new TGLabel(fConfigFrame, "Threshold Level:");
+    l->SetTextJustify(kTextRight); 
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 4, 5, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+    fThresholdLevel = new TGTextEntry(fConfigFrame, "0.999");
+    fThresholdLevel->Resize(40, 22);
+    fConfigFrame->AddFrame(fThresholdLevel, new TGTableLayoutHints(1, 2, 4, 5, kLHintsLeft, 5, 5, 2, 2));
+    
+    
+    // Batch mode
+    fBatchMode = new TGCheckButton(fConfigFrame, "Batch mode");
+    fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 5, 6, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    
+    
+    // select LED type
+    fTypeCombo->Select(EType_LG_LED1, kTRUE);
 }
 
 //______________________________________________________________________________
@@ -60,8 +115,16 @@ void TMCalibLED::Init()
     // Clear results array
     ClearResults();
     
-    // Start processing first element
-    ProcessElement(0);
+    // check if batch mode was selected
+    if (fBatchMode->IsOn())
+    {
+        for (UInt_t i = 0; i < gTAPSSize; i++) ProcessElement(i);
+    }
+    else
+    {
+        // Start processing first element
+        ProcessElement(0);
+    }
 }
 
 //______________________________________________________________________________
@@ -73,14 +136,31 @@ void TMCalibLED::Process(Int_t index)
     TH1F* h1;
     TH1F* h2;
     Double_t threshold;
- 
+    
     // load raw spectrum
-    sprintf(name, "LG/baf2-LG-%03d", index + 1);
+    sprintf(name, fUncutHName, index + 1);
     h1 = (TH1F*) fFile->Get(name);
 
     // load LED spectrum
-    sprintf(name, "LG_LED1/baf2-LG_LED1-%03d", index + 1);
+    sprintf(name, fCutHName, index + 1);
     h2 = (TH1F*) fFile->Get(name);
+    
+    // check if spectra could be loaded
+    if (!h1)
+    {
+        sprintf(name, "Spectrum '%s' was not found in ROOT file!", fUncutHName);
+        ModuleError(name);
+        Finished();
+        return;
+    }
+    
+    if (!h2)
+    {
+        sprintf(name, "Spectrum '%s' was not found in ROOT file!", fCutHName);
+        ModuleError(name);
+        Finished();
+        return;
+    }
     
     // clone spectrum
     if (hClone) delete hClone;
@@ -97,7 +177,7 @@ void TMCalibLED::Process(Int_t index)
     
     // draw spectrum
     hClone->Draw();
-    hClone->GetXaxis()->SetRangeUser(0, 60);
+    hClone->GetXaxis()->SetRangeUser(fXStart, fXEnd);
     hClone->GetYaxis()->SetRangeUser(0, 1.1);
     hClone->GetXaxis()->SetTitle("ADC Channel");
     hClone->GetYaxis()->SetTitle("LED divided by raw");
@@ -113,7 +193,7 @@ void TMCalibLED::Process(Int_t index)
     aLine.SetLineStyle(2);
     aLine.SetLineWidth(1);
     aLine.SetLineColor(kBlack);
-    aLine.DrawLine(0, fLevel, 60, fLevel);
+    aLine.DrawLine(fXStart, fLevel, fXEnd, fLevel);
 
     // mark threshold position
     aLine.SetLineStyle(1);
@@ -128,8 +208,11 @@ void TMCalibLED::Quit()
     // Save LED calibration results and quit module.
     
     // dump results
-    DumpResults("%6.2f");
+    //DumpResults("%6.2f");
     
+    // save results
+    Save();
+        
     // emit Finished() signal
     Finished();
 }
@@ -161,9 +244,48 @@ Double_t TMCalibLED::FindThreshold(TH1F* h)
 }
 
 //______________________________________________________________________________
+void TMCalibLED::UpdateLEDType(Int_t id)
+{
+    // Update the settings in the configuration dialog for the LED type the
+    // user chose in the combo box
+    
+    if (id == EType_LG_LED1)
+    {
+        fUncut->SetText("LG/baf2-LG-%03d");
+        fCut->SetText("LG_LED1/baf2-LG_LED1-%03d");
+        fUncut->SetEnabled(kFALSE);
+        fCut->SetEnabled(kFALSE);
+    }
+    else if (id == EType_LG_LED2)
+    {
+        fUncut->SetText("LG/baf2-LG-%03d");
+        fCut->SetText("LG_LED2/baf2-LG_LED2-%03d");
+        fUncut->SetEnabled(kFALSE);
+        fCut->SetEnabled(kFALSE);
+    }
+    else if (id == EType_MANUAL)
+    {
+        fUncut->SetText("");
+        fCut->SetText("");
+        fUncut->SetEnabled(kTRUE);
+        fCut->SetEnabled(kTRUE);
+    }
+}
+
+//______________________________________________________________________________
 void TMCalibLED::ReadConfig()
 {
     // Read the configuration made by the user in the config dialog.
-
+    
+    // copy histogram names
+    strcpy(fUncutHName, fUncut->GetText());
+    strcpy(fCutHName, fCut->GetText());
+    
+    // copy x-Axis range values
+    fXStart = atof(fXAxisStart->GetText());
+    fXEnd = atof(fXAxisEnd->GetText());
+    
+    // copy threshold level
+    fLevel = atof(fThresholdLevel->GetText());
 }
 

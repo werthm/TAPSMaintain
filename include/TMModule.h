@@ -45,6 +45,12 @@
 // then be read out in the ReadConfig() method that is called right     //
 // after the dialog unloading before the module execution.              //
 //                                                                      //
+//                                                                      //
+// RESULT HEADER                                                        //
+// Every module should have a result header that is saved along with    //
+// the results to file. Set this header via the SetResultHeader() meth- //
+// od.                                                                  //
+//                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -70,6 +76,7 @@ private:
     Bool_t fNeedsConfig;                        // Flag if module needs a configuration dialog
     UInt_t fNresults;                           // Number of results per element
     Double_t** fResults;                        // Result array of this module
+    Char_t fResultHeader[256];                  // Header for the result description when saving to file
 
 protected:    
     TFile* fFile;                               // ROOT input file
@@ -83,23 +90,27 @@ public:
     TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile, Bool_t needsConfig);
     virtual ~TMModule();
     
-    UInt_t GetID() { return fID; }
-    Bool_t NeedsRootInputFile() { return fNeedsTFile; }
-    Bool_t NeedsConfig() { return fNeedsConfig; }
-    UInt_t GetNresults() { return fNresults; }
-    Double_t** GetResults() { return fResults; }
-    TGCompositeFrame* GetFrame() { return fFrame; }
-    TGTransientFrame* GetConfigDialog() { return fConfigDialog; }
-    TGButton* GetConfigDialogCloseButton() { return fOk; }
+    UInt_t GetID() const { return fID; }
+    Bool_t NeedsRootInputFile() const { return fNeedsTFile; }
+    Bool_t NeedsConfig() const { return fNeedsConfig; }
+    UInt_t GetNresults() const { return fNresults; }
+    Double_t** GetResults() const { return fResults; }
+    TGCompositeFrame* GetFrame() const { return fFrame; }
+    TGTransientFrame* GetConfigDialog() const { return fConfigDialog; }
+    TGButton* GetConfigDialogCloseButton() const { return fOk; }
 
+    void SetResultHeader(const Char_t* h) { strncpy(fResultHeader, h, 256); }
     void SetResult(UInt_t element, UInt_t resultNumber, Double_t result);
     void SetRootInputFile(TFile* f) { fFile = f; }
     
     void ClearResults();
-    void DumpResults(const Char_t* numberFormat = "%9.7e");
+    void DumpResults(const Char_t* numberFormat = "%9.7e") const;
+    void SaveResults(const Char_t* filename) const;
     void CreateConfigDialog(TGWindow* main);
-
-    void Finished() { Emit("Finished()"); }         // *SIGNAL*  
+    
+    void ModuleError(const Char_t* msg) { Emit("ModuleError(const Char_t*)", msg); }    // *SIGNAL*  
+    void Save() { Emit("Save()"); }                                                     // *SIGNAL* 
+    void Finished() { Emit("Finished()"); }                                             // *SIGNAL*  
     
     virtual void Init() = 0;                        // (Re-)initalize the module
     virtual void ReadConfig() = 0;                  // Read configuration made in the config dialog 
