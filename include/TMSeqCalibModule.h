@@ -48,6 +48,7 @@ protected:
     
     TGTextButton* fPrev;                            // "Previous" button
     TGTextButton* fNext;                            // "Next" button
+    TGTextButton* fRedo;                            // "Redo" button
     TGTextButton* fQuit;                            // "Quit" button
     
     TGLabel* fInfo;                                 // Info label
@@ -68,6 +69,7 @@ public:
         fCanvas->Update();
     }
     
+    virtual void Redo() { Process(fCurrentElement); }
     virtual void Process(Int_t index) = 0;          // Process the element 'index'
     virtual void Quit() = 0;                        // Save results and quit
 

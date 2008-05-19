@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.0.1";
+static const Char_t gTAPSMaintainVersion[] = "0.1";
 
 // number of TAPS elements
 const UInt_t gTAPSSize = 384;

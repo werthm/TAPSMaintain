@@ -41,8 +41,12 @@ TMModuleLoader::TMModuleLoader(UInt_t startID)
     UInt_t numberOfModules = startID;
     
     // LED calibration module
-    TMCalibLED* mod1 = new TMCalibLED("LED Calibration", numberOfModules++);
+    TMCalibCosmics* mod1 = new TMCalibCosmics("Cosmics Calibration", numberOfModules++);
     fModules->Add(mod1);
+    
+    // LED calibration module
+    TMCalibLED* mod2 = new TMCalibLED("LED Calibration", numberOfModules++);
+    fModules->Add(mod2);
 }
 
 //______________________________________________________________________________

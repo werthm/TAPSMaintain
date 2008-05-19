@@ -28,7 +28,7 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     SetResultHeader("Results of the LED Calibration module\nFormat: element id, LED Threshold Channel\n");
     
     
-    hClone = 0;
+    fHClone = 0;
 
     // create configuration dialog
     fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 6, 2));
@@ -41,9 +41,9 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fTypeCombo = new TGComboBox(fConfigFrame);
     fTypeCombo->Connect("Selected(Int_t)", "TMCalibLED", this, "UpdateLEDType(Int_t)");
     fTypeCombo->Resize(200, 22);
-    fTypeCombo->AddEntry("BaF2 LG LED 1", EType_LG_LED1);
-    fTypeCombo->AddEntry("BaF2 LG LED 2", EType_LG_LED2);
-    fTypeCombo->AddEntry("Manual", EType_MANUAL);
+    fTypeCombo->AddEntry("BaF2 LG LED 1", ELED_Calib_Type_LG_LED1);
+    fTypeCombo->AddEntry("BaF2 LG LED 2", ELED_Calib_Type_LG_LED2);
+    fTypeCombo->AddEntry("Manual", ELED_Calib_Type_MANUAL);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
     // Uncut histogram name
@@ -96,7 +96,7 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     
     
     // select LED type
-    fTypeCombo->Select(EType_LG_LED1, kTRUE);
+    fTypeCombo->Select(ELED_Calib_Type_LG_LED1, kTRUE);
 }
 
 //______________________________________________________________________________
@@ -104,7 +104,7 @@ TMCalibLED::~TMCalibLED()
 {
     // Destructor.
 
-    if (hClone) delete hClone;
+    if (fHClone) delete fHClone;
 }
 
 //______________________________________________________________________________
@@ -125,6 +125,27 @@ void TMCalibLED::Init()
         // Start processing first element
         ProcessElement(0);
     }
+}
+
+//______________________________________________________________________________
+void TMCalibLED::Redo()
+{
+    // Redo the current elements but change x-Axis range to 
+    // look for the threshold limit in.
+
+    // backup old range values
+    Double_t oldStart = fXStart;
+    Double_t oldEnd = fXEnd;
+
+    // get user selected range
+    fXStart = fHClone->GetXaxis()->GetBinCenter(fHClone->GetXaxis()->GetFirst());
+    fXEnd = fHClone->GetXaxis()->GetBinCenter(fHClone->GetXaxis()->GetLast());
+
+    ProcessElement(fCurrentElement);
+
+    // reset old range values
+    fXStart = oldStart;
+    fXEnd = oldEnd;
 }
 
 //______________________________________________________________________________
@@ -163,24 +184,24 @@ void TMCalibLED::Process(Int_t index)
     }
     
     // clone spectrum
-    if (hClone) delete hClone;
-    hClone = (TH1F*) h2->Clone();
+    if (fHClone) delete fHClone;
+    fHClone = (TH1F*) h2->Clone();
     
     // divide LED spectrum
-    hClone->Divide(h1);
+    fHClone->Divide(h1);
     
     // find LED threshold position
-    threshold = FindThreshold(hClone);
+    threshold = FindThreshold(fHClone);
     
     // save result
     SetResult(index, 0, threshold);
     
     // draw spectrum
-    hClone->Draw();
-    hClone->GetXaxis()->SetRangeUser(fXStart, fXEnd);
-    hClone->GetYaxis()->SetRangeUser(0, 1.1);
-    hClone->GetXaxis()->SetTitle("ADC Channel");
-    hClone->GetYaxis()->SetTitle("LED divided by raw");
+    fHClone->Draw();
+    fHClone->GetXaxis()->SetRangeUser(fXStart, fXEnd);
+    fHClone->GetYaxis()->SetRangeUser(0, 1.1);
+    fHClone->GetXaxis()->SetTitle("ADC Channel");
+    fHClone->GetYaxis()->SetTitle("LED divided by raw");
     
     // draw text
     TText aText;
@@ -233,7 +254,7 @@ Double_t TMCalibLED::FindThreshold(TH1F* h)
         pos = h->GetBinCenter(i);
         content = h->GetBinContent(i);
      
-        if (pos < 0) continue;
+        if (pos < fXStart || pos > fXEnd) continue;
 
         if (content > fLevel) return (pos + posUnder) / 2.;   
         else posUnder = pos;
@@ -249,21 +270,21 @@ void TMCalibLED::UpdateLEDType(Int_t id)
     // Update the settings in the configuration dialog for the LED type the
     // user chose in the combo box
     
-    if (id == EType_LG_LED1)
+    if (id == ELED_Calib_Type_LG_LED1)
     {
         fUncut->SetText("LG/baf2-LG-%03d");
         fCut->SetText("LG_LED1/baf2-LG_LED1-%03d");
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
-    else if (id == EType_LG_LED2)
+    else if (id == ELED_Calib_Type_LG_LED2)
     {
         fUncut->SetText("LG/baf2-LG-%03d");
         fCut->SetText("LG_LED2/baf2-LG_LED2-%03d");
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
-    else if (id == EType_MANUAL)
+    else if (id == ELED_Calib_Type_MANUAL)
     {
         fUncut->SetText("");
         fCut->SetText("");
