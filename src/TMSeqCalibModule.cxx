@@ -34,6 +34,8 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
 {
     // Constructor.
     
+    Char_t cname[256];
+    
     fCurrentElement = -1;
     
     // style
@@ -53,9 +55,11 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
     //gStyle->SetPadRightMargin(0.05);
     
     // create an embedded canvas
-    fEmbCanvas = new TRootEmbeddedCanvas("ModuleEmb_Canvas", fFrame, 800, 600);
+    sprintf(cname, "%s_Emb_Canvas", name);
+    fEmbCanvas = new TRootEmbeddedCanvas(cname, fFrame, 800, 600);
     Int_t wID = fEmbCanvas->GetCanvasWindowId();
-    fCanvas = new TCanvas("ModuleCanvas", 800, 600, wID);
+    sprintf(cname, "%s_Canvas", name);
+    fCanvas = new TCanvas(cname, 800, 600, wID);
     fEmbCanvas->AdoptCanvas(fCanvas);
     
     fEmbCanvas->MapSubwindows();

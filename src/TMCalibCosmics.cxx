@@ -30,6 +30,12 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     // create configuration dialog
     fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 4, 2));
     
+    // create members
+    fHClone = 0;
+    fPedFunc = new TF1("PedFunc", "gaus", 0 , 200);
+    fPeakFunc = new TF1("PeakFunc", "gaus", 0, 1500);
+    fPedFunc->SetLineColor(kRed);
+    
     // Detector type
     TGLabel* l = new TGLabel(fConfigFrame, "Detector Type:");
     l->SetTextJustify(kTextRight);
@@ -62,7 +68,7 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     
     fAxisRangeFrame = new TGHorizontalFrame(fConfigFrame);
     fXAxisStart = new TGTextEntry(fAxisRangeFrame, "0");
-    fXAxisEnd = new TGTextEntry(fAxisRangeFrame, "300");
+    fXAxisEnd = new TGTextEntry(fAxisRangeFrame, "800");
     fXAxisStart->Resize(40, 22);
     fXAxisEnd->Resize(40, 22);
     fAxisRangeFrame->AddFrame(fXAxisStart, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 5, 5, 2, 2));
@@ -75,10 +81,12 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fBatchMode = new TGCheckButton(fConfigFrame, "Batch mode");
     fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
-    
     // select detector type
     fTypeCombo->Select(ECosmics_Calib_Type_BAF2_LG, kTRUE);
 
+    
+    // divide canvas
+    fCanvas->Divide(2, 1);
 }
 
 //______________________________________________________________________________
@@ -86,6 +94,7 @@ TMCalibCosmics::~TMCalibCosmics()
 {
     // Destructor.
 
+    if (fHClone) delete fHClone;
 }
 
 //______________________________________________________________________________
@@ -139,6 +148,41 @@ void TMCalibCosmics::Process(Int_t index)
         return;
     }
     
+    
+    // ----------------------------- pedestal fitting -----------------------------
+    Double_t maxPos = h1->GetXaxis()->GetBinCenter(h1->GetMaximumBin());
+    fPedFunc->SetParameters(1, maxPos, 0.1);
+    fPedFunc->SetRange(maxPos - 4, maxPos + 4);
+    h1->Fit("PedFunc", "RLL0");
+    maxPos = fPedFunc->GetParameter(1);
+    
+    fCanvas->cd(1)->SetLogy();
+    h1->Draw();
+    fPedFunc->Draw("same");
+    h1->GetXaxis()->SetRangeUser(maxPos - 7, maxPos + 7);
+    h1->GetXaxis()->SetTitle("ADC Channel");
+    h1->GetYaxis()->SetTitle("Counts");
+    
+    
+    // ----------------------------- cosmic peak fitting -----------------------------
+    // clone spectrum
+    if (fHClone) delete fHClone;
+    fHClone = (TH1F*) h1->Clone();
+    
+    // cosmics peak pad
+    fCanvas->cd(2)->SetLogy();
+    fHClone->Draw();
+    fHClone->GetXaxis()->SetRangeUser(fXStart, fXEnd);
+    fHClone->GetXaxis()->SetTitle("ADC Channel");
+    fHClone->GetYaxis()->SetTitle("Counts");
+    
+    
+    
+    
+    
+    
+    
+
     // clone spectrum
     //if (fHClone) delete fHClone;
     //fHClone = (TH1F*) h2->Clone();
@@ -147,8 +191,6 @@ void TMCalibCosmics::Process(Int_t index)
     //SetResult(index, 0, threshold);
     
     // draw spectrum
-    h1->Draw();
-    
     /*
     fHClone->GetXaxis()->SetRangeUser(fXStart, fXEnd);
     fHClone->GetYaxis()->SetRangeUser(0, 1.1);

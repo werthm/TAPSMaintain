@@ -64,6 +64,7 @@ public:
     void ProcessNextElement();
     void ProcessElement(Int_t index)
     {
+        fCanvas->cd();
         fCurrentElement = index;
         Process(index);
         fCanvas->Update();

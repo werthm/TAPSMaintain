@@ -17,6 +17,7 @@
 #define TAPSCalib_TMCalibCosmics
 
 #include "TH1.h"
+#include "TF1.h"
 #include "TGTableLayout.h"
 #include "TGComboBox.h"
 #include "TGTextEntry.h"
@@ -41,6 +42,10 @@ private:
     Char_t fHName[256];                         // name of the ADC spectra
     Double_t fXStart;                           // x-Axis start
     Double_t fXEnd;                             // x-Axis end
+    
+    TH1F* fHClone;                              // histogram pointer used for cloning
+    TF1* fPedFunc;                              // function used for pedestal fitting
+    TF1* fPeakFunc;                             // function used for cosmic peak fitting
     
     // Config dialog elements
     TGComboBox* fTypeCombo;                     // LED type selection combo box
