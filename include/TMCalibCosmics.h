@@ -40,19 +40,21 @@ class TMCalibCosmics : public TMSeqCalibModule
 private:
     // Configuration parameters
     Char_t fHName[256];                         // name of the ADC spectra
-    Double_t fXStart;                           // x-Axis start
-    Double_t fXEnd;                             // x-Axis end
+    Double_t fCStart;                           // Cosmic peak fit start
+    Double_t fCEnd;                             // Cosmic peak fit end
     
     TH1F* fHClone;                              // histogram pointer used for cloning
     TF1* fPedFunc;                              // function used for pedestal fitting
     TF1* fPeakFunc;                             // function used for cosmic peak fitting
+    TF1* fBgFunc;                               // cosmics peak background function
+    TF1* fTotalFunc;                            // total cosmic peak function
     
     // Config dialog elements
     TGComboBox* fTypeCombo;                     // LED type selection combo box
     TGTextEntry* fHNameEntry;                   // name of the ADC spectra
-    TGHorizontalFrame* fAxisRangeFrame;         // frame for the x-Axis range GUI elements
-    TGTextEntry* fXAxisStart;                   // start value of the x-Axis
-    TGTextEntry* fXAxisEnd;                     // end value of the x-Axis
+    TGHorizontalFrame* fRangeFrame;             // frame for the range GUI elements
+    TGTextEntry* fCStartEntry;                  // start value of fit range
+    TGTextEntry* fCEndEntry;                    // end value of fit range
     TGCheckButton* fBatchMode;                  // batch mode check box
     
 public:
