@@ -51,7 +51,8 @@ public:
     void ShowModuleError(const Char_t* msg) const;
     void SaveModuleResults();
     
-    void SetConfigAndStartModule();
+    void SetModuleConfigAndStart();
+    void AbortModuleConfig();
     Bool_t OpenInputFile(const char* inFile);
     void SelectAndOpenFile();
 

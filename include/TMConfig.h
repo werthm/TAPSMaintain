@@ -20,9 +20,25 @@
 // TAPSMaintain version
 static const Char_t gTAPSMaintainVersion[] = "0.1";
 
-// number of TAPS elements
-const UInt_t gTAPSSize = 384;
+// number of TAPS detector elements
+const UInt_t gMaxSize   = 384;
+const UInt_t gBaF2Size  = 384;
+const UInt_t gPbWO4Size = 24;
+const UInt_t gVetoSize  = 384;
 
+// energy loss of minimal ionizing particles in the TAPS detectors [MeV]
+const Double_t gTAPS_MIP_Loss_BaF2  = 37.7;
+const Double_t gTAPS_MIP_Loss_PbWO4 = 22.6;   // ?
+const Double_t gTAPS_MIP_Loss_Veto  = 5;      // ?
+
+// define TAPS detectors
+enum ETAPSDetector {
+    kNo_Detector,
+    kBaF2_Detector,
+    kPbWO4_Detector,
+    kVeto_Detector    
+};
+typedef ETAPSDetector TAPSDetector_t;
 
 #endif
 

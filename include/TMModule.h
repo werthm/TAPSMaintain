@@ -49,7 +49,7 @@
 // RESULT HEADER                                                        //
 // Every module should have a result header that is saved along with    //
 // the results to file. Set this header via the SetResultHeader() meth- //
-// od.                                                                  //
+// od. Use # to comment each line of this header.                       //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -84,6 +84,7 @@ protected:
     TGTransientFrame* fConfigDialog;            // Configuration dialog frame of this module
     TGCompositeFrame* fConfigFrame;             // Individual module configuration frame
     TGTextButton* fOk;                          // OK button of the configuration dialog
+    TGTextButton* fCancel;                      // Cancel button of the configuration dialog
 
 public:
     TMModule();
@@ -97,7 +98,7 @@ public:
     Double_t** GetResults() const { return fResults; }
     TGCompositeFrame* GetFrame() const { return fFrame; }
     TGTransientFrame* GetConfigDialog() const { return fConfigDialog; }
-    TGButton* GetConfigDialogCloseButton() const { return fOk; }
+    const Char_t* GetResultHeader() const { return fResultHeader; }
 
     void SetResultHeader(const Char_t* h) { strncpy(fResultHeader, h, 256); }
     void SetResult(UInt_t element, UInt_t resultNumber, Double_t result);
@@ -105,9 +106,11 @@ public:
     
     void ClearResults();
     void DumpResults(const Char_t* numberFormat = "%9.7e") const;
-    void SaveResults(const Char_t* filename) const;
+    virtual void SaveResults(const Char_t* filename);
     void CreateConfigDialog(TGWindow* main);
     
+    void ConfigDialogOk() { Emit("ConfigDialogOk()"); }                                 // *SIGNAL*
+    void ConfigDialogCancel() { Emit("ConfigDialogCancel()"); }                         // *SIGNAL*
     void ModuleError(const Char_t* msg) { Emit("ModuleError(const Char_t*)", msg); }    // *SIGNAL*  
     void Save() { Emit("Save()"); }                                                     // *SIGNAL* 
     void Finished() { Emit("Finished()"); }                                             // *SIGNAL*  

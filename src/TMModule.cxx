@@ -49,7 +49,7 @@
 // RESULT HEADER                                                        //
 // Every module should have a result header that is saved along with    //
 // the results to file. Set this header via the SetResultHeader() meth- //
-// od.                                                                  //
+// od. Use # to comment each line of this header.                       //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -76,6 +76,7 @@ TMModule::TMModule()
     fConfigDialog = 0;
     fConfigFrame = 0;
     fOk = 0;
+    fCancel = 0;
 }
 
 //______________________________________________________________________________
@@ -92,8 +93,8 @@ TMModule::TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t need
     fResultHeader[0] = '\0';
 
     // create result array
-    fResults = new Double_t*[gTAPSSize];
-    for (UInt_t i = 0; i < gTAPSSize; i++) fResults[i] = new Double_t[fNresults];
+    fResults = new Double_t*[gMaxSize];
+    for (UInt_t i = 0; i < gMaxSize; i++) fResults[i] = new Double_t[fNresults];
     
     // create frame
     fFrame = new TGCompositeFrame(0, 800, 600, kVerticalFrame);
@@ -108,6 +109,7 @@ TMModule::TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t need
    
     fConfigDialog = 0;
     fOk = 0;
+    fCancel = 0;
 
     // create config frame so subclasses can add their stuff to it
     if (fNeedsConfig) fConfigFrame = new TGCompositeFrame(0, 200, 200, kVerticalFrame);
@@ -121,7 +123,7 @@ TMModule::~TMModule()
 
     // delete results array
     if (fResults) {
-        for (UInt_t i = 0; i < gTAPSSize; i++) delete [] fResults[i];
+        for (UInt_t i = 0; i < gMaxSize; i++) delete [] fResults[i];
     }
     
     // delete frame
@@ -137,7 +139,7 @@ void TMModule::SetResult(UInt_t element, UInt_t resultNumber, Double_t result)
     // Set the result #resultNumber of the element 'element' to 'result'.
     
     // check bounds
-    if (element < 0 || element >= gTAPSSize) return;
+    if (element < 0 || element >= gMaxSize) return;
     if (resultNumber < 0 || resultNumber >= fNresults) return;
     
     // set result
@@ -149,7 +151,7 @@ void TMModule::ClearResults()
 {
     // Clear the results array.
     
-    for (UInt_t i = 0; i < gTAPSSize; i++)
+    for (UInt_t i = 0; i < gMaxSize; i++)
     {
         for (UInt_t j = 0; j < fNresults; j++)
         {
@@ -170,12 +172,12 @@ void TMModule::DumpResults(const Char_t* numberFormat) const
     printf("\nDumping result array of module '%s'\n\n", GetName());
     
     // print array content
-    for (UInt_t i = 0; i < gTAPSSize; i++)
+    for (UInt_t i = 0; i < gMaxSize; i++)
     {
         printf(" %3d ", i);
         for (UInt_t j = 0; j < fNresults; j++)
         {
-            printf(numberFormat, fResults[i][j]);
+            printf(format, fResults[i][j]);
         }
         printf("\n");
     }
@@ -184,7 +186,7 @@ void TMModule::DumpResults(const Char_t* numberFormat) const
 }
 
 //______________________________________________________________________________
-void TMModule::SaveResults(const Char_t* filename) const
+void TMModule::SaveResults(const Char_t* filename)
 {
     // Save the results array to the file 'filename'. Use numberFormat to format the array
     // content.
@@ -198,12 +200,12 @@ void TMModule::SaveResults(const Char_t* filename) const
     fprintf(fout, "\n");
     
     // print array content
-    for (UInt_t i = 0; i < gTAPSSize; i++)
+    for (UInt_t i = 0; i < gMaxSize; i++)
     {
-        fprintf(fout, "%3d  ", i);
+        fprintf(fout, " %3d ", i);
         for (UInt_t j = 0; j < fNresults; j++)
         {
-            fprintf(fout, "%9.7e  ", fResults[i][j]);
+            fprintf(fout, " %9.7e ", fResults[i][j]);
         }
         fprintf(fout, "\n");
     }
@@ -232,7 +234,16 @@ void TMModule::CreateConfigDialog(TGWindow* main)
     fConfigDialog->AddFrame(fConfigFrame, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 10, 10, 10, 10));
 
     // add Ok button
-    if (!fOk) fOk = new TGTextButton(fConfigDialog, "    Ok    ");
-    fConfigDialog->AddFrame(fOk, new TGLayoutHints(kLHintsBottom | kLHintsCenterX, 5, 5, 5, 5));
+    TGHorizontalFrame* buttonFrame = new TGHorizontalFrame(fConfigDialog);
+    
+    if (!fOk) fOk = new TGTextButton(buttonFrame, "     Ok     ");
+    fOk->Connect("Clicked()", "TMModule", this, "ConfigDialogOk()");
+    buttonFrame->AddFrame(fOk, new TGLayoutHints(kLHintsCenterX, 5, 5, 5, 5));
+    
+    if (!fCancel) fCancel = new TGTextButton(buttonFrame, "  Cancel  ");
+    fCancel->Connect("Clicked()", "TMModule", this, "ConfigDialogCancel()");
+    buttonFrame->AddFrame(fCancel, new TGLayoutHints(kLHintsCenterX, 5, 5, 5, 5));
+    
+    fConfigDialog->AddFrame(buttonFrame, new TGLayoutHints(kLHintsBottom | kLHintsCenterX, 0, 0, 0, 0));
 }
 

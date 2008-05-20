@@ -41,6 +41,7 @@ class TMSeqCalibModule : public TMModule
 
 protected:
     Int_t fCurrentElement;                          // index of the current element
+    TAPSDetector_t fDetID;                          // TAPS detector ID
     
     TRootEmbeddedCanvas* fEmbCanvas;                // the embedded canvas
     TCanvas* fCanvas;                               // the canvas
@@ -52,6 +53,8 @@ protected:
     TGTextButton* fQuit;                            // "Quit" button
     
     TGLabel* fInfo;                                 // Info label
+    
+    Int_t GetCurrentDetectorSize() const;
 
 public:
     TMSeqCalibModule() : TMModule() { }

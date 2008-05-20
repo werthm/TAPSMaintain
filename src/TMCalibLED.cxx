@@ -25,7 +25,8 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     // Constructor.
     
     // set module result header
-    SetResultHeader("Results of the LED Calibration module\nFormat: element id, LED Threshold Channel\n");
+    SetResultHeader("# Results of the LED Calibration module\n"
+                    "# Format: element id, LED Threshold Channel\n");
     
     
     fHClone = 0;
@@ -118,7 +119,7 @@ void TMCalibLED::Init()
     // check if batch mode was selected
     if (fBatchMode->IsOn())
     {
-        for (UInt_t i = 0; i < gTAPSSize; i++) ProcessElement(i);
+        for (Int_t i = 0; i < GetCurrentDetectorSize(); i++) ProcessElement(i);
     }
     else
     {
@@ -297,6 +298,12 @@ void TMCalibLED::UpdateLEDType(Int_t id)
 void TMCalibLED::ReadConfig()
 {
     // Read the configuration made by the user in the config dialog.
+    
+    // set detector id
+    Int_t type = fTypeCombo->GetSelected();
+    if (type == ELED_Calib_Type_LG_LED1)      fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_LG_LED2) fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_MANUAL)  fDetID = kBaF2_Detector;
     
     // copy histogram names
     strcpy(fUncutHName, fUncut->GetText());

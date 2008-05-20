@@ -21,6 +21,7 @@
 #include "TGTableLayout.h"
 #include "TGComboBox.h"
 #include "TGTextEntry.h"
+#include "TLine.h"
 
 #include "TMSeqCalibModule.h"
 
@@ -29,8 +30,7 @@ enum {
     ECosmics_Calib_Type_BAF2_LG,
     ECosmics_Calib_Type_BAF2_SG,
     ECosmics_Calib_Type_PBWO4_LG,
-    ECosmics_Calib_Type_VETO,
-    ECosmics_Calib_Type_MANUAL
+    ECosmics_Calib_Type_VETO
 };
 
 
@@ -67,6 +67,7 @@ public:
     virtual void Process(Int_t index);
     virtual void Redo();
     virtual void Quit();
+    virtual void SaveResults(const Char_t* filename);
     
     void UpdateDetectorType(Int_t id);
 

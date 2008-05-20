@@ -29,7 +29,8 @@ ClassImp(TMSeqCalibModule)
 
 
 //______________________________________________________________________________
-TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile, Bool_t needsConfig)
+TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile, 
+                                   Bool_t needsConfig)
     : TMModule(name, id, inNresults, needsROOTInputFile, needsConfig)
 {
     // Constructor.
@@ -37,6 +38,7 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
     Char_t cname[256];
     
     fCurrentElement = -1;
+    fDetID = kNo_Detector;
     
     // style
     gStyle->SetFrameBorderMode(0);
@@ -102,6 +104,17 @@ TMSeqCalibModule::~TMSeqCalibModule()
     
 }
 
+//______________________________________________________________________________
+Int_t TMSeqCalibModule::GetCurrentDetectorSize() const
+{
+    // Return the number of elements in the current detector (check fDetID).
+
+    if (fDetID == kBaF2_Detector) return gBaF2Size;
+    else if (fDetID == kPbWO4_Detector) return gPbWO4Size;
+    else if (fDetID == kVeto_Detector) return gVetoSize;
+    else return 0;
+}
+
 //______________________________________________________________________________ 
 void TMSeqCalibModule::ShowCanvasInfo(Int_t event, Int_t px, Int_t py, TObject *selected)
 {
@@ -116,7 +129,7 @@ void TMSeqCalibModule::ProcessNextElement()
     // Process the next element.
     
     // process the next element if index is within bounds
-    if (fCurrentElement < (Int_t)gTAPSSize - 1) ProcessElement(fCurrentElement + 1);
+    if (fCurrentElement < GetCurrentDetectorSize() - 1) ProcessElement(fCurrentElement + 1);
 }
 
 //______________________________________________________________________________

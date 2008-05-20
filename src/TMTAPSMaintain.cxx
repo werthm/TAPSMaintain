@@ -90,7 +90,10 @@ void TMTAPSMaintain::Start()
             m->CreateConfigDialog(fMainWindow);
 
             // make connection to start the module after dialog unloading
-            m->GetConfigDialogCloseButton()->Connect("Clicked()", "TMTAPSMaintain", this, "SetConfigAndStartModule()");
+            m->Connect("ConfigDialogOk()", "TMTAPSMaintain", this, "SetModuleConfigAndStart()");
+            
+            // make connection to cancel module loading 
+            m->Connect("ConfigDialogCancel()", "TMTAPSMaintain", this, "AbortModuleConfig()");
         }
         
         printf("Module '%s' (ID %d) loaded.\n", name, id);
@@ -180,7 +183,7 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
 }
 
 //______________________________________________________________________________ 
-void TMTAPSMaintain::SetConfigAndStartModule()
+void TMTAPSMaintain::SetModuleConfigAndStart()
 {
     // Unload the configuration dialog of a module and start it.
 
@@ -199,6 +202,21 @@ void TMTAPSMaintain::SetConfigAndStartModule()
                        
     // start module
     fActiveModule->Init();
+}
+
+//______________________________________________________________________________ 
+void TMTAPSMaintain::AbortModuleConfig()
+{
+    // Unload the configuration dialog and cancel module loading.
+
+    // unload the configuration dialog
+    fActiveModule->GetConfigDialog()->UnmapWindow();
+    fActiveModule->GetConfigDialog()->ReparentWindow(0);
+    
+    printf("Aborting module '%s'\n", fActiveModule->GetName());
+    
+    // unset active modules
+    fActiveModule = 0;
 }
 
 //______________________________________________________________________________ 
