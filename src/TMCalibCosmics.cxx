@@ -38,6 +38,7 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fBgFunc = new TF1("BgFunc", "expo", 0, 1500);
     fTotalFunc = new TF1("TotalFunc", "gaus(0)+expo(3)", 0, 1500);
     fPedFunc->SetLineColor(kRed);
+    fBgFunc->SetLineColor(kGreen);
     fTotalFunc->SetLineColor(kRed);
     
     // Detector type
@@ -64,16 +65,17 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fConfigFrame->AddFrame(fHNameEntry, new TGTableLayoutHints(1, 2, 1, 2, kLHintsFillX | kLHintsRight, 5, 5, 2, 2));
     
     
-    // x-Axis Range
+    // Fit Range
     l = new TGLabel(fConfigFrame, "Fit Range:");
     l->SetTextJustify(kTextRight);
     fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
     fRangeFrame = new TGHorizontalFrame(fConfigFrame);
-    fCStartEntry = new TGTextEntry(fRangeFrame, "0");
-    fCEndEntry = new TGTextEntry(fRangeFrame, "600");
+    fCStartEntry = new TGTextEntry(fRangeFrame, "20");
+    fCEndEntry = new TGTextEntry(fRangeFrame, "700");
     fCStartEntry->Resize(40, 22);
     fCEndEntry->Resize(40, 22);
+    fRangeFrame->AddFrame(new TGLabel(fRangeFrame, "Ped. + "), new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
     fRangeFrame->AddFrame(fCStartEntry, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 5, 5, 2, 2));
     fRangeFrame->AddFrame(new TGLabel(fRangeFrame, "to"), new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
     fRangeFrame->AddFrame(fCEndEntry, new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
@@ -181,8 +183,8 @@ void TMCalibCosmics::Process(Int_t index)
     fHClone = (TH1F*) h1->Clone();
     
     // fit bg
+    fBgFunc->SetParameters(0, 0);
     fBgFunc->SetRange(pedPos + 20, 1000);
-    //fBgFunc->SetParameters(4.54372, -5.46387e-03);
     fHClone->Fit("BgFunc", "RB0Q");
     
     // fit peak
@@ -191,22 +193,24 @@ void TMCalibCosmics::Process(Int_t index)
     Double_t peakHeight = fHClone->GetBinContent(fHClone->GetMaximumBin());
     fHClone->GetXaxis()->SetRangeUser(pedPos, 1000);
     
-    fPeakFunc->SetRange(peakPos - 100, peakPos + 200);
+    fPeakFunc->SetRange(peakPos - 200, peakPos + 200);
     fPeakFunc->SetParameters(peakHeight, peakPos, 10);
     fHClone->Fit("PeakFunc", "RB0Q");
     
     // fit both
     fTotalFunc->SetParameters(fPeakFunc->GetParameter(0), fPeakFunc->GetParameter(1), fPeakFunc->GetParameter(2),
                               fBgFunc->GetParameter(0), fBgFunc->GetParameter(1));
-    fTotalFunc->SetRange(pedPos + 20, fCEnd);
-    fHClone->Fit("TotalFunc", "RB0Q"); 
-    peakPos = fTotalFunc->GetParameter(1);                         
+    fTotalFunc->SetRange(pedPos + fCStart, fCEnd);
+    fHClone->Fit("TotalFunc", "RBQ0"); 
+    peakPos = fTotalFunc->GetParameter(1);  
+    fBgFunc->SetParameters(fTotalFunc->GetParameter(3), fTotalFunc->GetParameter(4));
     
     // cosmics peak pad
     fCanvas->cd(2)->SetLogy();
     fHClone->Draw();
     fTotalFunc->Draw("same");
-    fHClone->GetXaxis()->SetRangeUser(fCStart, fCEnd);
+    fBgFunc->Draw("same");
+    fHClone->GetXaxis()->SetRangeUser(0, fCEnd);
     fHClone->GetXaxis()->SetTitle("ADC Channel");
     fHClone->GetYaxis()->SetTitle("Counts");
     
