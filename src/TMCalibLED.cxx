@@ -190,7 +190,9 @@ void TMCalibLED::Process(Int_t index)
     
     // divide LED spectrum
     fHClone->Divide(h1);
-    
+    fHClone->Rebin(2);
+    fHClone->Scale(1./2.);
+
     // find LED threshold position
     threshold = FindThreshold(fHClone);
     
@@ -224,6 +226,33 @@ void TMCalibLED::Process(Int_t index)
     aLine.DrawLine(threshold, 0, threshold, 1);
 }
 
+//______________________________________________________________________________
+void TMCalibLED::SaveResults(const Char_t* filename)
+{
+    // Save the results array to the file 'filename'. Use numberFormat to format the array
+    // content. Overwritten method of class TMModule to customize number output format
+    
+    // open output file
+    FILE* fout;
+    fout = fopen(filename, "w");
+    
+    // save module result header
+    fprintf(fout, GetResultHeader());
+    fprintf(fout, "\n");
+    
+    Double_t** results = GetResults();
+    
+    // print array content
+    for (Int_t i = 0; i < GetCurrentDetectorSize(); i++)
+    {
+        fprintf(fout, "%3d  %7.3f\n", i, results[i][0]); 
+    }
+    
+    fclose(fout);
+    
+    printf("Saved results of module '%s' to file '%s'.\n", GetName(), filename);
+}
+ 
 //______________________________________________________________________________
 void TMCalibLED::Quit()
 {

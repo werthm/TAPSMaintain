@@ -68,6 +68,7 @@ public:
     virtual void Process(Int_t index);
     virtual void Redo();
     virtual void Quit();
+    virtual void SaveResults(const Char_t* filename);
     
     void UpdateLEDType(Int_t id);
 
