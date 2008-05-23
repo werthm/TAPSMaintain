@@ -29,6 +29,7 @@
 enum {
     ELED_Calib_Type_LG_LED1,
     ELED_Calib_Type_LG_LED2,
+    ELED_Calib_Type_PbWO4_LED,
     ELED_Calib_Type_MANUAL
 };
 

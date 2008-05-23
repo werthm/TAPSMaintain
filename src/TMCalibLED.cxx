@@ -44,6 +44,7 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fTypeCombo->Resize(200, 22);
     fTypeCombo->AddEntry("BaF2 LG LED 1", ELED_Calib_Type_LG_LED1);
     fTypeCombo->AddEntry("BaF2 LG LED 2", ELED_Calib_Type_LG_LED2);
+    fTypeCombo->AddEntry("PbWO4 LED", ELED_Calib_Type_PbWO4_LED);
     fTypeCombo->AddEntry("Manual", ELED_Calib_Type_MANUAL);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
@@ -314,7 +315,14 @@ void TMCalibLED::UpdateLEDType(Int_t id)
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
-    else if (id == ELED_Calib_Type_MANUAL)
+    else if (id == ELED_Calib_Type_PbWO4_LED)
+    {
+        fUncut->SetText("PWO-LG/pwo-LG-%03d");
+        fCut->SetText("PWO-LG-TIME/pwo-LG-TIME-%03d");
+        fUncut->SetEnabled(kFALSE);
+        fCut->SetEnabled(kFALSE);
+    }
+     else if (id == ELED_Calib_Type_MANUAL)
     {
         fUncut->SetText("");
         fCut->SetText("");
@@ -330,9 +338,10 @@ void TMCalibLED::ReadConfig()
     
     // set detector id
     Int_t type = fTypeCombo->GetSelected();
-    if (type == ELED_Calib_Type_LG_LED1)      fDetID = kBaF2_Detector;
-    else if (type == ELED_Calib_Type_LG_LED2) fDetID = kBaF2_Detector;
-    else if (type == ELED_Calib_Type_MANUAL)  fDetID = kBaF2_Detector;
+    if (type == ELED_Calib_Type_LG_LED1)        fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_LG_LED2)   fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_PbWO4_LED) fDetID = kPbWO4_Detector;
+    else if (type == ELED_Calib_Type_MANUAL)    fDetID = kBaF2_Detector;
     
     // copy histogram names
     strcpy(fUncutHName, fUncut->GetText());
