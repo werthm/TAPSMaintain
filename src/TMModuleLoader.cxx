@@ -41,7 +41,7 @@ TMModuleLoader::TMModuleLoader(UInt_t startID)
     UInt_t numberOfModules = startID;
     
     // TAPS database module
-    TMDBModule* m1 = new TMDBModule("MySQL database", numberOfModules++);
+    TMDBModule* m1 = new TMDBModule("TAPS database", numberOfModules++);
     fModules->Add(m1);
     
     // LED calibration module
