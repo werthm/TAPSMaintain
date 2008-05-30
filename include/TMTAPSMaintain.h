@@ -42,7 +42,7 @@ public:
     TMTAPSMaintain();
     virtual ~TMTAPSMaintain();
     
-    void Start();
+    Int_t Start();
     void Quit();
     void HandleMenu(Int_t id);
     

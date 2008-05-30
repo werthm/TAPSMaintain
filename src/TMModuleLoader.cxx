@@ -40,13 +40,17 @@ TMModuleLoader::TMModuleLoader(UInt_t startID)
     // ---------------------------- Load modules ----------------------------
     UInt_t numberOfModules = startID;
     
-    // LED calibration module
-    TMCalibCosmics* mod1 = new TMCalibCosmics("Cosmics Calibration", numberOfModules++);
-    fModules->Add(mod1);
+    // TAPS database module
+    TMDBModule* m1 = new TMDBModule("MySQL database", numberOfModules++);
+    fModules->Add(m1);
     
     // LED calibration module
-    TMCalibLED* mod2 = new TMCalibLED("LED Calibration", numberOfModules++);
-    fModules->Add(mod2);
+    TMCalibCosmics* m2 = new TMCalibCosmics("Cosmics Calibration", numberOfModules++);
+    fModules->Add(m2);
+    
+    // LED calibration module
+    TMCalibLED* m3 = new TMCalibLED("LED Calibration", numberOfModules++);
+    fModules->Add(m3);
 }
 
 //______________________________________________________________________________

@@ -32,6 +32,7 @@
 #pragma link C++ class TMSeqCalibModule+; 
 
 // Modules
+#pragma link C++ class TMDBModule+; 
 #pragma link C++ class TMCalibCosmics+; 
 #pragma link C++ class TMCalibLED+; 
 

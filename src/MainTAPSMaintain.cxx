@@ -26,7 +26,9 @@ int main(int argc, char* argv[])
     TApplication app("TAPSMaintain", 0, 0);
 
     TMTAPSMaintain tm;
-    tm.Start();
+    
+    // try to start TAPSMaintain
+    if (tm.Start()) return -1;
     
     // open ROOT file if specified
     if (argc == 2)

@@ -43,9 +43,12 @@ TMTAPSMaintain::~TMTAPSMaintain()
 }
 
 //______________________________________________________________________________
-void TMTAPSMaintain::Start()
+Int_t TMTAPSMaintain::Start()
 {
     // Start the application.
+    
+    // check for window server
+    if (!gClient) return -1;
     
     printf("\nStarting up TAPSMaintain Version %s ...\n\n", gTAPSMaintainVersion);
 
@@ -101,6 +104,8 @@ void TMTAPSMaintain::Start()
     
     fMainWindow->Show();
     printf("\nReady!\n");
+    
+    return 0;
 }
 
 //______________________________________________________________________________ 

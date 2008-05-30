@@ -36,6 +36,11 @@
 //                     dialog was displayed                             //
 //                                                                      //
 //                                                                      //
+// GUI                                                                  //
+// Add the module's GUI elements to the frame 'fFrame' which is the     //
+// main frame of every class derived from TMModule.                     //
+//                                                                      //
+//                                                                      //
 // CONFIGURATION DIALOG                                                 //
 // A module can have a configuration dialog that is displayed before    //
 // every execution of the module. To add such a dialog the needsConfig  //
