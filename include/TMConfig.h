@@ -23,7 +23,7 @@ static const Char_t gTAPSMaintainVersion[] = "0.1beta";
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://localhost/taps";
 static const Char_t gTAPS_DB_User[] = "root";
-static const Char_t gTAPS_DB_Passwd[] = "";
+static const Char_t gTAPS_DB_Passwd[] = "root";
 
 // number of TAPS detector elements
 const UInt_t gMaxSize   = 384;

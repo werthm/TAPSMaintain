@@ -86,6 +86,12 @@ Int_t TMTAPSMaintain::Start()
         // connect ModuleError() signal
         m->Connect("ModuleError(const Char_t*)", "TMTAPSMaintain", this, "ShowModuleError(const Char_t*)");
 
+        // connect ModuleInfo() signal
+        m->Connect("ModuleInfo(const Char_t*)", "TMTAPSMaintain", this, "ShowModuleInfo(const Char_t*)");
+        
+        // connect ModuleQuestion() signal
+        m->Connect("ModuleQuestion(const Char_t*)", "TMTAPSMaintain", this, "ShowModuleQuestion(const Char_t*)");
+
         // connect ShowFileDialog() signal
         m->Connect("ShowFileDialog(EFileDialogMode)", "TMTAPSMaintain", this, "ShowFileDialogForModule(EFileDialogMode)");
 
@@ -125,7 +131,7 @@ void TMTAPSMaintain::Quit()
                      kMBYes | kMBNo, &retval, kFitWidth | kFitHeight, kTextLeft);
     
         // abort quiting
-        if (retval == 2) return;
+        if (retval == kMBNo) return;
     }
     
     if (fMainWindow) delete fMainWindow;
@@ -248,7 +254,7 @@ void TMTAPSMaintain::StopModule(Bool_t forced)
                      kMBYes | kMBNo, &retval, kFitWidth | kFitHeight, kTextLeft);
         
             // abort module stopping
-            if (retval == 2) return;
+            if (retval == kMBNo) return;
         }
         
         printf("Stopping module '%s'\n", fActiveModule->GetName());
@@ -367,15 +373,43 @@ void TMTAPSMaintain::SelectAndOpenFile()
 }
 
 //______________________________________________________________________________ 
-void TMTAPSMaintain::ShowModuleError(const Char_t* msg) const
+void TMTAPSMaintain::ShowModuleMessage(const Char_t* msg, EMsgBoxIcon icon) const
 {
     // Show the error message emitted by a module.
     
     Int_t retval;
-    new TGMsgBox(gClient->GetRoot(), fMainWindow, "Module Error", msg, 
-                 kMBIconStop, kMBOk, &retval, kFitWidth | kFitHeight, kTextLeft);
+    Char_t title[256];
+   
+    // check if a module is active
+    if (!fActiveModule) return;
+  
+    // set dialog title
+    if (icon == kMBIconStop) strcpy(title, "Module Error");
+    if (icon == kMBIconAsterisk) strcpy(title, "Module Information");
+    else strcpy(title, "Module Message");
+
+    new TGMsgBox(gClient->GetRoot(), fMainWindow, title, msg, 
+                 icon, kMBOk, &retval, kFitWidth | kFitHeight, kTextLeft);
 }
 
+//______________________________________________________________________________ 
+void TMTAPSMaintain::ShowModuleQuestion(const Char_t* question) const
+{
+    // Show a question dialog for a module and pass the answer back
+    // to the module.
+    
+    // check if a module is active
+    if (!fActiveModule) return;
+   
+    // show question
+    Int_t retval;
+    new TGMsgBox(gClient->GetRoot(), fMainWindow, "Module question", question, kMBIconQuestion, 
+                 kMBYes | kMBNo, &retval, kFitWidth | kFitHeight, kTextLeft);
+    
+    // set return value in module
+    fActiveModule->SetDialogReturnValue(retval);
+}
+ 
 //______________________________________________________________________________ 
 void TMTAPSMaintain::ShowFileDialogForModule(EFileDialogMode type)
 {
@@ -386,7 +420,7 @@ void TMTAPSMaintain::ShowFileDialogForModule(EFileDialogMode type)
     if (!fActiveModule) return;
     
     // configure the file choose dialog
-    const char* kFileExt[] = {"All files", "*.*", 0, 0};
+    const char* kFileExt[] = {"All files", "*", 0, 0};
     TGFileInfo fileInfo;
     fileInfo.fFileTypes = kFileExt;
     fileInfo.fIniDir = strdup((char *)fCurrentDir);

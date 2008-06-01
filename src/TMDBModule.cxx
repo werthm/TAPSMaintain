@@ -26,11 +26,15 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     
     Char_t aName[256];
     
+    // initialize members   
+    fCurrentTable[0] = '\0';
+
+
     fFrame->SetLayoutManager(new TGHorizontalLayout(fFrame));
     
     // ------------------------------ Control frame ------------------------------
     fControlFrame = new TGCompositeFrame(fFrame, 50, 50);
-    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 7, 2));
+    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 8, 2));
     
     // DB URL
     TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
@@ -147,7 +151,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fExportFrame->AddFrame(fExportBrowse, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
     fExportButton = new TGTextButton(fExportFrame, " Export ");
-    //fExportButton->Connect("Clicked()", "TMDBModule", this, "ExportFile()");
+    fExportButton->Connect("Clicked()", "TMDBModule", this, "ExportFile()");
     fExportFrame->AddFrame(fExportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
 
@@ -155,11 +159,24 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fControlFrame->AddFrame(fExportFrame,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
 
 
+    // ------------------------------ Main control buttons ------------------------------
+    fWriteButton = new TGTextButton(fControlFrame, "Write to DB");
+    //fWriteButton->SetFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    fWriteButton->SetTopMargin(15);
+    fWriteButton->SetBottomMargin(15);
+    fWriteButton->SetRightMargin(15);
+    fWriteButton->SetLeftMargin(15);
+    fWriteButton->Connect("Clicked()", "TMDBModule", this, "WriteTable()");
+    fControlFrame->AddFrame(fWriteButton,  new TGTableLayoutHints(0, 1, 7, 8, kLHintsRight, 15, 15, 35, 15));
 
-
-
-
-
+    fQuitButton = new TGTextButton(fControlFrame, "Quit Module");
+    //fQuitButton->SetFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    fQuitButton->SetTopMargin(15);
+    fQuitButton->SetBottomMargin(15);
+    fQuitButton->SetRightMargin(15);
+    fQuitButton->SetLeftMargin(15);
+    fQuitButton->Connect("Clicked()", "TMDBModule", this, "Finished()");
+    fControlFrame->AddFrame(fQuitButton,  new TGTableLayoutHints(1, 2, 7, 8, kLHintsRight, 15, 15, 35, 15));
 
 
 
@@ -268,8 +285,9 @@ void TMDBModule::Init()
     // scroll to table beginning
     fTableCanvas->SetVsbPosition(0);
 
-    // clear import file name
+    // clear import/export file names
     fImportFileEntry->SetText("");
+    fExportFileEntry->SetText("");
 
     // select default entry in combos
     fTableCombo->Select(EDB_Table_Empty, kTRUE);
@@ -400,6 +418,42 @@ void TMDBModule::ImportFile()
 }
 
 //______________________________________________________________________________
+void TMDBModule::ExportFile()
+{
+    // Export values into the specified file.
+    
+    // get the selected file name
+    const Char_t* filename = fExportFileEntry->GetText();
+
+    // leave if export file entry is empty
+    if (!strcmp(filename, "")) return;
+
+    // open the file
+    FILE* fout;
+    fout = fopen(filename, "w");
+    
+    // write header
+    fprintf(fout, "# TAPSMaintain database table export\n");
+    fprintf(fout, "# Table: %s\n", fCurrentTable);
+    fprintf(fout, "\n");
+    fprintf(fout, "# ID    Value\n");
+ 
+    // write current values to file
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {   
+        fprintf(fout, "%3d    %s\n", i+1, fElementCurrentValue[i]->GetText()->Data());
+    }
+
+    // close the file
+    fclose(fout);
+
+    // show info message
+    Char_t msg[256];
+    sprintf(msg, "Values of table '%s' were saved to '%s' .", fCurrentTable, filename);
+    ModuleInfo(msg);
+}
+
+//______________________________________________________________________________
 void TMDBModule::SetBlockValues(UInt_t block, Double_t value)
 {
     // Set all elements of the block 'block' to the value 'value' (A = 1, B = 2, ...).
@@ -430,7 +484,8 @@ void TMDBModule::SetRingValues(UInt_t ring, Double_t value)
 
     // loop over all elements and change value if element belongs to the
     // specified ring
-    UInt_t mid, mid_ring;
+    UInt_t mid;
+    UInt_t mid_ring = 0;
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
         // map element to first block
@@ -451,7 +506,6 @@ void TMDBModule::SetRingValues(UInt_t ring, Double_t value)
         // element belongs to specified ring -> change value
         if (mid_ring == ring)
         {
-            printf("Updating %d\n", i);
             fElementNewValue[i]->SetNumber(value);
         }
     }
@@ -464,6 +518,9 @@ void TMDBModule::ClearValues()
     
     // clear title
     fTableTitle->SetText("Table: none");
+    
+    // unset table name variable
+    fCurrentTable[0] = '\0';
 
     // clear values
     for (UInt_t i = 0; i < gMaxSize; i++)
@@ -532,13 +589,52 @@ void TMDBModule::DoRangeManipulation()
 }
 
 //______________________________________________________________________________
+Bool_t TMDBModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName)
+{
+    // Set the table name of the TAPS table 'table' in tableName and the column
+    // name of the data column in columnName.
+    // Return kTRUE on success.
+  
+    if (table == EDB_Table_BaF2_HV) 
+    {
+        strcpy(tableName, "hvbaf_par");
+        strcpy(columnName, "th");
+        return kTRUE;
+    }
+    else if (table == EDB_Table_BaF2_CFD)
+    {
+        strcpy(tableName, "cfd_par");
+        strcpy(columnName, "th");
+        return kTRUE;
+    }
+    else if (table == EDB_Table_BaF2_LED1)
+    {
+        strcpy(tableName, "ledl_par");
+        strcpy(columnName, "th");
+        return kTRUE;
+    }
+    else if (table == EDB_Table_BaF2_LED2)
+    {
+        strcpy(tableName, "ledh_par");
+        strcpy(columnName, "th");
+        return kTRUE;
+    }
+    else return kFALSE;
+}
+
+//______________________________________________________________________________
 void TMDBModule::ReadTable(Int_t table)
 {
     // Read table from database and display the content.
 
-    Char_t tableName[256];
+    Char_t columnName[256];
     Char_t query[256];
     Char_t name[256];
+    Double_t val;
+    Int_t badEntries = 0;
+    Char_t badEntriesID[768];
+    badEntriesID[0] = '\0';
+
 
     // Clear current displayed values
     ClearValues();
@@ -550,65 +646,115 @@ void TMDBModule::ReadTable(Int_t table)
     TSQLServer* tapsDB = TSQLServer::Connect(fDBURLEntry->GetText(), 
                                              fDBUserEntry->GetText(), 
                                              fDBPasswdEntry->GetText());
+    
     // exit if connection to DB failed
     if (!tapsDB)
     {
-        ModuleError("Could not connect to the database server. Please check your settings!");
+        printf("ERROR: Could not connect to the database server. Please check your settings!\n");
         return;
     }
     
-    // Choose table and set ID and value data column
-    Int_t col_ID, col_VAL;
-    if (table == EDB_Table_BaF2_HV) 
-    {
-        strcpy(tableName, "hvbaf_par");
-        col_ID = 0;
-        col_VAL = 1;
-    }
-    else if (table == EDB_Table_BaF2_CFD)
-    {
-        strcpy(tableName, "cfd_par");
-        col_ID = 0;
-        col_VAL = 2;
-    }
-    else if (table == EDB_Table_BaF2_LED1)
-    {
-        strcpy(tableName, "ledl_par");
-        col_ID = 0;
-        col_VAL = 2;
-    }
-    else if (table == EDB_Table_BaF2_LED2)
-    {
-        strcpy(tableName, "ledh_par");
-        col_ID = 0;
-        col_VAL = 2;
-    }
-    else return;
-
+    // Choose table and set name of the column containing the
+    // data values
+    if (!SetTableSettings((EDB_TAPS_Table)table, fCurrentTable, columnName)) return;
 
     // display table info
-    printf("Reading values from table %s ...\n", tableName);
-    sprintf(name, "Table: %s", tableName);
+    printf("Reading values from table %s ...\n", fCurrentTable);
+    sprintf(name, "Table: %s", fCurrentTable);
     fTableTitle->SetText(name);
     
     // read values
-    sprintf(query, "SELECT * FROM %s", tableName);
-    TSQLResult* res = tapsDB->Query(query);
-    TSQLRow* row;
-    Int_t id, val;
-    while ((row = res->Next()))
-    {
-        id  = atoi(row->GetField(col_ID));
-        val = atoi(row->GetField(col_VAL));
-        if (id > (Int_t)gBaF2Size) break;
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {   
+        sprintf(query, "SELECT %s FROM %s WHERE id=%d", columnName, fCurrentTable, i+1);
+        TSQLResult* res = tapsDB->Query(query);
+        
+        // check if multiple values were found
+        if (res->GetRowCount() > 1) 
+        {
+            Char_t tmp[4];
+
+            // increment counter and add bad ID to list
+            badEntries++;
+            if (badEntries == 1) sprintf(tmp, "%d", i+1);
+            else sprintf(tmp, ", %d", i+1);
+            strcat(badEntriesID, tmp);
+        }
+  
+        // get the value
+        val = atof(res->Next()->GetField(0));
 
         // set current and new value
-        fElementCurrentValue[id-1]->SetText(val);
-        fElementNewValue[id-1]->SetNumber(val);
-}
-    delete res;
+        fElementCurrentValue[i]->SetText(val);
+        fElementNewValue[i]->SetNumber(val);
+
+        delete res;
+    }
 
     // deconnect from server
     delete tapsDB;
+
+    // create SQL error if necessary
+    if (badEntries)
+    {
+        printf("\nWARNING: Broken SQL table!\n"
+               "         For the following ID(s) more than 1 values were found in table '%s':\n"
+               "         -> %s\n"
+               "         Only the last value of every ID is read by TAPSMaintain!\n"
+               "         ATTENTION: THESE VALUE WILL NOT BE UPDATED BY TAPSMaintain!\n\n"
+               , fCurrentTable, badEntriesID);
+    }
+}
+
+//______________________________________________________________________________
+void TMDBModule::WriteTable()
+{
+    // Write the values back to the table in the database. 
+    
+    Char_t columnName[256];
+    Char_t query[256];
+    Int_t table = fTableCombo->GetSelected();
+
+    // Leave if the dummy entry in the combo was selected
+    if (table == EDB_Table_Empty) return;
+ 
+    // ask user for confirmation
+    ModuleQuestion("Are you REALLY sure you want to write the new values to the DB?");
+    if (GetDialogReturnValue() == kMBNo) return;
+
+    // try to open connection to MySQL server
+    TSQLServer* tapsDB = TSQLServer::Connect(fDBURLEntry->GetText(), 
+                                             fDBUserEntry->GetText(), 
+                                             fDBPasswdEntry->GetText());
+    
+    // exit if connection to DB failed
+    if (!tapsDB)
+    {
+        printf("ERROR: Could not connect to the database server. Please check your settings!\n");
+        return;
+    }
+    
+    // Choose table and set name of the column containing the
+    // data values
+    if (!SetTableSettings((EDB_TAPS_Table)table, fCurrentTable, columnName)) return;
+
+    // display table info
+    printf("Updating values in table %s ...\n", fCurrentTable);
+    
+    // write values
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {   
+        sprintf(query, "UPDATE %s SET %s=%f WHERE id=%d", fCurrentTable, columnName, 
+                fElementNewValue[i]->GetNumber(), i+1);
+        TSQLResult* res = tapsDB->Query(query);
+        
+        delete res;
+    }
+
+    // deconnect from server
+    delete tapsDB;
+
+    // read new table
+    ReadTable(table);
 }
 

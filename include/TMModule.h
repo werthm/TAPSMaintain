@@ -68,6 +68,7 @@
 #include "TGWidget.h"
 #include "TFile.h"
 #include "TGFileDialog.h"
+#include "TGMsgBox.h"
 #include "TGButton.h"
 
 #include "TMConfig.h"
@@ -84,6 +85,7 @@ private:
     Double_t** fResults;                        // Result array of this module
     Char_t fResultHeader[256];                  // Header for the result description when saving to file
     Char_t fMiscFileName[256];                  // Misc. input file: Will be set after emitting the ShowFileDialog() signal
+    Int_t fDialogReturnValue;                   // Return value of a dialog opened by TAPSMaintain
 
 protected:    
     TFile* fFile;                               // ROOT input file
@@ -106,7 +108,7 @@ public:
     TGCompositeFrame* GetFrame() const { return fFrame; }
     TGTransientFrame* GetConfigDialog() const { return fConfigDialog; }
     const Char_t* GetResultHeader() const { return fResultHeader; }
-
+    Int_t GetDialogReturnValue() const { return fDialogReturnValue; }
     void GetAndDeleteMiscFileName(Char_t* out)
     {
         // fMiscFileName can only be read once!
@@ -119,19 +121,23 @@ public:
     void SetMiscFileName(const Char_t* f) { strncpy(fMiscFileName, f, 256); }
     void SetResult(UInt_t element, UInt_t resultNumber, Double_t result);
     void SetRootInputFile(TFile* f) { fFile = f; }
-    
+    void SetDialogReturnValue(Int_t v) { fDialogReturnValue = v; }
+
     void ClearResults();
     void DumpResults(const Char_t* numberFormat = "%9.7e") const;
     virtual void SaveResults(const Char_t* filename);
     void CreateConfigDialog(TGWindow* main);
     
-    void ConfigDialogOk() { Emit("ConfigDialogOk()"); }                                 // *SIGNAL*
-    void ConfigDialogCancel() { Emit("ConfigDialogCancel()"); }                         // *SIGNAL*
-    void ModuleError(const Char_t* msg) { Emit("ModuleError(const Char_t*)", msg); }    // *SIGNAL*  
+    void ConfigDialogOk() { Emit("ConfigDialogOk()"); }                                     // *SIGNAL*
+    void ConfigDialogCancel() { Emit("ConfigDialogCancel()"); }                             // *SIGNAL*
+    void ModuleError(const Char_t* msg) { Emit("ModuleError(const Char_t*)", msg); }        // *SIGNAL*  
+    void ModuleInfo(const Char_t* msg) { Emit("ModuleInfo(const Char_t*)", msg); }          // *SIGNAL*  
+    void ModuleQuestion(const Char_t* question) 
+    { Emit("ModuleQuestion(const Char_t*)", question); }                                    // *SIGNAL*  
     void ShowFileDialog(EFileDialogMode type) 
-    { Emit("ShowFileDialog(EFileDialogMode)", type); }                                  // *SIGNAL* 
-    void Save() { Emit("Save()"); }                                                     // *SIGNAL* 
-    void Finished() { Emit("Finished()"); }                                             // *SIGNAL*  
+    { Emit("ShowFileDialog(EFileDialogMode)", type); }                                      // *SIGNAL* 
+    void Save() { Emit("Save()"); }                                                         // *SIGNAL* 
+    void Finished() { Emit("Finished()"); }                                                 // *SIGNAL*  
     
     virtual void Init() = 0;                        // (Re-)initalize the module
     virtual void ReadConfig() = 0;                  // Read configuration made in the config dialog 

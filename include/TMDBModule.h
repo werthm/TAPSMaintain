@@ -31,7 +31,7 @@
 #include "TMUtils.h"
 
 
-enum {
+enum EDB_TAPS_Table {
     EDB_Table_Empty, 
     EDB_Table_BaF2_HV, 
     EDB_Table_BaF2_CFD,
@@ -96,8 +96,14 @@ private:
     TGNumberEntry** fElementNewValue;                       // new value entry array of all elements
     TGLabel** fElementValueChanged;                         // value change status array of all elements
 
+    TGTextButton* fWriteButton;                             // will write the values to the DB
+    TGTextButton* fQuitButton;                              // quit module button
+
+    Char_t fCurrentTable[256];                              // name of the current table
+
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
+    Bool_t SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName);
     
 public:
     TMDBModule() : TMModule() { }
@@ -107,10 +113,12 @@ public:
     void DoRangeManipulation();
     void ClearValues();
     void ReadTable(Int_t table);
+    void WriteTable();
     void MarkChanges();
     void OpenImportFile();
     void SelectExportFile();
     void ImportFile();
+    void ExportFile();
     void HandleMouseWheel(Event_t* event);
 
     virtual void Init();

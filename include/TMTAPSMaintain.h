@@ -48,7 +48,10 @@ public:
     
     void StartModule(TMModule* mod);
     void StopModule(Bool_t forced = kFALSE);
-    void ShowModuleError(const Char_t* msg) const;
+    void ShowModuleError(const Char_t* msg) const { ShowModuleMessage(msg, kMBIconStop); }
+    void ShowModuleInfo(const Char_t* msg) const { ShowModuleMessage(msg, kMBIconAsterisk); }
+    void ShowModuleQuestion(const Char_t* question) const;
+    void ShowModuleMessage(const Char_t* msg, EMsgBoxIcon icon = kMBIconAsterisk) const;
     void ShowFileDialogForModule(EFileDialogMode type);
     void SaveModuleResults();
     
