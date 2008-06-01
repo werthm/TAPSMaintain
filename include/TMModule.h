@@ -67,6 +67,7 @@
 #include "TGLabel.h"
 #include "TGWidget.h"
 #include "TFile.h"
+#include "TGFileDialog.h"
 #include "TGButton.h"
 
 #include "TMConfig.h"
@@ -82,6 +83,7 @@ private:
     UInt_t fNresults;                           // Number of results per element
     Double_t** fResults;                        // Result array of this module
     Char_t fResultHeader[256];                  // Header for the result description when saving to file
+    Char_t fMiscFileName[256];                  // Misc. input file: Will be set after emitting the ShowFileDialog() signal
 
 protected:    
     TFile* fFile;                               // ROOT input file
@@ -105,7 +107,16 @@ public:
     TGTransientFrame* GetConfigDialog() const { return fConfigDialog; }
     const Char_t* GetResultHeader() const { return fResultHeader; }
 
+    void GetAndDeleteMiscFileName(Char_t* out)
+    {
+        // fMiscFileName can only be read once!
+    
+        strncpy(out, fMiscFileName, 256);
+        fMiscFileName[0] = '\0';
+    }
+
     void SetResultHeader(const Char_t* h) { strncpy(fResultHeader, h, 256); }
+    void SetMiscFileName(const Char_t* f) { strncpy(fMiscFileName, f, 256); }
     void SetResult(UInt_t element, UInt_t resultNumber, Double_t result);
     void SetRootInputFile(TFile* f) { fFile = f; }
     
@@ -117,6 +128,8 @@ public:
     void ConfigDialogOk() { Emit("ConfigDialogOk()"); }                                 // *SIGNAL*
     void ConfigDialogCancel() { Emit("ConfigDialogCancel()"); }                         // *SIGNAL*
     void ModuleError(const Char_t* msg) { Emit("ModuleError(const Char_t*)", msg); }    // *SIGNAL*  
+    void ShowFileDialog(EFileDialogMode type) 
+    { Emit("ShowFileDialog(EFileDialogMode)", type); }                                  // *SIGNAL* 
     void Save() { Emit("Save()"); }                                                     // *SIGNAL* 
     void Finished() { Emit("Finished()"); }                                             // *SIGNAL*  
     

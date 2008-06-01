@@ -49,6 +49,7 @@ public:
     void StartModule(TMModule* mod);
     void StopModule(Bool_t forced = kFALSE);
     void ShowModuleError(const Char_t* msg) const;
+    void ShowFileDialogForModule(EFileDialogMode type);
     void SaveModuleResults();
     
     void SetModuleConfigAndStart();

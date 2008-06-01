@@ -13,8 +13,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TAPSCalib_TMCalibLED
-#define TAPSCalib_TMCalibLED
+#ifndef TAPSMaintain_TMCalibLED
+#define TAPSMaintain_TMCalibLED
 
 #include "TH1.h"
 #include "TText.h"

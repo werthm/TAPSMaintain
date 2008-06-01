@@ -13,8 +13,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TAPSCalib_TMCalibCosmics
-#define TAPSCalib_TMCalibCosmics
+#ifndef TAPSMaintain_TMCalibCosmics
+#define TAPSMaintain_TMCalibCosmics
 
 #include "TH1.h"
 #include "TF1.h"

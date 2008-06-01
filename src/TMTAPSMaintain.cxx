@@ -86,6 +86,9 @@ Int_t TMTAPSMaintain::Start()
         // connect ModuleError() signal
         m->Connect("ModuleError(const Char_t*)", "TMTAPSMaintain", this, "ShowModuleError(const Char_t*)");
 
+        // connect ShowFileDialog() signal
+        m->Connect("ShowFileDialog(EFileDialogMode)", "TMTAPSMaintain", this, "ShowFileDialogForModule(EFileDialogMode)");
+
         // create configuration dialog if necessary
         if (m->NeedsConfig())
         {
@@ -288,7 +291,7 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
                "Version %s\n"
                "Compiled on %s\n"
                "Linked to ROOT %s\n\n"
-               "(C) 2008 by Dominik Werthmueller",
+               "(C) 2008 by Dominik Werthmueller, University of Basel",
                gTAPSMaintainVersion, __DATE__, ROOT_RELEASE);
         
         new TGMsgBox(gClient->GetRoot(), fMainWindow, "About TAPSMaintain", cAbout, 
@@ -371,6 +374,34 @@ void TMTAPSMaintain::ShowModuleError(const Char_t* msg) const
     Int_t retval;
     new TGMsgBox(gClient->GetRoot(), fMainWindow, "Module Error", msg, 
                  kMBIconStop, kMBOk, &retval, kFitWidth | kFitHeight, kTextLeft);
+}
+
+//______________________________________________________________________________ 
+void TMTAPSMaintain::ShowFileDialogForModule(EFileDialogMode type)
+{
+    // Show the file dialog of the type 'type' and pass the selected file to the active
+    // module.
+  
+    // check if a module is active
+    if (!fActiveModule) return;
+    
+    // configure the file choose dialog
+    const char* kFileExt[] = {"All files", "*.*", 0, 0};
+    TGFileInfo fileInfo;
+    fileInfo.fFileTypes = kFileExt;
+    fileInfo.fIniDir = strdup((char *)fCurrentDir);
+
+    // show the dialog
+    new TGFileDialog(gClient->GetRoot(), fMainWindow, type, &fileInfo);
+
+    // pass the selected file to the active module
+    if (fileInfo.fFilename)
+    {
+        fActiveModule->SetMiscFileName(fileInfo.fFilename);
+    }
+
+    // save current directory
+    strcpy(fCurrentDir, fileInfo.fIniDir);
 }
 
 //______________________________________________________________________________ 

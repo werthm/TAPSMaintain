@@ -13,19 +13,22 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TAPSCalib_TMDBModule
-#define TAPSCalib_TMDBModule
+#ifndef TAPSMaintain_TMDBModule
+#define TAPSMaintain_TMDBModule
 
 #include "RQ_OBJECT.h"
 #include "TGComboBox.h"
+#include "TGFileDialog.h"
 #include "TGNumberEntry.h"
 #include "TGTableLayout.h"
 #include "TColor.h"
 #include "TSQLServer.h"
 #include "TSQLResult.h"
 #include "TSQLRow.h"
+#include "TSystem.h"
 
 #include "TMModule.h"
+#include "TMUtils.h"
 
 
 enum {
@@ -75,6 +78,16 @@ private:
     TGNumberEntry* fRangeManipEntry;                        // entry for range manipulation
     TGTextButton* fRangeManipButton;                        // button for range manipulation
     
+    TGGroupFrame* fImportFrame;                             // import frame
+    TGTextEntry* fImportFileEntry;                          // import file path entry
+    TGTextButton* fImportBrowse;                            // import "Browse" button
+    TGTextButton* fImportButton;                            // do import button
+    
+    TGGroupFrame* fExportFrame;                             // export frame
+    TGTextEntry* fExportFileEntry;                          // export file path entry
+    TGTextButton* fExportBrowse;                            // export "Browse" button
+    TGTextButton* fExportButton;                            // do export button
+ 
     TGVerticalFrame* fInputFrame;                           // input frame
     TGLabel* fTableTitle;                                   // displays the currently loaded table
     TGCanvas* fTableCanvas;                                 // table scroll canvas
@@ -95,7 +108,9 @@ public:
     void ClearValues();
     void ReadTable(Int_t table);
     void MarkChanges();
-
+    void OpenImportFile();
+    void SelectExportFile();
+    void ImportFile();
     void HandleMouseWheel(Event_t* event);
 
     virtual void Init();

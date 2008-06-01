@@ -259,6 +259,7 @@ void TMCalibCosmics::SaveResults(const Char_t* filename)
         fprintf(fout, "%3d  %7.3f  %7.3f  %8.6f\n", i, results[i][0], results[i][1], results[i][2]); 
     }
     
+    // close the file
     fclose(fout);
     
     printf("Saved results of module '%s' to file '%s'.\n", GetName(), filename);

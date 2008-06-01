@@ -30,6 +30,7 @@
 #pragma link C++ class TMMainFrame+; 
 #pragma link C++ class TMModule+; 
 #pragma link C++ class TMSeqCalibModule+; 
+#pragma link C++ namespace TMUtils; 
 
 // Modules
 #pragma link C++ class TMDBModule+; 

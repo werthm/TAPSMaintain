@@ -23,8 +23,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TAPSCalib_TMSeqCalibModule
-#define TAPSCalib_TMSeqCalibModule
+#ifndef TAPSMaintain_TMSeqCalibModule
+#define TAPSMaintain_TMSeqCalibModule
 
 #include "RQ_OBJECT.h"
 #include "TRootEmbeddedCanvas.h"

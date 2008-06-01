@@ -77,6 +77,7 @@ TMModule::TMModule()
     fNresults = 0;
     fResults = 0;
     fResultHeader[0] = '\0';
+    fMiscFileName[0] = '\0';
     fFrame = 0;
     fConfigDialog = 0;
     fConfigFrame = 0;
@@ -96,6 +97,7 @@ TMModule::TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t need
     fFile = 0;
     fNresults = inNresults;
     fResultHeader[0] = '\0';
+    fMiscFileName[0] = '\0';
 
     // create result array
     fResults = new Double_t*[gMaxSize];

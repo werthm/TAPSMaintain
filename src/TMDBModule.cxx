@@ -30,7 +30,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     
     // ------------------------------ Control frame ------------------------------
     fControlFrame = new TGCompositeFrame(fFrame, 50, 50);
-    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 5, 2));
+    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 7, 2));
     
     // DB URL
     TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
@@ -72,7 +72,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fTableCombo->Select(EDB_Table_Empty, kFALSE);
 
 
-    // Range manipulation frame
+    // ------------------------------ Range manipulation frame ------------------------------
     fRangeManipFrame = new TGGroupFrame(fControlFrame, "Element range manipulation", kHorizontalFrame);
     fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "Set all"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
     
@@ -104,19 +104,69 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fRangeManipEntry = new TGNumberEntry(fRangeManipFrame, 0, 8);
     fRangeManipFrame->AddFrame(fRangeManipEntry, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
-    fRangeManipButton = new TGTextButton(fRangeManipFrame, "    Set    ");
+    fRangeManipButton = new TGTextButton(fRangeManipFrame, "  Set  ");
     fRangeManipButton->Connect("Clicked()", "TMDBModule", this, "DoRangeManipulation()");
     fRangeManipFrame->AddFrame(fRangeManipButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
+    // add range manipulation frame to control frame
+    fControlFrame->AddFrame(fRangeManipFrame,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+
+    
+    // ------------------------------ Import frame ------------------------------
+    fImportFrame = new TGGroupFrame(fControlFrame, 
+                                    "Import values from file (2 numbers per line: ELEMENT_ID  VALUE)", kHorizontalFrame);
+    fImportFrame->AddFrame(new TGLabel(fImportFrame, "File:"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
+    
+    fImportFileEntry = new TGTextEntry(fImportFrame, "");
+    fImportFileEntry->Resize(200, 22);
+    fImportFrame->AddFrame(fImportFileEntry, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    
+    fImportBrowse = new TGTextButton(fImportFrame, " Browse ");
+    fImportBrowse->Connect("Clicked()", "TMDBModule", this, "OpenImportFile()");
+    fImportFrame->AddFrame(fImportBrowse, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+
+    fImportButton = new TGTextButton(fImportFrame, " Import ");
+    fImportButton->Connect("Clicked()", "TMDBModule", this, "ImportFile()");
+    fImportFrame->AddFrame(fImportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
 
     // add range manipulation frame to control frame
-    fControlFrame->AddFrame(fRangeManipFrame,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    fControlFrame->AddFrame(fImportFrame,  new TGTableLayoutHints(0, 2, 5, 6, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+
+
+    // ------------------------------ Export frame ------------------------------
+    fExportFrame = new TGGroupFrame(fControlFrame, "Export values", kHorizontalFrame);
+    fExportFrame->AddFrame(new TGLabel(fExportFrame, "File:"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
+    
+    fExportFileEntry = new TGTextEntry(fExportFrame, "");
+    fExportFileEntry->Resize(200, 22);
+    fExportFrame->AddFrame(fExportFileEntry, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    
+    fExportBrowse = new TGTextButton(fExportFrame, " Browse ");
+    fExportBrowse->Connect("Clicked()", "TMDBModule", this, "SelectExportFile()");
+    fExportFrame->AddFrame(fExportBrowse, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+
+    fExportButton = new TGTextButton(fExportFrame, " Export ");
+    //fExportButton->Connect("Clicked()", "TMDBModule", this, "ExportFile()");
+    fExportFrame->AddFrame(fExportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+
+
+    // add range manipulation frame to control frame
+    fControlFrame->AddFrame(fExportFrame,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+
+
+
+
+
+
+
+
 
 
     // add control frame to main frame
     fFrame->AddFrame(fControlFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft | kLHintsFillX | kLHintsFillY, 10, 10, 10, 10));
     
+ 
 
     // ------------------------------ Input frame ------------------------------
     fInputFrame = new TGVerticalFrame(fFrame, 250, 500);
@@ -218,6 +268,9 @@ void TMDBModule::Init()
     // scroll to table beginning
     fTableCanvas->SetVsbPosition(0);
 
+    // clear import file name
+    fImportFileEntry->SetText("");
+
     // select default entry in combos
     fTableCombo->Select(EDB_Table_Empty, kTRUE);
     fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
@@ -253,6 +306,97 @@ void TMDBModule::HandleMouseWheel(Event_t* event)
         Int_t newpos = fTableCanvas->GetVsbPosition() + page;
         fTableCanvas->SetVsbPosition(newpos);
     }
+}
+
+//______________________________________________________________________________
+void TMDBModule::OpenImportFile()
+{
+    // Let the user select a file to import the values from.
+
+    Char_t filename[256];
+
+    // Let TAPSMaintain open the "Open file" dialog
+    ShowFileDialog(kFDOpen);
+
+    // copy file name
+    GetAndDeleteMiscFileName(filename);
+  
+    // abort if file name is empty
+    if (!strcmp(filename, "")) return;
+
+    // Check if it's a directory
+    Long_t id, flags, modtime;
+    Long64_t size;
+    gSystem->GetPathInfo(filename, &id, &size, &flags, &modtime);
+    
+    // Write the selected file name into the text entry
+    if (flags == 0 || flags == 1) fImportFileEntry->SetText(filename);
+}
+
+//______________________________________________________________________________
+void TMDBModule::SelectExportFile()
+{
+    // Let the user select a file to export the value into.
+
+    Char_t filename[256];
+
+    // Let TAPSMaintain open the "Save file" dialog
+    ShowFileDialog(kFDSave);
+    
+    // copy file name
+    GetAndDeleteMiscFileName(filename);
+    
+    // abort if file name is empty
+    if (!strcmp(filename, "")) return;
+
+    // Check if it's a directory
+    Long_t id, flags, modtime;
+    Long64_t size;
+    gSystem->GetPathInfo(filename, &id, &size, &flags, &modtime);
+    
+    // Write the selected file name into the text entry
+    fExportFileEntry->SetText(filename);
+}
+
+//______________________________________________________________________________
+void TMDBModule::ImportFile()
+{
+    // Import values from the specified file.
+    
+    Char_t line[256];
+
+    Int_t id;
+    Float_t value;
+
+    // get the selected file name
+    const Char_t* filename = fImportFileEntry->GetText();
+
+    // leave if import file entry is empty
+    if (!strcmp(filename, "")) return;
+
+    // open the file
+    FILE* fin;
+    fin = fopen(filename, "r");
+ 
+    // read file and set values
+    while (!feof(fin))
+    {
+        fgets(line, 256, fin);
+
+        // check if line is a comment
+        if (TMUtils::IsComment(line)) continue;
+
+        if (sscanf(line, "%d%f", &id, &value) == 2)
+        {
+            fElementNewValue[id-1]->SetNumber(value);
+        }
+    }
+
+    // close the file
+    fclose(fin);
+
+    // check changes
+    MarkChanges();
 }
 
 //______________________________________________________________________________
@@ -317,7 +461,11 @@ void TMDBModule::SetRingValues(UInt_t ring, Double_t value)
 void TMDBModule::ClearValues()
 {
     // Set all values in the element array displays and entries to 0.
+    
+    // clear title
+    fTableTitle->SetText("Table: none");
 
+    // clear values
     for (UInt_t i = 0; i < gMaxSize; i++)
     {   
         fElementCurrentValue[i]->SetText("0");
