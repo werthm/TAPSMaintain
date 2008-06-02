@@ -20,6 +20,7 @@ I             = include
 O             = obj
 L             = lib
 B             = bin
+LTCPIP        = libtcpip
 
 SRC           = $(wildcard $(S)/TM*.cxx) $(S)/Dict.cxx
 INCD          = $(wildcard $(I)/TM*.h)
@@ -56,6 +57,7 @@ endif
 # -------------------------------- Compile options --------------------------------
 
 CCCOMP      = g++
+CCOMP       = gcc
 CXXFLAGS    = -O3 -g -Wall -fPIC $(ROOTCFLAGS) -I./$(I)
 LDFLAGS     = -O3 -g $(ROOTLDFLAGS)
 
@@ -73,11 +75,11 @@ end:
 	@echo "-> Finished!"
 	@echo
 
-TAPSMaintain: libTAPSMaintain.so $(S)/MainTAPSMaintain.cxx
+TAPSMaintain: libTAPSMaintain.so libtcpip.so $(S)/MainTAPSMaintain.cxx
 	@echo
 	@echo "Building TAPSMaintain application ..."
 	@mkdir -p $(B)
-	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIBTM) -o $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
+	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIBTM) $(CURDIR)/$(L)/libtcpip.so -o $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
 
 libTAPSMaintain.so: $(OBJ)
 	@echo
@@ -86,6 +88,13 @@ libTAPSMaintain.so: $(OBJ)
 	@rm -f $(LIBTM) $(L)/libTAPSMaintain.so
 	@$(CCCOMP) $(LDFLAGS) $(ROOTGLIBS) $(SOFLAGS) $(OBJD) -o $(LIBTM)
 	@$(POST_LIB_BUILD)
+
+libtcpip.so: $(LTCPIP)/hw_write.c $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c
+	@echo
+	@echo "Building libtcpip ..."
+	@mkdir -p $(L)
+	@$(CCOMP) -shared -O2 -DOSF1 -DLINUX -DLIBC6 -DWARPFILL $(LTCPIP)/hw_write.c \
+	          $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c -o $(L)/libtcpip.so
 
 $(S)/Dict.cxx: $(INC) $(I)/LinkDef.h 
 	@echo

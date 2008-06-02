@@ -134,7 +134,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fImportFrame->AddFrame(fImportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
 
-    // add range manipulation frame to control frame
+    // add import frame to control frame
     fControlFrame->AddFrame(fImportFrame,  new TGTableLayoutHints(0, 2, 5, 6, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
 
 
@@ -155,28 +155,41 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fExportFrame->AddFrame(fExportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
 
 
-    // add range manipulation frame to control frame
+    // add export frame to control frame
     fControlFrame->AddFrame(fExportFrame,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
 
 
     // ------------------------------ Main control buttons ------------------------------
-    fWriteButton = new TGTextButton(fControlFrame, "Write to DB");
-    //fWriteButton->SetFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
-    fWriteButton->SetTopMargin(15);
-    fWriteButton->SetBottomMargin(15);
-    fWriteButton->SetRightMargin(15);
-    fWriteButton->SetLeftMargin(15);
-    fWriteButton->Connect("Clicked()", "TMDBModule", this, "WriteTable()");
-    fControlFrame->AddFrame(fWriteButton,  new TGTableLayoutHints(0, 1, 7, 8, kLHintsRight, 15, 15, 35, 15));
+    fButtonsFrame = new TGHorizontalFrame(fControlFrame);
+    
+    fWriteDBButton = new TGTextButton(fButtonsFrame, "Write to DB");
+    fWriteDBButton->SetTopMargin(15);
+    fWriteDBButton->SetBottomMargin(15);
+    fWriteDBButton->SetRightMargin(15);
+    fWriteDBButton->SetLeftMargin(15);
+    fWriteDBButton->Connect("Clicked()", "TMDBModule", this, "WriteTable()");
+    fButtonsFrame->AddFrame(fWriteDBButton, new TGLayoutHints(kLHintsLeft, 5, 5, 5, 5));
+    
+    fWriteHWButton = new TGTextButton(fButtonsFrame, "Write to HW");
+    fWriteHWButton->SetEnabled(kFALSE);
+    fWriteHWButton->SetTopMargin(15);
+    fWriteHWButton->SetBottomMargin(15);
+    fWriteHWButton->SetRightMargin(15);
+    fWriteHWButton->SetLeftMargin(15);
+    fWriteHWButton->Connect("Clicked()", "TMDBModule", this, "WriteHVToHardware()");
+    fButtonsFrame->AddFrame(fWriteHWButton, new TGLayoutHints(kLHintsLeft, 20, 5, 5, 5));
 
-    fQuitButton = new TGTextButton(fControlFrame, "Quit Module");
-    //fQuitButton->SetFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    fQuitButton = new TGTextButton(fButtonsFrame, "Quit Module");
     fQuitButton->SetTopMargin(15);
     fQuitButton->SetBottomMargin(15);
     fQuitButton->SetRightMargin(15);
     fQuitButton->SetLeftMargin(15);
     fQuitButton->Connect("Clicked()", "TMDBModule", this, "Finished()");
-    fControlFrame->AddFrame(fQuitButton,  new TGTableLayoutHints(1, 2, 7, 8, kLHintsRight, 15, 15, 35, 15));
+    fButtonsFrame->AddFrame(fQuitButton, new TGLayoutHints(kLHintsLeft, 20, 5, 5, 5));
+
+    // add buttons frame to control frame
+    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 7, 8, kLHintsFillX | kLHintsLeft, 5, 5, 35, 5));
+
 
 
 
@@ -639,6 +652,10 @@ void TMDBModule::ReadTable(Int_t table)
     // Clear current displayed values
     ClearValues();
     
+    // activate BaF2 HV hardware writinga
+    if (table == EDB_Table_BaF2_HV) fWriteHWButton->SetEnabled(kTRUE);
+    else fWriteHWButton->SetEnabled(kFALSE);
+    
     // Leave if the dummy entry in the combo was selected
     if (table == EDB_Table_Empty) return;
 
@@ -756,5 +773,31 @@ void TMDBModule::WriteTable()
 
     // read new table
     ReadTable(table);
+}
+
+//______________________________________________________________________________
+void TMDBModule::WriteHVToHardware()
+{
+    // Write the current values to the hardware HV crate. 
+    
+    // check value range 0..2000 V
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {
+        Double_t val = fElementNewValue[i]->GetNumber();
+        if (val < 0 || val > 2000) return;
+    }
+
+    // ask user for confirmation
+    ModuleQuestion("Are you REALLY sure you want to write the new values to the hardware?");
+    if (GetDialogReturnValue() == kMBNo) return;
+
+    // write all values
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {
+        Int_t val = (Int_t)fElementNewValue[i]->GetNumber();
+        Set_BAF2_HV((char*)gTAPS_Server, i+1, val);
+    }
+
+
 }
 

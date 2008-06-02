@@ -31,6 +31,9 @@
 #include "TMUtils.h"
 
 
+extern "C" void Set_BAF2_HV(char* server, int det, int value); 
+
+
 enum EDB_TAPS_Table {
     EDB_Table_Empty, 
     EDB_Table_BaF2_HV, 
@@ -96,7 +99,9 @@ private:
     TGNumberEntry** fElementNewValue;                       // new value entry array of all elements
     TGLabel** fElementValueChanged;                         // value change status array of all elements
 
-    TGTextButton* fWriteButton;                             // will write the values to the DB
+    TGHorizontalFrame* fButtonsFrame;                       // horizontal frame for the main buttons
+    TGTextButton* fWriteDBButton;                           // will write the values to the DB
+    TGTextButton* fWriteHWButton;                           // will write the values to the DB
     TGTextButton* fQuitButton;                              // quit module button
 
     Char_t fCurrentTable[256];                              // name of the current table
@@ -114,6 +119,7 @@ public:
     void ClearValues();
     void ReadTable(Int_t table);
     void WriteTable();
+    void WriteHVToHardware();
     void MarkChanges();
     void OpenImportFile();
     void SelectExportFile();
