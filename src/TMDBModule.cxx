@@ -34,7 +34,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     
     // ------------------------------ Control frame ------------------------------
     fControlFrame = new TGCompositeFrame(fFrame, 50, 50);
-    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 8, 2));
+    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 9, 2));
     
     // DB URL
     TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
@@ -191,7 +191,15 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 7, 8, kLHintsFillX | kLHintsLeft, 5, 5, 35, 5));
 
 
-
+    // Progress bar
+    fProgressBar = new TGHProgressBar(fControlFrame, TGProgressBar::kFancy, 10);
+    fProgressBar->SetBarColor("green");
+    fProgressBar->Resize(200, 25);
+    fProgressBar->SetMin(0);
+    fProgressBar->SetMax(gMaxSize);
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing element %.0f");
+    fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 8, 9, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
+    
 
     // add control frame to main frame
     fFrame->AddFrame(fControlFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft | kLHintsFillX | kLHintsFillY, 10, 10, 10, 10));
@@ -791,13 +799,18 @@ void TMDBModule::WriteHVToHardware()
     ModuleQuestion("Are you REALLY sure you want to write the new values to the hardware?");
     if (GetDialogReturnValue() == kMBNo) return;
 
+
     // write all values
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
         Int_t val = (Int_t)fElementNewValue[i]->GetNumber();
         Set_BAF2_HV((char*)gTAPS_Server, i+1, val);
+
+        fProgressBar->SetPosition(i+1); 
+        gSystem->ProcessEvents();
     }
 
-
+    // reset progress bar
+    fProgressBar->Reset();
 }
 

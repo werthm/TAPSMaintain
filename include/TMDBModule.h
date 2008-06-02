@@ -21,6 +21,7 @@
 #include "TGFileDialog.h"
 #include "TGNumberEntry.h"
 #include "TGTableLayout.h"
+#include "TGProgressBar.h"
 #include "TColor.h"
 #include "TSQLServer.h"
 #include "TSQLResult.h"
@@ -31,6 +32,8 @@
 #include "TMUtils.h"
 
 
+// C method provided by libtcpip to set the BaF2 high voltage
+// in the hardware crate.
 extern "C" void Set_BAF2_HV(char* server, int det, int value); 
 
 
@@ -103,6 +106,8 @@ private:
     TGTextButton* fWriteDBButton;                           // will write the values to the DB
     TGTextButton* fWriteHWButton;                           // will write the values to the DB
     TGTextButton* fQuitButton;                              // quit module button
+
+    TGHProgressBar* fProgressBar;                           // progress bar
 
     Char_t fCurrentTable[256];                              // name of the current table
 
