@@ -711,7 +711,9 @@ void TMDBModule::ReadTable(Int_t table)
         val = atof(res->Next()->GetField(0));
 
         // set current and new value
-        fElementCurrentValue[i]->SetText(val);
+        Char_t value[128];
+        sprintf(value, "%f", val);
+        fElementCurrentValue[i]->SetText(value);
         fElementNewValue[i]->SetNumber(val);
 
         delete res;

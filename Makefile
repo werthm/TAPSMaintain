@@ -55,7 +55,7 @@ ifeq ($(OSTYPE),Linux)
 	LIB_TM = $(L)/libTAPSMaintain.so
 	SOFLAGS_TM = -shared
 	LIB_TCPIP = $(L)/libtcpip.so
-	SOFLAGS_TCPIP = -shared -DOSF1 -DLINUX -DLIBC6 -DWARPFILL
+	SOFLAGS_TCPIP = -fPIC -shared -DOSF1 -DLINUX -DLIBC6 -DWARPFILL
 	POST_LIB_BUILD = 
 endif
 
