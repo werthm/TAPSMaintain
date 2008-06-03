@@ -33,7 +33,7 @@
 #pragma link C++ namespace TMUtils; 
 
 // Modules
-#pragma link C++ class TMDBModule+; 
+#pragma link C++ class TMHWConfigModule+; 
 #pragma link C++ class TMCalibCosmics+; 
 #pragma link C++ class TMCalibLED+; 
 
