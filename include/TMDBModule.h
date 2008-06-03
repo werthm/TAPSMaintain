@@ -21,7 +21,7 @@
 #include "TGFileDialog.h"
 #include "TGNumberEntry.h"
 #include "TGTableLayout.h"
-#include "TGProgressBar.h"
+//#include "TGProgressBar.h"
 #include "TColor.h"
 #include "TSQLServer.h"
 #include "TSQLResult.h"
@@ -34,8 +34,11 @@
 
 // C method provided by libtcpip to set the BaF2 high voltage
 // in the hardware crate.
-extern "C" void Set_BAF2_HV(char* server, int det, int value); 
-
+extern "C"
+{
+    void Set_BAF2_HV(char* server, int det, int value); 
+    void Init_BAF2_HV(char* server); 
+}
 
 enum EDB_TAPS_Table {
     EDB_Table_Empty, 
@@ -107,7 +110,7 @@ private:
     TGTextButton* fWriteHWButton;                           // will write the values to the DB
     TGTextButton* fQuitButton;                              // quit module button
 
-    TGHProgressBar* fProgressBar;                           // progress bar
+    //TGHProgressBar* fProgressBar;                           // progress bar
 
     Char_t fCurrentTable[256];                              // name of the current table
 

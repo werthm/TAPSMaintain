@@ -191,14 +191,14 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 7, 8, kLHintsFillX | kLHintsLeft, 5, 5, 35, 5));
 
 
-    // Progress bar
-    fProgressBar = new TGHProgressBar(fControlFrame, TGProgressBar::kFancy, 10);
-    fProgressBar->SetBarColor("green");
-    fProgressBar->Resize(200, 25);
-    fProgressBar->SetMin(0);
-    fProgressBar->SetMax(gMaxSize);
-    fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing element %.0f");
-    fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 8, 9, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
+    //// Progress bar
+    //fProgressBar = new TGHProgressBar(fControlFrame, TGProgressBar::kFancy, 10);
+    //fProgressBar->SetBarColor("green");
+    //fProgressBar->Resize(200, 25);
+    //fProgressBar->SetMin(0);
+    //fProgressBar->SetMax(gMaxSize);
+    //fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing element %.0f");
+    //fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 8, 9, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
     
 
     // add control frame to main frame
@@ -675,6 +675,7 @@ void TMDBModule::ReadTable(Int_t table)
     // exit if connection to DB failed
     if (!tapsDB)
     {
+        fTableCombo->Select(EDB_Table_Empty, kTRUE);
         printf("ERROR: Could not connect to the database server. Please check your settings!\n");
         return;
     }
@@ -796,10 +797,14 @@ void TMDBModule::WriteHVToHardware()
     }
 
     // ask user for confirmation
-    ModuleQuestion("Are you REALLY sure you want to write the new values to the hardware?");
+    ModuleQuestion("Are you sure you want to write the new values to the hardware?");
+    if (GetDialogReturnValue() == kMBNo) return;
+    
+    // ask user for confirmation a second time
+    ModuleQuestion("Are you REALLY sure?");
     if (GetDialogReturnValue() == kMBNo) return;
 
-
+    /* Commented method of setting the HV using Set_BAF2_HV. Use Init_BAF2_HV instead
     // write all values
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
@@ -812,5 +817,13 @@ void TMDBModule::WriteHVToHardware()
 
     // reset progress bar
     fProgressBar->Reset();
+    */
+
+    // call BaF2 init method
+    Init_BAF2_HV((char*)gTAPS_Server);
+
+    ModuleInfo("The command for the initialization of the BaF2 HV was sent to the\n"
+               "TAPS hardware server. Please wait until all 544 elements were\n"
+               "initialized. This could take some time!");
 }
 

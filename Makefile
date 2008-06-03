@@ -63,7 +63,7 @@ LDFLAGS     = -O3 -g $(ROOTLDFLAGS)
 
 # ------------------------------------ targets ------------------------------------
 
-all:	begin libTAPSMaintain.so TAPSMaintain end
+all:	begin $(L)/libTAPSMaintain.so $(B)/TAPSMaintain end
 
 begin:
 	@echo
@@ -75,13 +75,13 @@ end:
 	@echo "-> Finished!"
 	@echo
 
-TAPSMaintain: libTAPSMaintain.so libtcpip.so $(S)/MainTAPSMaintain.cxx
+$(B)/TAPSMaintain: $(L)/libTAPSMaintain.so $(L)/libtcpip.so $(S)/MainTAPSMaintain.cxx
 	@echo
 	@echo "Building TAPSMaintain application ..."
 	@mkdir -p $(B)
 	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIBTM) $(CURDIR)/$(L)/libtcpip.so -o $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
 
-libTAPSMaintain.so: $(OBJ)
+$(L)/libTAPSMaintain.so: $(OBJ)
 	@echo
 	@echo "Building libTAPSMaintain ..."
 	@mkdir -p $(L)
@@ -89,11 +89,11 @@ libTAPSMaintain.so: $(OBJ)
 	@$(CCCOMP) $(LDFLAGS) $(ROOTGLIBS) $(SOFLAGS) $(OBJD) -o $(LIBTM)
 	@$(POST_LIB_BUILD)
 
-libtcpip.so: $(LTCPIP)/hw_write.c $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c
+$(L)/libtcpip.so: $(LTCPIP)/hw_write.c $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c
 	@echo
-	@echo "Building libtcpip ..."
+	@echo "Building TAPS Slowcontrol libtcpip ..."
 	@mkdir -p $(L)
-	@$(CCOMP) -shared -O2 -DOSF1 -DLINUX -DLIBC6 -DWARPFILL $(LTCPIP)/hw_write.c \
+	@$(CCOMP) -shared -O3 -DOSF1 -DLINUX -DLIBC6 -DWARPFILL $(LTCPIP)/hw_write.c \
 	          $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c -o $(L)/libtcpip.so
 
 $(S)/Dict.cxx: $(INC) $(I)/LinkDef.h 

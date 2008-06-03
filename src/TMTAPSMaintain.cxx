@@ -296,8 +296,9 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
                "A Universal TAPS Maintenance Software\n\n"
                "Version %s\n"
                "Compiled on %s\n"
-               "Linked to ROOT %s\n\n"
-               "(C) 2008 by Dominik Werthmueller, University of Basel",
+               "Linked to ROOT %s and libtcpip\n\n"
+               "(C) 2008 by Dominik Werthmueller, University of Basel\n"
+               "TAPS Slowcontrol libtcpip by J.G. Messchendorp",
                gTAPSMaintainVersion, __DATE__, ROOT_RELEASE);
         
         new TGMsgBox(gClient->GetRoot(), fMainWindow, "About TAPSMaintain", cAbout, 
