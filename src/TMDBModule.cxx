@@ -712,7 +712,7 @@ void TMDBModule::ReadTable(Int_t table)
 
         // set current and new value
         Char_t value[128];
-        sprintf(value, "%f", val);
+        sprintf(value, "%.f", val);
         fElementCurrentValue[i]->SetText(value);
         fElementNewValue[i]->SetNumber(val);
 
