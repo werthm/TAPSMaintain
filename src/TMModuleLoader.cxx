@@ -40,8 +40,8 @@ TMModuleLoader::TMModuleLoader(UInt_t startID)
     // ---------------------------- Load modules ----------------------------
     UInt_t numberOfModules = startID;
     
-    // TAPS database module
-    TMDBModule* m1 = new TMDBModule("TAPS database", numberOfModules++);
+    // TAPS hardware settings module
+    TMHWConfigModule* m1 = new TMHWConfigModule("TAPS hardware settings", numberOfModules++);
     fModules->Add(m1);
     
     // LED calibration module

@@ -6,21 +6,23 @@
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// TMDBModule                                                           //
+// TMHWConfigModule                                                     //
 //                                                                      //
-// Module for the manipulation of the TAPS MySQL database.              //
+// Module for the manipulation of the TAPS hardware settings.           //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
 
-#ifndef TAPSMaintain_TMDBModule
-#define TAPSMaintain_TMDBModule
+#ifndef TAPSMaintain_TMHWConfigModule
+#define TAPSMaintain_TMHWConfigModule
 
 #include "RQ_OBJECT.h"
+#include "TMath.h"
 #include "TGComboBox.h"
 #include "TGFileDialog.h"
 #include "TGNumberEntry.h"
 #include "TGTableLayout.h"
+#include "TGTab.h"
 //#include "TGProgressBar.h"
 #include "TColor.h"
 #include "TSQLServer.h"
@@ -71,9 +73,9 @@ enum {
 };
 
 
-class TMDBModule : public TMModule
+class TMHWConfigModule : public TMModule
 {
-    RQ_OBJECT("TMDBModule")
+    RQ_OBJECT("TMHWConfigModule")
 
 private:
     TGCompositeFrame* fControlFrame;                        // frame for the control elements
@@ -82,20 +84,29 @@ private:
     TGTextEntry* fDBPasswdEntry;                            // DB password entry
     TGComboBox* fTableCombo;                                // DB table selection combo box
 
-    TGGroupFrame* fRangeManipFrame;                         // frame for range manipulation elements
+    TGTab* fSettingsTab;                                    // tab for different settings
+
+    TGCompositeFrame* fRangeManipFrame;                     // frame for range manipulation elements
     TGComboBox* fRangeManipCombo;                           // combo box for range manipulation
     TGNumberEntry* fRangeManipEntry;                        // entry for range manipulation
     TGTextButton* fRangeManipButton;                        // button for range manipulation
     
-    TGGroupFrame* fImportFrame;                             // import frame
+    TGCompositeFrame* fImportFrame;                         // import frame
     TGTextEntry* fImportFileEntry;                          // import file path entry
     TGTextButton* fImportBrowse;                            // import "Browse" button
     TGTextButton* fImportButton;                            // do import button
     
-    TGGroupFrame* fExportFrame;                             // export frame
+    TGCompositeFrame* fExportFrame;                         // export frame
     TGTextEntry* fExportFileEntry;                          // export file path entry
     TGTextButton* fExportBrowse;                            // export "Browse" button
     TGTextButton* fExportButton;                            // do export button
+    
+    TGCompositeFrame* fGMFrame;                             // gain match frame
+    TGTextEntry* fGMCalibFileEntry;                         // calibration file path entry
+    TGTextButton* fGMCalibBrowse;                           // calibration file "Browse" button
+    TGNumberEntry* fGMRangeEntry;                           // range entry
+    TGNumberEntry* fGMResEntry;                             // resolution entry
+    TGTextButton* fGMButton;                                // perform gain match
  
     TGVerticalFrame* fInputFrame;                           // input frame
     TGLabel* fTableTitle;                                   // displays the currently loaded table
@@ -105,7 +116,7 @@ private:
     TGNumberEntry** fElementNewValue;                       // new value entry array of all elements
     TGLabel** fElementValueChanged;                         // value change status array of all elements
 
-    TGHorizontalFrame* fButtonsFrame;                       // horizontal frame for the main buttons
+    TGCompositeFrame* fButtonsFrame;                        // horizontal frame for the main buttons
     TGTextButton* fWriteDBButton;                           // will write the values to the DB
     TGTextButton* fWriteHWButton;                           // will write the values to the DB
     TGTextButton* fQuitButton;                              // quit module button
@@ -119,9 +130,9 @@ private:
     Bool_t SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName);
     
 public:
-    TMDBModule() : TMModule() { }
-    TMDBModule(const Char_t* name, UInt_t id);
-    virtual ~TMDBModule();
+    TMHWConfigModule() : TMModule() { }
+    TMHWConfigModule(const Char_t* name, UInt_t id);
+    virtual ~TMHWConfigModule();
     
     void DoRangeManipulation();
     void ClearValues();
@@ -129,16 +140,18 @@ public:
     void WriteTable();
     void WriteHVToHardware();
     void MarkChanges();
-    void OpenImportFile();
+    void SelectImportFile();
     void SelectExportFile();
+    void SelectGMCalibFile();
     void ImportFile();
     void ExportFile();
+    void DoGainMatch();
     void HandleMouseWheel(Event_t* event);
 
     virtual void Init();
     virtual void ReadConfig() { }
 
-    ClassDef(TMDBModule, 0) // TAPS database manipulation module
+    ClassDef(TMHWConfigModule, 0) // Module for setting the TAPS hardware parameters
 };
 
 #endif

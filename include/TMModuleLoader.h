@@ -18,7 +18,7 @@
 
 #include "TList.h"
 
-#include "TMDBModule.h"
+#include "TMHWConfigModule.h"
 #include "TMCalibCosmics.h"
 #include "TMCalibLED.h"
 

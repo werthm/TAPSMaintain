@@ -39,6 +39,9 @@ const Double_t gTAPS_MIP_Loss_BaF2  = 37.7;
 const Double_t gTAPS_MIP_Loss_PbWO4 = 22.6;   // ?
 const Double_t gTAPS_MIP_Loss_Veto  = 5;      // ?
 
+// BaF2 HV calibration gain slope
+const Double_t gBaF2_Gain_Slope = 153;
+
 // define TAPS detectors
 enum ETAPSDetector {
     kNo_Detector,

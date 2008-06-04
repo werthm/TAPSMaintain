@@ -6,20 +6,20 @@
 
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-// TMDBModule                                                           //
+// TMHWConfigModule                                                     //
 //                                                                      //
-// Module for the manipulation of the TAPS MySQL database.              //
+// Module for the manipulation of the TAPS hardware settings.           //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
 
-#include "TMDBModule.h"
+#include "TMHWConfigModule.h"
 
-ClassImp(TMDBModule)
+ClassImp(TMHWConfigModule)
 
 
 //______________________________________________________________________________
-TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
+TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     : TMModule(name, id, 0, kFALSE, kFALSE)
 {
     // Constructor.
@@ -34,7 +34,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     
     // ------------------------------ Control frame ------------------------------
     fControlFrame = new TGCompositeFrame(fFrame, 50, 50);
-    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 9, 2));
+    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 6, 2));
     
     // DB URL
     TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
@@ -65,7 +65,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     
     // combo box
     fTableCombo = new TGComboBox(fControlFrame);
-    fTableCombo->Connect("Selected(Int_t)", "TMDBModule", this, "ReadTable(Int_t)");
+    fTableCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "ReadTable(Int_t)");
     fTableCombo->Resize(200, 22);
     fTableCombo->AddEntry("Select TAPS table here", EDB_Table_Empty);
     fTableCombo->AddEntry("BaF2 High Voltage", EDB_Table_BaF2_HV);
@@ -76,9 +76,13 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fTableCombo->Select(EDB_Table_Empty, kFALSE);
 
 
+    // ------------------------------ Begin Tab ------------------------------
+    fSettingsTab = new TGTab(fControlFrame, 50, 50);   
+
     // ------------------------------ Range manipulation frame ------------------------------
-    fRangeManipFrame = new TGGroupFrame(fControlFrame, "Element range manipulation", kHorizontalFrame);
-    fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "Set all"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
+    fRangeManipFrame = fSettingsTab->AddTab("Set Values");
+    fRangeManipFrame->SetLayoutManager(new TGHorizontalLayout(fRangeManipFrame));
+    fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "Set all"), new TGLayoutHints(kLHintsLeft, 15, 5, 35, 5));
     
     fRangeManipCombo = new TGComboBox(fRangeManipFrame);
     fRangeManipCombo->Resize(150, 22);
@@ -100,95 +104,172 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fRangeManipCombo->AddEntry("Ring 9 elements", ERange_Ring_9);
     fRangeManipCombo->AddEntry("Ring 10 elements", ERange_Ring_10);
     fRangeManipCombo->AddEntry("Ring 11 elements", ERange_Ring_11);
-    fRangeManipFrame->AddFrame(fRangeManipCombo, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fRangeManipFrame->AddFrame(fRangeManipCombo, new TGLayoutHints(kLHintsLeft, 7, 5, 32, 2));
     fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
 
-    fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "to"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
+    fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "to"), new TGLayoutHints(kLHintsLeft, 7, 5, 35, 5));
     
     fRangeManipEntry = new TGNumberEntry(fRangeManipFrame, 0, 8);
-    fRangeManipFrame->AddFrame(fRangeManipEntry, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fRangeManipFrame->AddFrame(fRangeManipEntry, new TGLayoutHints(kLHintsLeft, 7, 5, 32, 2));
 
-    fRangeManipButton = new TGTextButton(fRangeManipFrame, "  Set  ");
-    fRangeManipButton->Connect("Clicked()", "TMDBModule", this, "DoRangeManipulation()");
-    fRangeManipFrame->AddFrame(fRangeManipButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
-
-    // add range manipulation frame to control frame
-    fControlFrame->AddFrame(fRangeManipFrame,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    fRangeManipButton = new TGTextButton(fRangeManipFrame, "    Set    ");
+    fRangeManipButton->Connect("Clicked()", "TMHWConfigModule", this, "DoRangeManipulation()");
+    fRangeManipFrame->AddFrame(fRangeManipButton, new TGLayoutHints(kLHintsLeft, 7, 15, 32, 2));
 
     
     // ------------------------------ Import frame ------------------------------
-    fImportFrame = new TGGroupFrame(fControlFrame, 
-                                    "Import values from file (2 numbers per line: ELEMENT_ID  VALUE)", kHorizontalFrame);
-    fImportFrame->AddFrame(new TGLabel(fImportFrame, "File:"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
-    
+    fImportFrame = fSettingsTab->AddTab("Import");
+    fImportFrame->SetLayoutManager(new TGTableLayout(fImportFrame, 4, 4));
+   
+    l = new TGLabel(fImportFrame, "Input file:");
+    l->SetTextJustify(kTextLeft);
+    fImportFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 15, 5, 15, 5)); 
+
     fImportFileEntry = new TGTextEntry(fImportFrame, "");
     fImportFileEntry->Resize(200, 22);
-    fImportFrame->AddFrame(fImportFileEntry, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
-    
+    fImportFrame->AddFrame(fImportFileEntry,
+                           new TGTableLayoutHints(0, 3, 1, 2, kLHintsFillX | kLHintsLeft, 15, 5, 5, 5));
+
     fImportBrowse = new TGTextButton(fImportFrame, " Browse ");
-    fImportBrowse->Connect("Clicked()", "TMDBModule", this, "OpenImportFile()");
-    fImportFrame->AddFrame(fImportBrowse, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fImportBrowse->Connect("Clicked()", "TMHWConfigModule", this, "SelectImportFile()");
+    fImportFrame->AddFrame(fImportBrowse, 
+                           new TGTableLayoutHints(3, 4, 1, 2, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
 
     fImportButton = new TGTextButton(fImportFrame, " Import ");
-    fImportButton->Connect("Clicked()", "TMDBModule", this, "ImportFile()");
-    fImportFrame->AddFrame(fImportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fImportButton->Connect("Clicked()", "TMHWConfigModule", this, "ImportFile()");
+    fImportFrame->AddFrame(fImportButton, 
+                           new TGTableLayoutHints(3, 4, 2, 3, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
 
-
-    // add import frame to control frame
-    fControlFrame->AddFrame(fImportFrame,  new TGTableLayoutHints(0, 2, 5, 6, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    l = new TGLabel(fImportFrame, "Import values from a file. File format should be 2 column space sep-\n"
+                                  "arated ELEMENT ID and VALUE. Commented lines using # are\n"
+                                  "allowed.\n");
+    l->SetTextJustify(kTextLeft);
+    fImportFrame->AddFrame(l, new TGTableLayoutHints(0, 4, 3, 4, kLHintsFillX | kLHintsLeft, 15, 15, 15, 5));
 
 
     // ------------------------------ Export frame ------------------------------
-    fExportFrame = new TGGroupFrame(fControlFrame, "Export values", kHorizontalFrame);
-    fExportFrame->AddFrame(new TGLabel(fExportFrame, "File:"), new TGLayoutHints(kLHintsLeft, 5, 5, 15, 5));
+    fExportFrame = fSettingsTab->AddTab("Export");
+    fExportFrame->SetLayoutManager(new TGTableLayout(fExportFrame, 4, 4));
+    
+    l = new TGLabel(fExportFrame, "Output file:");
+    l->SetTextJustify(kTextLeft);
+    fExportFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 15, 5, 15, 5)); 
     
     fExportFileEntry = new TGTextEntry(fExportFrame, "");
     fExportFileEntry->Resize(200, 22);
-    fExportFrame->AddFrame(fExportFileEntry, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fExportFrame->AddFrame(fExportFileEntry,
+                           new TGTableLayoutHints(0, 3, 1, 2, kLHintsFillX | kLHintsLeft, 15, 5, 5, 5));
     
     fExportBrowse = new TGTextButton(fExportFrame, " Browse ");
-    fExportBrowse->Connect("Clicked()", "TMDBModule", this, "SelectExportFile()");
-    fExportFrame->AddFrame(fExportBrowse, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fExportBrowse->Connect("Clicked()", "TMHWConfigModule", this, "SelectExportFile()");
+    fExportFrame->AddFrame(fExportBrowse, 
+                           new TGTableLayoutHints(3, 4, 1, 2, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
 
     fExportButton = new TGTextButton(fExportFrame, " Export ");
-    fExportButton->Connect("Clicked()", "TMDBModule", this, "ExportFile()");
-    fExportFrame->AddFrame(fExportButton, new TGLayoutHints(kLHintsLeft, 5, 5, 12, 2));
+    fExportButton->Connect("Clicked()", "TMHWConfigModule", this, "ExportFile()");
+    fExportFrame->AddFrame(fExportButton, 
+                           new TGTableLayoutHints(3, 4, 2, 3, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
+
+  l = new TGLabel(fExportFrame, "Export all current values into the specified file. The format is 2 column\n"
+                                  "ELEMENT ID and VALUE space separated\n");
+    l->SetTextJustify(kTextLeft);
+    fExportFrame->AddFrame(l, new TGTableLayoutHints(0, 4, 3, 4, kLHintsFillX | kLHintsLeft, 15, 15, 15, 5));
+
+    
+    // ------------------------------ Gain match frame ------------------------------
+    fGMFrame = fSettingsTab->AddTab("BaF2 gain match");
+    fGMFrame->SetLayoutManager(new TGTableLayout(fGMFrame, 6, 4));
+    
+    l = new TGLabel(fGMFrame, "Calibration file:");
+    l->SetTextJustify(kTextLeft);
+    fGMFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 15, 5, 15, 5));
+    
+    fGMCalibFileEntry = new TGTextEntry(fGMFrame, "");
+    fGMCalibFileEntry->Resize(200, 22);
+    fGMFrame->AddFrame(fGMCalibFileEntry,
+                       new TGTableLayoutHints(0, 3, 1, 2, kLHintsFillX | kLHintsLeft, 15, 5, 5, 5));
+    
+    fGMCalibBrowse = new TGTextButton(fGMFrame, " Browse ");
+    fGMCalibBrowse->Connect("Clicked()", "TMHWConfigModule", this, "SelectGMCalibFile()");
+    fGMFrame->AddFrame(fGMCalibBrowse, 
+                       new TGTableLayoutHints(3, 4, 1, 2, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
+    
+    l = new TGLabel(fGMFrame, "Range (MeV):");
+    l->SetTextJustify(kTextLeft);
+    fGMFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsLeft, 15, 5, 15, 5));
+ 
+    fGMRangeEntry = new TGNumberEntry(fGMFrame, 1000);
+    fGMRangeEntry->Resize(80, 22);
+    fGMFrame->AddFrame(fGMRangeEntry,
+                       new TGTableLayoutHints(1, 2, 2, 3, kLHintsLeft, 5, 5, 12, 2));
+    
+    l = new TGLabel(fGMFrame, "Resolution (Channels):");
+    l->SetTextJustify(kTextLeft);
+    fGMFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 3, 4, kLHintsFillX | kLHintsLeft, 15, 5, 15, 5));
+ 
+    fGMResEntry = new TGNumberEntry(fGMFrame, 4096);
+    fGMResEntry->Resize(80, 22);
+    fGMFrame->AddFrame(fGMResEntry,
+                       new TGTableLayoutHints(1, 2, 3, 4, kLHintsLeft, 5, 5, 12, 2));
+
+    
+    fGMButton = new TGTextButton(fGMFrame, " Calculate new HV ");
+    fGMButton->Connect("Clicked()", "TMHWConfigModule", this, "DoGainMatch()");
+    fGMFrame->AddFrame(fGMButton, 
+                       new TGTableLayoutHints(3, 4, 4, 5, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
 
 
-    // add export frame to control frame
-    fControlFrame->AddFrame(fExportFrame,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+
+
+    l = new TGLabel(fGMFrame, "Open a cosmics calibration file created by TAPSMaintain and enter\n"
+                              "the desired range and the available resolution to calculate the new\n"
+                              "HV values. The old HV values are directly read form the database.\n"
+                              "Afterwards you can write them to the DB or to the hardware crate.\n");
+    l->SetTextJustify(kTextLeft);
+    fGMFrame->AddFrame(l, new TGTableLayoutHints(0, 4, 5, 6, kLHintsFillX | kLHintsLeft, 15, 15, 15, 5));
+
+
+    
+    // ------------------------------ End Tab ------------------------------
+    fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    fSettingsTab->SetEnabled(3, kFALSE);
+
 
 
     // ------------------------------ Main control buttons ------------------------------
-    fButtonsFrame = new TGHorizontalFrame(fControlFrame);
+    fButtonsFrame = new TGCompositeFrame(fControlFrame);
+    fButtonsFrame->SetLayoutManager(new TGTableLayout(fButtonsFrame, 1, 3));
     
     fWriteDBButton = new TGTextButton(fButtonsFrame, "Write to DB");
     fWriteDBButton->SetTopMargin(15);
     fWriteDBButton->SetBottomMargin(15);
     fWriteDBButton->SetRightMargin(15);
     fWriteDBButton->SetLeftMargin(15);
-    fWriteDBButton->Connect("Clicked()", "TMDBModule", this, "WriteTable()");
-    fButtonsFrame->AddFrame(fWriteDBButton, new TGLayoutHints(kLHintsLeft, 5, 5, 5, 5));
-    
+    fWriteDBButton->Connect("Clicked()", "TMHWConfigModule", this, "WriteTable()");
+    fButtonsFrame->AddFrame(fWriteDBButton,
+                            new TGTableLayoutHints(0, 1, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
+
     fWriteHWButton = new TGTextButton(fButtonsFrame, "Write to HW");
     fWriteHWButton->SetEnabled(kFALSE);
     fWriteHWButton->SetTopMargin(15);
     fWriteHWButton->SetBottomMargin(15);
     fWriteHWButton->SetRightMargin(15);
     fWriteHWButton->SetLeftMargin(15);
-    fWriteHWButton->Connect("Clicked()", "TMDBModule", this, "WriteHVToHardware()");
-    fButtonsFrame->AddFrame(fWriteHWButton, new TGLayoutHints(kLHintsLeft, 20, 5, 5, 5));
+    fWriteHWButton->Connect("Clicked()", "TMHWConfigModule", this, "WriteHVToHardware()");
+    fButtonsFrame->AddFrame(fWriteHWButton,
+                            new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
 
     fQuitButton = new TGTextButton(fButtonsFrame, "Quit Module");
     fQuitButton->SetTopMargin(15);
     fQuitButton->SetBottomMargin(15);
     fQuitButton->SetRightMargin(15);
     fQuitButton->SetLeftMargin(15);
-    fQuitButton->Connect("Clicked()", "TMDBModule", this, "Finished()");
-    fButtonsFrame->AddFrame(fQuitButton, new TGLayoutHints(kLHintsLeft, 20, 5, 5, 5));
+    fQuitButton->Connect("Clicked()", "TMHWConfigModule", this, "Finished()");
+    fButtonsFrame->AddFrame(fQuitButton,
+                            new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
 
     // add buttons frame to control frame
-    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 7, 8, kLHintsFillX | kLHintsLeft, 5, 5, 35, 5));
+    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 5, 6, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
 
 
     //// Progress bar
@@ -203,7 +284,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
 
     // add control frame to main frame
     fFrame->AddFrame(fControlFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft | kLHintsFillX | kLHintsFillY, 10, 10, 10, 10));
-    
+    fControlFrame->Resize(fControlFrame->GetDefaultSize()); 
  
 
     // ------------------------------ Input frame ------------------------------
@@ -221,7 +302,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
     fTableFrame->SetLayoutManager(new TGTableLayout(fTableFrame, gMaxSize+1, 4));
     
     // mouse wheel scrolling
-    fTableFrame->Connect("ProcessedEvent(Event_t*)", "TMDBModule", this, "HandleMouseWheel(Event_t*)");
+    fTableFrame->Connect("ProcessedEvent(Event_t*)", "TMHWConfigModule", this, "HandleMouseWheel(Event_t*)");
     gVirtualX->GrabButton(fTableFrame->GetId(), kButton4, kAnyModifier, 
                           kButtonPressMask | kButtonReleaseMask | kPointerMotionMask, kNone, kNone);
     gVirtualX->GrabButton(fTableFrame->GetId(), kButton5, kAnyModifier, 
@@ -267,7 +348,7 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
 
         // add new value entry
         fElementNewValue[i] = new TGNumberEntry(fTableFrame, 0, 10);
-        fElementNewValue[i]->Connect("ValueSet(Long_t)", "TMDBModule", this, "MarkChanges()");
+        fElementNewValue[i]->Connect("ValueSet(Long_t)", "TMHWConfigModule", this, "MarkChanges()");
         fTableFrame->AddFrame(fElementNewValue[i], 
                               new TGTableLayoutHints(2, 3, i+1, i+2, kLHintsFillX | kLHintsLeft, 4, 4, 4, 4));
         
@@ -289,14 +370,14 @@ TMDBModule::TMDBModule(const Char_t* name, UInt_t id)
 }
 
 //______________________________________________________________________________
-TMDBModule::~TMDBModule()
+TMHWConfigModule::~TMHWConfigModule()
 {
     // Destructor.
     
 }
 
 //______________________________________________________________________________
-void TMDBModule::Init()
+void TMHWConfigModule::Init()
 {
     // (Re-)initalize the module.
 
@@ -309,6 +390,10 @@ void TMDBModule::Init()
     // clear import/export file names
     fImportFileEntry->SetText("");
     fExportFileEntry->SetText("");
+    fGMCalibFileEntry->SetText("");
+
+    // select first tab
+    fSettingsTab->SetTab(0, kFALSE);
 
     // select default entry in combos
     fTableCombo->Select(EDB_Table_Empty, kTRUE);
@@ -316,7 +401,7 @@ void TMDBModule::Init()
 }
 
 //______________________________________________________________________________
-void TMDBModule::HandleMouseWheel(Event_t* event)
+void TMHWConfigModule::HandleMouseWheel(Event_t* event)
 {
     // Handle mouse wheel to scroll (taken from tutorials/gui/guitest.C).
 
@@ -348,7 +433,7 @@ void TMDBModule::HandleMouseWheel(Event_t* event)
 }
 
 //______________________________________________________________________________
-void TMDBModule::OpenImportFile()
+void TMHWConfigModule::SelectImportFile()
 {
     // Let the user select a file to import the values from.
 
@@ -373,7 +458,33 @@ void TMDBModule::OpenImportFile()
 }
 
 //______________________________________________________________________________
-void TMDBModule::SelectExportFile()
+void TMHWConfigModule::SelectGMCalibFile()
+{
+    // Let the user select a calibration file for the gain match
+    // function.
+
+    Char_t filename[256];
+
+    // Let TAPSMaintain open the "Open file" dialog
+    ShowFileDialog(kFDOpen);
+
+    // copy file name
+    GetAndDeleteMiscFileName(filename);
+  
+    // abort if file name is empty
+    if (!strcmp(filename, "")) return;
+
+    // Check if it's a directory
+    Long_t id, flags, modtime;
+    Long64_t size;
+    gSystem->GetPathInfo(filename, &id, &size, &flags, &modtime);
+    
+    // Write the selected file name into the text entry
+    if (flags == 0 || flags == 1) fGMCalibFileEntry->SetText(filename);
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::SelectExportFile()
 {
     // Let the user select a file to export the value into.
 
@@ -398,7 +509,7 @@ void TMDBModule::SelectExportFile()
 }
 
 //______________________________________________________________________________
-void TMDBModule::ImportFile()
+void TMHWConfigModule::ImportFile()
 {
     // Import values from the specified file.
     
@@ -439,7 +550,67 @@ void TMDBModule::ImportFile()
 }
 
 //______________________________________________________________________________
-void TMDBModule::ExportFile()
+void TMHWConfigModule::DoGainMatch()
+{
+    // Perform gain match: calculate the new HV values.
+    
+    Char_t line[256];
+    
+    Int_t id;
+    Float_t ped, peak, cosm_gain;
+    Double_t range, res;
+    Double_t nom_gain, gain_bias;
+    Double_t hv_old, hv_new;
+   
+    // get the selected file name
+    const Char_t* filename = fGMCalibFileEntry->GetText();
+
+    // leave if import file entry is empty
+    if (!strcmp(filename, "")) return;
+
+    // read range/resolution
+    range = fGMRangeEntry->GetNumber();
+    res = fGMResEntry->GetNumber();
+
+    // open the file
+    FILE* fin;
+    fin = fopen(filename, "r");
+ 
+    // read file and set values
+    while (!feof(fin))
+    {
+        fgets(line, 256, fin);
+
+        // check if line is a comment
+        if (TMUtils::IsComment(line)) continue;
+        
+        // read id, pedestal pos., cosmic peak pos. and gain
+        if (sscanf(line, "%d%f%f%f", &id, &ped, &peak, &cosm_gain) == 4)
+        {
+            if (ped == 0 && peak == 0) continue;
+
+            // read old HV value
+            hv_old = atof(fElementCurrentValue[id]->GetText()->Data());
+
+            // calculate new HV value
+            nom_gain = range / (res - ped);
+            gain_bias = hv_old - gBaF2_Gain_Slope * TMath::Log(peak - ped);
+            hv_new = gBaF2_Gain_Slope * TMath::Log(gTAPS_MIP_Loss_BaF2 / nom_gain) + gain_bias;
+
+            // set new HV value
+            fElementNewValue[id]->SetNumber((Int_t)hv_new);
+        }
+    }
+
+    // close the file
+    fclose(fin);
+
+    // check changes
+    MarkChanges();
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::ExportFile()
 {
     // Export values into the specified file.
     
@@ -475,7 +646,7 @@ void TMDBModule::ExportFile()
 }
 
 //______________________________________________________________________________
-void TMDBModule::SetBlockValues(UInt_t block, Double_t value)
+void TMHWConfigModule::SetBlockValues(UInt_t block, Double_t value)
 {
     // Set all elements of the block 'block' to the value 'value' (A = 1, B = 2, ...).
 
@@ -492,7 +663,7 @@ void TMDBModule::SetBlockValues(UInt_t block, Double_t value)
 }
 
 //______________________________________________________________________________
-void TMDBModule::SetRingValues(UInt_t ring, Double_t value)
+void TMHWConfigModule::SetRingValues(UInt_t ring, Double_t value)
 {
     // Set all elements of the ring 'ring' to the value 'value' (inner ring = 1,
     // 2nd ring = 2, ...)
@@ -533,7 +704,7 @@ void TMDBModule::SetRingValues(UInt_t ring, Double_t value)
 }
 
 //______________________________________________________________________________
-void TMDBModule::ClearValues()
+void TMHWConfigModule::ClearValues()
 {
     // Set all values in the element array displays and entries to 0.
     
@@ -554,7 +725,7 @@ void TMDBModule::ClearValues()
 }
 
 //______________________________________________________________________________
-void TMDBModule::MarkChanges()
+void TMHWConfigModule::MarkChanges()
 {
     // Mark the elements if their new value differs from the current one.
     
@@ -579,7 +750,7 @@ void TMDBModule::MarkChanges()
 }
 
 //______________________________________________________________________________
-void TMDBModule::DoRangeManipulation()
+void TMHWConfigModule::DoRangeManipulation()
 {
     // Change the values of the selected specific range of elements.
 
@@ -610,7 +781,7 @@ void TMDBModule::DoRangeManipulation()
 }
 
 //______________________________________________________________________________
-Bool_t TMDBModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName)
+Bool_t TMHWConfigModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName)
 {
     // Set the table name of the TAPS table 'table' in tableName and the column
     // name of the data column in columnName.
@@ -644,7 +815,7 @@ Bool_t TMDBModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Cha
 }
 
 //______________________________________________________________________________
-void TMDBModule::ReadTable(Int_t table)
+void TMHWConfigModule::ReadTable(Int_t table)
 {
     // Read table from database and display the content.
 
@@ -660,10 +831,18 @@ void TMDBModule::ReadTable(Int_t table)
     // Clear current displayed values
     ClearValues();
     
-    // activate BaF2 HV hardware writinga
-    if (table == EDB_Table_BaF2_HV) fWriteHWButton->SetEnabled(kTRUE);
-    else fWriteHWButton->SetEnabled(kFALSE);
-    
+    // activate BaF2 HV functions
+    if (table == EDB_Table_BaF2_HV) 
+    {
+        fWriteHWButton->SetEnabled(kTRUE);
+        fSettingsTab->SetEnabled(3, kTRUE);
+    }
+    else 
+    {
+        fWriteHWButton->SetEnabled(kFALSE);
+        fSettingsTab->SetEnabled(3, kFALSE);
+    }
+
     // Leave if the dummy entry in the combo was selected
     if (table == EDB_Table_Empty) return;
 
@@ -735,7 +914,7 @@ void TMDBModule::ReadTable(Int_t table)
 }
 
 //______________________________________________________________________________
-void TMDBModule::WriteTable()
+void TMHWConfigModule::WriteTable()
 {
     // Write the values back to the table in the database. 
     
@@ -787,7 +966,7 @@ void TMDBModule::WriteTable()
 }
 
 //______________________________________________________________________________
-void TMDBModule::WriteHVToHardware()
+void TMHWConfigModule::WriteHVToHardware()
 {
     // Write the current values to the hardware HV crate. 
     
