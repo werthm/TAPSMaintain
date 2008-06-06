@@ -973,12 +973,12 @@ void TMHWConfigModule::WriteHVToHardware()
     // check value range 0..2000 V
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
-        Double_t val = fElementNewValue[i]->GetNumber();
+        Double_t val = atof(fElementCurrentValue[i]->GetText()->Data());
         if (val < 0 || val > 2000) return;
     }
 
     // ask user for confirmation
-    ModuleQuestion("Are you sure you want to write the new values to the hardware?");
+    ModuleQuestion("Are you sure you want to write the current values\nsaved in the database to the hardware?");
     if (GetDialogReturnValue() == kMBNo) return;
     
     // ask user for confirmation a second time
@@ -989,7 +989,7 @@ void TMHWConfigModule::WriteHVToHardware()
     // write all values
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
-        Int_t val = (Int_t)fElementNewValue[i]->GetNumber();
+        Int_t val = atoi(fElementCurrentValue[i]->GetText()->Data());
         Set_BAF2_HV((char*)gTAPS_Server, i+1, val);
 
         fProgressBar->SetPosition(i+1); 
