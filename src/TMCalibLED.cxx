@@ -246,7 +246,7 @@ void TMCalibLED::SaveResults(const Char_t* filename)
     // print array content
     for (Int_t i = 0; i < GetCurrentDetectorSize(); i++)
     {
-        fprintf(fout, "%3d  %7.3f\n", i, results[i][0]); 
+        fprintf(fout, "%3d  %7.3f\n", i+1, results[i][0]); 
     }
     
     fclose(fout);

@@ -181,7 +181,7 @@ void TMModule::DumpResults(const Char_t* numberFormat) const
     // print array content
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
-        printf(" %3d ", i);
+        printf(" %3d ", i+1);
         for (UInt_t j = 0; j < fNresults; j++)
         {
             printf(format, fResults[i][j]);
@@ -209,7 +209,7 @@ void TMModule::SaveResults(const Char_t* filename)
     // print array content
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
-        fprintf(fout, " %3d ", i);
+        fprintf(fout, " %3d ", i+1);
         for (UInt_t j = 0; j < fNresults; j++)
         {
             fprintf(fout, " %9.7e ", fResults[i][j]);

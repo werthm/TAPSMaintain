@@ -256,7 +256,7 @@ void TMCalibCosmics::SaveResults(const Char_t* filename)
     // print array content
     for (Int_t i = 0; i < GetCurrentDetectorSize(); i++)
     {
-        fprintf(fout, "%3d  %7.3f  %7.3f  %8.6f\n", i, results[i][0], results[i][1], results[i][2]); 
+        fprintf(fout, "%3d  %7.3f  %7.3f  %8.6f\n", i+1, results[i][0], results[i][1], results[i][2]); 
     }
     
     // close the file

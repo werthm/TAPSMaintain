@@ -590,15 +590,18 @@ void TMHWConfigModule::DoGainMatch()
             if (ped == 0 && peak == 0) continue;
 
             // read old HV value
-            hv_old = atof(fElementCurrentValue[id]->GetText()->Data());
+            hv_old = atof(fElementCurrentValue[id-1]->GetText()->Data());
 
             // calculate new HV value
             nom_gain = range / (res - ped);
             gain_bias = hv_old - gBaF2_Gain_Slope * TMath::Log(peak - ped);
             hv_new = gBaF2_Gain_Slope * TMath::Log(gTAPS_MIP_Loss_BaF2 / nom_gain) + gain_bias;
+            
+            // correct bad HV value
+            if (hv_new < 0) hv_new = hv_old;
 
             // set new HV value
-            fElementNewValue[id]->SetNumber((Int_t)hv_new);
+            fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
         }
     }
 
