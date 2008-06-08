@@ -71,8 +71,8 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
     fRangeFrame = new TGHorizontalFrame(fConfigFrame);
-    fCStartEntry = new TGTextEntry(fRangeFrame, "20");
-    fCEndEntry = new TGTextEntry(fRangeFrame, "700");
+    fCStartEntry = new TGTextEntry(fRangeFrame, "30");
+    fCEndEntry = new TGTextEntry(fRangeFrame, "1000");
     fCStartEntry->Resize(40, 22);
     fCEndEntry->Resize(40, 22);
     fRangeFrame->AddFrame(new TGLabel(fRangeFrame, "Ped. + "), new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
