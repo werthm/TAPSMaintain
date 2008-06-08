@@ -34,9 +34,9 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     // create members
     fHClone = 0;
     fPedFunc = new TF1("PedFunc", "gaus", 0 , 200);
-    fPeakFunc = new TF1("PeakFunc", "gaus", 0, 1500);
-    fBgFunc = new TF1("BgFunc", "expo", 0, 1500);
-    fTotalFunc = new TF1("TotalFunc", "gaus(0)+expo(3)", 0, 1500);
+    fPeakFunc = new TF1("PeakFunc", "gaus", 0, 4000);
+    fBgFunc = new TF1("BgFunc", "expo", 0, 4000);
+    fTotalFunc = new TF1("TotalFunc", "gaus(0)+expo(3)", 0, 4000);
     fPedFunc->SetLineColor(kRed);
     fBgFunc->SetLineColor(kGreen);
     fTotalFunc->SetLineColor(kRed);
