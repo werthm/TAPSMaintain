@@ -72,6 +72,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableCombo->AddEntry("BaF2 CFD Threshold", EDB_Table_BaF2_CFD);
     fTableCombo->AddEntry("BaF2 LED1 Threshold", EDB_Table_BaF2_LED1);
     fTableCombo->AddEntry("BaF2 LED2 Threshold", EDB_Table_BaF2_LED2);
+    fTableCombo->AddEntry("Veto LED Threshold", EDB_Table_Veto_LED);
     fControlFrame->AddFrame(fTableCombo, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     fTableCombo->Select(EDB_Table_Empty, kFALSE);
 
@@ -811,6 +812,12 @@ Bool_t TMHWConfigModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableNam
     else if (table == EDB_Table_BaF2_LED2)
     {
         strcpy(tableName, "ledh_par");
+        strcpy(columnName, "th");
+        return kTRUE;
+    }
+    else if (table == EDB_Table_Veto_LED)
+    {
+        strcpy(tableName, "vled_par");
         strcpy(columnName, "th");
         return kTRUE;
     }

@@ -47,7 +47,8 @@ enum EDB_TAPS_Table {
     EDB_Table_BaF2_HV, 
     EDB_Table_BaF2_CFD,
     EDB_Table_BaF2_LED1,
-    EDB_Table_BaF2_LED2
+    EDB_Table_BaF2_LED2,
+    EDB_Table_Veto_LED
 };
 
 
