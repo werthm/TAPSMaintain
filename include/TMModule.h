@@ -107,6 +107,7 @@ public:
     Double_t** GetResults() const { return fResults; }
     TGCompositeFrame* GetFrame() const { return fFrame; }
     TGTransientFrame* GetConfigDialog() const { return fConfigDialog; }
+    TGCompositeFrame* GetConfigFrame() const { return fConfigFrame; }
     const Char_t* GetResultHeader() const { return fResultHeader; }
     Int_t GetDialogReturnValue() const { return fDialogReturnValue; }
     void GetAndDeleteMiscFileName(Char_t* out)

@@ -89,3 +89,31 @@ Bool_t TMUtils::IsComment(const Char_t* s)
     else return kFALSE;
 }
 
+//______________________________________________________________________________
+UInt_t TMUtils::GetRingNumber(Int_t elem)
+{
+    // Returns the number of the ring (1 to 11 for 384 BaF2 layout) the element
+    // 'elem' belongs to (element counting starts at 0).
+    
+    // element layout (first and last elements of a ring)
+    UInt_t ringRange[11][2] = {{0, 0}, {1, 2}, {3, 5}, {6, 9}, {10, 14}, {15, 20},
+                              {21, 27}, {28, 35}, {36, 44}, {45, 54}, {55, 63}};
+                              
+    // map element to first block
+    UInt_t mid = elem % 64;
+
+    if (mid >= ringRange[0][0] && mid <= ringRange[0][1]) return 1;
+    else if (mid >= ringRange[1][0] && mid <= ringRange[1][1]) return 2;
+    else if (mid >= ringRange[2][0] && mid <= ringRange[2][1]) return 3;
+    else if (mid >= ringRange[3][0] && mid <= ringRange[3][1]) return 4;
+    else if (mid >= ringRange[4][0] && mid <= ringRange[4][1]) return 5;
+    else if (mid >= ringRange[5][0] && mid <= ringRange[5][1]) return 6;
+    else if (mid >= ringRange[6][0] && mid <= ringRange[6][1]) return 7;
+    else if (mid >= ringRange[7][0] && mid <= ringRange[7][1]) return 8;
+    else if (mid >= ringRange[8][0] && mid <= ringRange[8][1]) return 9;
+    else if (mid >= ringRange[9][0] && mid <= ringRange[9][1]) return 10;
+    else if (mid >= ringRange[10][0] && mid <= ringRange[10][1]) return 11;
+    else return 99;
+}
+
+

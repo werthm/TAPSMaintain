@@ -672,35 +672,15 @@ void TMHWConfigModule::SetRingValues(UInt_t ring, Double_t value)
     // Set all elements of the ring 'ring' to the value 'value' (inner ring = 1,
     // 2nd ring = 2, ...)
 
-    UInt_t ringRange[11][2] = {{0, 0}, {1, 2}, {3, 5}, {6, 9}, {10, 14}, {15, 20},
-                              {21, 27}, {28, 35}, {36, 44}, {45, 54}, {55, 63}};
-
     // check bounds
     if (ring > 11) return;
 
     // loop over all elements and change value if element belongs to the
     // specified ring
-    UInt_t mid;
-    UInt_t mid_ring = 0;
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
-        // map element to first block
-        mid = i % 64;
-
-        if (mid >= ringRange[0][0] && mid <= ringRange[0][1]) mid_ring = 1;
-        if (mid >= ringRange[1][0] && mid <= ringRange[1][1]) mid_ring = 2;
-        if (mid >= ringRange[2][0] && mid <= ringRange[2][1]) mid_ring = 3;
-        if (mid >= ringRange[3][0] && mid <= ringRange[3][1]) mid_ring = 4;
-        if (mid >= ringRange[4][0] && mid <= ringRange[4][1]) mid_ring = 5;
-        if (mid >= ringRange[5][0] && mid <= ringRange[5][1]) mid_ring = 6;
-        if (mid >= ringRange[6][0] && mid <= ringRange[6][1]) mid_ring = 7;
-        if (mid >= ringRange[7][0] && mid <= ringRange[7][1]) mid_ring = 8;
-        if (mid >= ringRange[8][0] && mid <= ringRange[8][1]) mid_ring = 9;
-        if (mid >= ringRange[9][0] && mid <= ringRange[9][1]) mid_ring = 10;
-        if (mid >= ringRange[10][0] && mid <= ringRange[10][1]) mid_ring = 11;
-        
         // element belongs to specified ring -> change value
-        if (mid_ring == ring)
+        if (ring == TMUtils::GetRingNumber(i))
         {
             fElementNewValue[i]->SetNumber(value);
         }

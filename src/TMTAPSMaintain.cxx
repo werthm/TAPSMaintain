@@ -172,7 +172,8 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
             // connect frame and display it
             TGTransientFrame* configDialog = mod->GetConfigDialog();
             configDialog->ReparentWindow(gClient->GetRoot());
-            configDialog->SetSize(configDialog->GetDefaultSize());
+            configDialog->Resize(mod->GetConfigFrame()->GetDefaultWidth() + 30, 
+                                 mod->GetConfigFrame()->GetDefaultHeight() + 50);
             configDialog->MapSubwindows();
             configDialog->MapRaised();
             

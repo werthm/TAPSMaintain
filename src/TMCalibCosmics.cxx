@@ -86,10 +86,12 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fBatchMode = new TGCheckButton(fConfigFrame, "Batch mode");
     fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
+    // needs to be called in every TMModule that uses a configuration dialog
+    fConfigFrame->Layout();
+    
     // select detector type
     fTypeCombo->Select(ECosmics_Calib_Type_BAF2_LG, kTRUE);
 
-    
     // divide canvas
     fCanvas->Divide(2, 1);
 }

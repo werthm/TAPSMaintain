@@ -29,6 +29,8 @@ namespace TMUtils
 
     Char_t* Trim(const Char_t* s);
     Bool_t IsComment(const Char_t* s);
+    
+    UInt_t GetRingNumber(Int_t element);
 }
 
 #endif

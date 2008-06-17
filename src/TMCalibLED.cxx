@@ -26,13 +26,12 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     
     // set module result header
     SetResultHeader("# Results of the LED Calibration module\n"
-                    "# Format: element id, LED Threshold Channel\n");
-    
+                    "# Format: element id, set LED threshold voltage, LED threshold channel\n");
     
     fHClone = 0;
 
     // create configuration dialog
-    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 6, 2));
+    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 17, 2));
     
     // LED type
     TGLabel* l = new TGLabel(fConfigFrame, "LED Type:");
@@ -44,7 +43,6 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fTypeCombo->Resize(200, 22);
     fTypeCombo->AddEntry("BaF2 LG LED 1", ELED_Calib_Type_LG_LED1);
     fTypeCombo->AddEntry("BaF2 LG LED 2", ELED_Calib_Type_LG_LED2);
-    fTypeCombo->AddEntry("PbWO4 LED", ELED_Calib_Type_PbWO4_LED);
     fTypeCombo->AddEntry("Manual", ELED_Calib_Type_MANUAL);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
@@ -65,11 +63,89 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fCut = new TGTextEntry(fConfigFrame);
     fConfigFrame->AddFrame(fCut, new TGTableLayoutHints(1, 2, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 2, 2));
     
+    // threshold voltage number entries
+    // ring 1
+    l = new TGLabel(fConfigFrame, "Ring 1 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 3, 4, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing1Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing1Voltage, new TGTableLayoutHints(1, 2, 3, 4, kLHintsLeft, 5, 5, 2, 2));
+    
+    // ring 2
+    l = new TGLabel(fConfigFrame, "Ring 2 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 4, 5, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing2Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing2Voltage, new TGTableLayoutHints(1, 2, 4, 5, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 3
+    l = new TGLabel(fConfigFrame, "Ring 3 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 5, 6, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing3Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing3Voltage, new TGTableLayoutHints(1, 2, 5, 6, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 4
+    l = new TGLabel(fConfigFrame, "Ring 4 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 6, 7, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing4Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing4Voltage, new TGTableLayoutHints(1, 2, 6, 7, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 5
+    l = new TGLabel(fConfigFrame, "Ring 5 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 7, 8, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing5Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing5Voltage, new TGTableLayoutHints(1, 2, 7, 8, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 6
+    l = new TGLabel(fConfigFrame, "Ring 6 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 8, 9, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing6Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing6Voltage, new TGTableLayoutHints(1, 2, 8, 9, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 7
+    l = new TGLabel(fConfigFrame, "Ring 7 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 9, 10, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing7Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing7Voltage, new TGTableLayoutHints(1, 2, 9, 10, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 8
+    l = new TGLabel(fConfigFrame, "Ring 8 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 10, 11, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing8Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing8Voltage, new TGTableLayoutHints(1, 2, 10, 11, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 9
+    l = new TGLabel(fConfigFrame, "Ring 9 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 11, 12, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing9Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing9Voltage, new TGTableLayoutHints(1, 2, 11, 12, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 10
+    l = new TGLabel(fConfigFrame, "Ring 10 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 12, 13, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing10Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing10Voltage, new TGTableLayoutHints(1, 2, 12, 13, kLHintsLeft, 5, 5, 2, 2));
+
+    // ring 11
+    l = new TGLabel(fConfigFrame, "Ring 11 Threshold [mV]:");
+    l->SetTextJustify(kTextRight);
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 13, 14, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fRing11Voltage = new TGNumberEntry(fConfigFrame, -999, 6);
+    fConfigFrame->AddFrame(fRing11Voltage, new TGTableLayoutHints(1, 2, 13, 14, kLHintsLeft, 5, 5, 2, 2));
+
     
     // x-Axis Range
     l = new TGLabel(fConfigFrame, "x-Axis Range:");
     l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 3, 4, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 14, 15, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
     fAxisRangeFrame = new TGHorizontalFrame(fConfigFrame);
     fXAxisStart = new TGTextEntry(fAxisRangeFrame, "0");
@@ -79,23 +155,25 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fAxisRangeFrame->AddFrame(fXAxisStart, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 5, 5, 2, 2));
     fAxisRangeFrame->AddFrame(new TGLabel(fAxisRangeFrame, "to"), new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
     fAxisRangeFrame->AddFrame(fXAxisEnd, new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
-    fConfigFrame->AddFrame(fAxisRangeFrame, new TGTableLayoutHints(1, 2, 3, 4, kLHintsLeft, 0, 0, 0, 0));
+    fConfigFrame->AddFrame(fAxisRangeFrame, new TGTableLayoutHints(1, 2, 14, 15, kLHintsLeft, 0, 0, 0, 0));
     
     
     // Threshold level
     l = new TGLabel(fConfigFrame, "Threshold Level:");
     l->SetTextJustify(kTextRight); 
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 4, 5, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 15, 16, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
-    fThresholdLevel = new TGTextEntry(fConfigFrame, "0.999");
+    fThresholdLevel = new TGTextEntry(fConfigFrame, "0.9");
     fThresholdLevel->Resize(40, 22);
-    fConfigFrame->AddFrame(fThresholdLevel, new TGTableLayoutHints(1, 2, 4, 5, kLHintsLeft, 5, 5, 2, 2));
+    fConfigFrame->AddFrame(fThresholdLevel, new TGTableLayoutHints(1, 2, 15, 16, kLHintsLeft, 5, 5, 2, 2));
     
     
     // Batch mode
     fBatchMode = new TGCheckButton(fConfigFrame, "Batch mode");
-    fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 5, 6, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 16, 17, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
     
+    // needs to be called in every TMModule that uses a configuration dialog
+    fConfigFrame->Layout();
     
     // select LED type
     fTypeCombo->Select(ELED_Calib_Type_LG_LED1, kTRUE);
@@ -246,7 +324,10 @@ void TMCalibLED::SaveResults(const Char_t* filename)
     // print array content
     for (Int_t i = 0; i < GetCurrentDetectorSize(); i++)
     {
-        fprintf(fout, "%3d  %7.3f\n", i+1, results[i][0]); 
+        // get element threshold voltage
+        Int_t thresVol = (Int_t)fRingVoltages[TMUtils::GetRingNumber(i)-1];
+        
+        fprintf(fout, "%3d  %5d  %7.3f\n", i+1, thresVol, results[i][0]); 
     }
     
     fclose(fout);
@@ -315,14 +396,7 @@ void TMCalibLED::UpdateLEDType(Int_t id)
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
-    else if (id == ELED_Calib_Type_PbWO4_LED)
-    {
-        fUncut->SetText("PWO-LG/pwo-LG-%03d");
-        fCut->SetText("PWO-LG-TIME/pwo-LG-TIME-%03d");
-        fUncut->SetEnabled(kFALSE);
-        fCut->SetEnabled(kFALSE);
-    }
-     else if (id == ELED_Calib_Type_MANUAL)
+    else if (id == ELED_Calib_Type_MANUAL)
     {
         fUncut->SetText("");
         fCut->SetText("");
@@ -340,7 +414,6 @@ void TMCalibLED::ReadConfig()
     Int_t type = fTypeCombo->GetSelected();
     if (type == ELED_Calib_Type_LG_LED1)        fDetID = kBaF2_Detector;
     else if (type == ELED_Calib_Type_LG_LED2)   fDetID = kBaF2_Detector;
-    else if (type == ELED_Calib_Type_PbWO4_LED) fDetID = kPbWO4_Detector;
     else if (type == ELED_Calib_Type_MANUAL)    fDetID = kBaF2_Detector;
     
     // copy histogram names
@@ -353,5 +426,18 @@ void TMCalibLED::ReadConfig()
     
     // copy threshold level
     fLevel = atof(fThresholdLevel->GetText());
+    
+    // read ring threshold voltages
+    fRingVoltages[0] = fRing1Voltage->GetNumber();
+    fRingVoltages[1] = fRing2Voltage->GetNumber();
+    fRingVoltages[2] = fRing3Voltage->GetNumber();
+    fRingVoltages[3] = fRing4Voltage->GetNumber();
+    fRingVoltages[4] = fRing5Voltage->GetNumber();
+    fRingVoltages[5] = fRing6Voltage->GetNumber();
+    fRingVoltages[6] = fRing7Voltage->GetNumber();
+    fRingVoltages[7] = fRing8Voltage->GetNumber();
+    fRingVoltages[8] = fRing9Voltage->GetNumber();
+    fRingVoltages[9] = fRing10Voltage->GetNumber();
+    fRingVoltages[10] = fRing11Voltage->GetNumber();
 }
 
