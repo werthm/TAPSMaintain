@@ -29,6 +29,11 @@
 #include "TSQLResult.h"
 #include "TSQLRow.h"
 #include "TSystem.h"
+#include "TF1.h"
+#include "TGraph.h"
+#include "TCanvas.h"
+#include "TAxis.h"
+#include "TText.h"
 
 #include "TMModule.h"
 #include "TMUtils.h"
@@ -108,7 +113,14 @@ private:
     TGNumberEntry* fGMRangeEntry;                           // range entry
     TGNumberEntry* fGMResEntry;                             // resolution entry
     TGTextButton* fGMButton;                                // perform gain match
- 
+    
+    TGCompositeFrame* fLEDFrame;                            // LED settings frame
+    TGTextEntry* fLEDCalibFileEntry;                        // LED calibration file path entry
+    TGTextButton* fLEDCalibBrowse;                          // LED calibration file "Browse" button
+    TGTextButton* fLEDAddFileButton;                        // 'add file to LED calibration' button
+    TGTextButton* fLEDShowChannelButton;                    // show the fit of a specific channel
+    TGNumberEntry* fLEDShowChannelEntry;                    // number of the channel to show the fit of
+    
     TGVerticalFrame* fInputFrame;                           // input frame
     TGLabel* fTableTitle;                                   // displays the currently loaded table
     TGCanvas* fTableCanvas;                                 // table scroll canvas
@@ -123,11 +135,17 @@ private:
     TGTextButton* fQuitButton;                              // quit module button
 
     //TGHProgressBar* fProgressBar;                           // progress bar
+    
+    TCanvas* fExternalCanvas;                               // external canvas
 
     Char_t fCurrentTable[256];                              // name of the current table
+    TF1** fLEDFitFunctions;                                 // fit functions for the LED setting
+    TGraph** fLEDGraphs;                                    // graph for the LED setting
+    UInt_t fNLEDCalibSets;                                  // number of LED calibration values per channel
 
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
+    void CreateExternalCanvas();
     Bool_t SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName);
     
 public:
@@ -144,10 +162,14 @@ public:
     void SelectImportFile();
     void SelectExportFile();
     void SelectGMCalibFile();
+    void SelectLEDCalibFile();
+    void ShowLEDCalibChannel();
     void ImportFile();
     void ExportFile();
     void DoGainMatch();
+    void AddFileToLEDCalibration();
     void HandleMouseWheel(Event_t* event);
+    void DestroyExternalCanvas();
 
     virtual void Init();
     virtual void ReadConfig() { }

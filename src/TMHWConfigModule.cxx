@@ -28,6 +28,10 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     
     // initialize members   
     fCurrentTable[0] = '\0';
+    fLEDFitFunctions = 0;
+    fLEDGraphs = 0;
+    fNLEDCalibSets = 0;
+    fExternalCanvas = 0;
 
 
     fFrame->SetLayoutManager(new TGHorizontalLayout(fFrame));
@@ -229,8 +233,51 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     l->SetTextJustify(kTextLeft);
     fGMFrame->AddFrame(l, new TGTableLayoutHints(0, 4, 5, 6, kLHintsFillX | kLHintsLeft, 15, 15, 15, 5));
 
-
+    // ------------------------------ LED settings frame ------------------------------
+    fLEDFrame = fSettingsTab->AddTab("LED");
+    fLEDFrame->SetLayoutManager(new TGTableLayout(fLEDFrame, 5, 4));
     
+    l = new TGLabel(fLEDFrame, "LED calibration file:");
+    l->SetTextJustify(kTextLeft);
+    fLEDFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 15, 5, 15, 5));
+    
+    fLEDCalibFileEntry = new TGTextEntry(fLEDFrame, "");
+    fLEDCalibFileEntry->Resize(200, 22);
+    fLEDFrame->AddFrame(fLEDCalibFileEntry,
+                       new TGTableLayoutHints(0, 3, 1, 2, kLHintsFillX | kLHintsLeft, 15, 5, 5, 5));
+    
+    fLEDCalibBrowse = new TGTextButton(fLEDFrame, " Browse ");
+    fLEDCalibBrowse->Connect("Clicked()", "TMHWConfigModule", this, "SelectLEDCalibFile()");
+    fLEDFrame->AddFrame(fLEDCalibBrowse, 
+                       new TGTableLayoutHints(3, 4, 1, 2, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
+    
+    fLEDAddFileButton = new TGTextButton(fLEDFrame, " Add ");
+    fLEDAddFileButton->Connect("Clicked()", "TMHWConfigModule", this, "AddFileToLEDCalibration()");
+    fLEDFrame->AddFrame(fLEDAddFileButton, 
+                       new TGTableLayoutHints(3, 4, 2, 3, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
+    
+    l = new TGLabel(fLEDFrame, "Choose channel to show:");
+    l->SetTextJustify(kTextRight);
+    fLEDFrame->AddFrame(l, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsLeft, 5, 15, 8, 2));
+    
+    fLEDShowChannelEntry = new TGNumberEntry(fLEDFrame, 1, 4);
+    fLEDFrame->AddFrame(fLEDShowChannelEntry,
+                       new TGTableLayoutHints(2, 3, 3, 4, kLHintsLeft, 5, 15, 5, 5));
+
+    fLEDShowChannelButton = new TGTextButton(fLEDFrame, " Show ");
+    fLEDShowChannelButton->Connect("Clicked()", "TMHWConfigModule", this, "ShowLEDCalibChannel()");
+    fLEDFrame->AddFrame(fLEDShowChannelButton, 
+                       new TGTableLayoutHints(3, 4, 3, 4, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
+                                          
+   
+    
+    l = new TGLabel(fLEDFrame, "Open several LED calibration files and add them to the LED setting\n"
+                              "calculation. A linear fit is performed for every TAPS channel using\n"
+                              "the points of the calibration files.");
+    l->SetTextJustify(kTextLeft);
+    fLEDFrame->AddFrame(l, new TGTableLayoutHints(0, 4, 4, 5, kLHintsFillX | kLHintsLeft, 15, 15, 15, 5));
+    
+                       
     // ------------------------------ End Tab ------------------------------
     fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
     fSettingsTab->SetEnabled(3, kFALSE);
@@ -388,10 +435,11 @@ void TMHWConfigModule::Init()
     // scroll to table beginning
     fTableCanvas->SetVsbPosition(0);
 
-    // clear import/export file names
+    // clear file name entries
     fImportFileEntry->SetText("");
     fExportFileEntry->SetText("");
     fGMCalibFileEntry->SetText("");
+    fLEDCalibFileEntry->SetText("");
 
     // select first tab
     fSettingsTab->SetTab(0, kFALSE);
@@ -399,6 +447,23 @@ void TMHWConfigModule::Init()
     // select default entry in combos
     fTableCombo->Select(EDB_Table_Empty, kTRUE);
     fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
+    
+    // cleanup old LED calibration memory
+    if (fNLEDCalibSets)
+    {
+        for (UInt_t i = 0; i < gMaxSize; i++) 
+        {
+            delete fLEDFitFunctions[i];
+            delete fLEDGraphs[i];
+        }
+        
+        delete [] fLEDFitFunctions;
+        delete [] fLEDGraphs;
+        
+        fNLEDCalibSets = 0;
+        fLEDFitFunctions = 0;
+        fLEDGraphs = 0;
+    }
 }
 
 //______________________________________________________________________________
@@ -482,6 +547,31 @@ void TMHWConfigModule::SelectGMCalibFile()
     
     // Write the selected file name into the text entry
     if (flags == 0 || flags == 1) fGMCalibFileEntry->SetText(filename);
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::SelectLEDCalibFile()
+{
+    // Let the user select a calibration file for the LED setting.
+
+    Char_t filename[256];
+
+    // Let TAPSMaintain open the "Open file" dialog
+    ShowFileDialog(kFDOpen);
+
+    // copy file name
+    GetAndDeleteMiscFileName(filename);
+  
+    // abort if file name is empty
+    if (!strcmp(filename, "")) return;
+
+    // Check if it's a directory
+    Long_t id, flags, modtime;
+    Long64_t size;
+    gSystem->GetPathInfo(filename, &id, &size, &flags, &modtime);
+    
+    // Write the selected file name into the text entry
+    if (flags == 0 || flags == 1) fLEDCalibFileEntry->SetText(filename);
 }
 
 //______________________________________________________________________________
@@ -647,6 +737,181 @@ void TMHWConfigModule::ExportFile()
     Char_t msg[256];
     sprintf(msg, "Values of table '%s' were saved to '%s' .", fCurrentTable, filename);
     ModuleInfo(msg);
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::AddFileToLEDCalibration()
+{
+    // Add an additional file to the LED calibration. Regenerate and refit the
+    // calibration graphs of every channel.
+
+    Char_t line[256];
+    Int_t id, voltageLED;
+    Float_t thr;
+    Double_t thresholds[gMaxSize];
+    Double_t voltages[gMaxSize];
+    
+    // get the selected file name
+    const Char_t* filename = fLEDCalibFileEntry->GetText();
+
+    // leave if import file entry is empty
+    if (!strcmp(filename, "")) return;
+    
+    // clear file input entry
+    fLEDCalibFileEntry->SetText("");
+    
+    // init arrays
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {
+        thresholds[i] = 0;
+        voltages[i] = 0;
+    }
+    
+    // open the file
+    FILE* fin;
+    fin = fopen(filename, "r");
+    
+    // read voltages and threshold from file
+    while (!feof(fin))
+    {
+        fgets(line, 256, fin);
+
+        // check if line is a comment
+        if (TMUtils::IsComment(line)) continue;
+        
+        // read id, LED threshold voltage and LED threshold channel
+        if (sscanf(line, "%d%d%f", &id, &voltageLED, &thr) == 3)
+        {
+            voltages[id-1] = (Double_t) voltageLED;
+            thresholds[id-1] = (Double_t) thr;
+        }
+    }
+    fclose(fin);
+    
+    // check if fit functions exist
+    if (!fLEDFitFunctions)
+    {
+        // generate LED fit functions
+        fLEDFitFunctions = new TF1*[gMaxSize];
+        for (UInt_t i = 0; i < gMaxSize; i++)
+        {
+            sprintf(line, "LED_fit_func_%i", i+1);
+            fLEDFitFunctions[i] = new TF1(line, "pol1", 0, 1000);
+        }
+    }
+    
+    // generate and fit graphs if not created yet
+    if (!fLEDGraphs)
+    {
+        // create graphs
+        fLEDGraphs = new TGraph*[gMaxSize];
+        for (UInt_t i = 0; i < gMaxSize; i++) fLEDGraphs[i] = new TGraph(1);
+        
+        // fill values into graphs
+        for (UInt_t i = 0; i < gMaxSize; i++)
+        {
+            fLEDGraphs[i]->SetPoint(0, thresholds[i], voltages[i]);
+        }
+        
+        fNLEDCalibSets = 1;
+    }
+    // regenerate and refit graphs if already created
+    else
+    {
+        Double_t oldVoltages[fNLEDCalibSets];
+        Double_t oldThresholds[fNLEDCalibSets];
+        
+        for (UInt_t i = 0; i < gMaxSize; i++)
+        {            
+            // backup current values
+            Double_t* graphX = fLEDGraphs[i]->GetX();
+            Double_t* graphY = fLEDGraphs[i]->GetY();
+            
+            for (UInt_t j = 0; j < fNLEDCalibSets; j++)
+            {
+                oldThresholds[j] = graphX[j];
+                oldVoltages[j] = graphY[j];
+            }
+            
+            // destroy current graph
+            delete fLEDGraphs[i];
+            
+            // create new graph
+            fLEDGraphs[i] = new TGraph(fNLEDCalibSets + 1);
+            
+            // fill new graph
+            for (UInt_t j = 0; j < fNLEDCalibSets; j++)
+            {
+                fLEDGraphs[i]->SetPoint(j, oldThresholds[j], oldVoltages[j]);
+            }
+            fLEDGraphs[i]->SetPoint(fNLEDCalibSets, thresholds[i], voltages[i]);
+            
+            // fit new graph
+            fLEDFitFunctions[i]->SetParameters(0, 0);
+            sprintf(line, "LED_fit_func_%d", i+1);
+            fLEDGraphs[i]->Fit(line, "Q");
+            
+        }
+        
+        // increment LED data set counter
+        fNLEDCalibSets++;
+    }
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::ShowLEDCalibChannel()
+{
+    // Show the LED calibration graph including the fit function of a specific
+    // TAPS channel.
+    
+    UInt_t id = (UInt_t) fLEDShowChannelEntry->GetNumber();
+    
+    if (id > 0 && id <= gMaxSize && fNLEDCalibSets)
+    {
+        TText aText;
+        Char_t text[256];
+        aText.SetTextSize(0.05);
+        aText.SetNDC();
+        
+        CreateExternalCanvas();
+        fLEDGraphs[id-1]->SetMarkerStyle(20);
+        fLEDGraphs[id-1]->Draw("ap");
+        sprintf(text, "LED Calibration: Channel %d", id);
+        fLEDGraphs[id-1]->SetTitle(text);
+        fLEDGraphs[id-1]->GetXaxis()->SetTitle("Threshold Channel");
+        fLEDGraphs[id-1]->GetYaxis()->SetTitle("Applied Voltage [mV]");
+        
+        sprintf(text, "constant: %f", fLEDFitFunctions[id-1]->GetParameter(0));
+        aText.DrawText(0.2, 0.8, text);
+        sprintf(text, "slope: %f", fLEDFitFunctions[id-1]->GetParameter(1));
+        aText.DrawText(0.2, 0.75, text);
+    
+        fExternalCanvas->Update();
+    }
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::CreateExternalCanvas()
+{
+    // Create the external canvas if necessary.
+    
+    if (!fExternalCanvas)
+    {
+        fExternalCanvas = new TCanvas();
+        fExternalCanvas->Connect("Closed()", "TMHWConfigModule", this, "DestroyExternalCanvas()");
+    }
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::DestroyExternalCanvas()
+{
+    // Destroy the external canvas.
+    
+    if (fExternalCanvas)
+    {
+        //delete fExternalCanvas;
+        fExternalCanvas = 0;
+    }
 }
 
 //______________________________________________________________________________
