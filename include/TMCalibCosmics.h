@@ -64,6 +64,7 @@ public:
     
     virtual void Init();
     virtual void ReadConfig();
+    virtual void Cleanup();
     virtual void Process(Int_t index);
     virtual void Redo();
     virtual void Quit();

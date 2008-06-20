@@ -125,6 +125,18 @@ void TMCalibCosmics::Init()
 }
 
 //______________________________________________________________________________
+void TMCalibCosmics::Cleanup()
+{
+    // Cleanup memory.
+    
+    if (fHClone) 
+    {
+        delete fHClone;
+        fHClone = 0;
+    }
+}
+
+//______________________________________________________________________________
 void TMCalibCosmics::Redo()
 {
     // Redo the current elements but change x-Axis range to 

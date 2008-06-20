@@ -36,6 +36,14 @@
 //                     dialog was displayed                             //
 //                                                                      //
 //                                                                      //
+// VIRTUAL METHODS                                                      //
+// The following method can be overwritten by any subclass of TMModule: //
+//                                                                      //
+// void Cleanup()    : module memory cleanup method. Will be called in  //
+//                     Finished() before emitting the Finished() sig-   //
+//                     nal.                                             //
+//                                                                      //
+//                                                                      // 
 // GUI                                                                  //
 // Add the module's GUI elements to the frame 'fFrame' which is the     //
 // main frame of every class derived from TMModule.                     //
@@ -138,10 +146,11 @@ public:
     void ShowFileDialog(EFileDialogMode type) 
     { Emit("ShowFileDialog(EFileDialogMode)", type); }                                      // *SIGNAL* 
     void Save() { Emit("Save()"); }                                                         // *SIGNAL* 
-    void Finished() { Emit("Finished()"); }                                                 // *SIGNAL*  
+    void Finished() { Cleanup(); Emit("Finished()"); }                                      // *SIGNAL*  
     
     virtual void Init() = 0;                        // (Re-)initalize the module
     virtual void ReadConfig() = 0;                  // Read configuration made in the config dialog 
+    virtual void Cleanup() { }                      // module cleanup: will be called in Finished()
 
     ClassDef(TMModule, 0) // Abstract module class
 };

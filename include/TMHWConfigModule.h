@@ -22,6 +22,7 @@
 #include "TGFileDialog.h"
 #include "TGNumberEntry.h"
 #include "TGTableLayout.h"
+#include "TG3DLine.h"
 #include "TGTab.h"
 //#include "TGProgressBar.h"
 #include "TColor.h"
@@ -47,6 +48,7 @@ extern "C"
     void Init_BAF2_HV(char* server); 
 }
 
+
 enum EDB_TAPS_Table {
     EDB_Table_Empty, 
     EDB_Table_BaF2_HV, 
@@ -57,7 +59,18 @@ enum EDB_TAPS_Table {
 };
 
 
+// Hardcoded values used for QT signal connections
+enum EFILE_BROWSE_SELECT {
+    EFILE_SELECT_IMPORT             = 1,
+    EFILE_SELECT_EXPORT             = 2,
+    EFILE_SELECT_GM_ENERGY_CALIB    = 3,
+    EFILE_SELECT_LED_ENERGY_CALIB   = 4,
+    EFILE_SELECT_LED_CALIB          = 5
+};
+
+
 enum {
+    ERange_Single_Element,
     ERange_All_Elements,
     ERange_Block_A,
     ERange_Block_B,
@@ -105,6 +118,7 @@ private:
     TGCompositeFrame* fExportFrame;                         // export frame
     TGTextEntry* fExportFileEntry;                          // export file path entry
     TGTextButton* fExportBrowse;                            // export "Browse" button
+    TGCheckButton* fExportColumn;                           // checkbox to select current or new values to export
     TGTextButton* fExportButton;                            // do export button
     
     TGCompositeFrame* fGMFrame;                             // gain match frame
@@ -115,11 +129,16 @@ private:
     TGTextButton* fGMButton;                                // perform gain match
     
     TGCompositeFrame* fLEDFrame;                            // LED settings frame
+    TGTextEntry* fLEDEnergyCalibFileEntry;                  // LED energy calibration file path entry
+    TGTextButton* fLEDEnergyCalibBrowse;                    // LED energy calibration file "Browse" button
     TGTextEntry* fLEDCalibFileEntry;                        // LED calibration file path entry
     TGTextButton* fLEDCalibBrowse;                          // LED calibration file "Browse" button
     TGTextButton* fLEDAddFileButton;                        // 'add file to LED calibration' button
+    TGComboBox* fLEDRangeCombo;                             // combo box for LED range selection
+    TGNumberEntry* fLEDChannelEntry;                        // number of the channel to show the fit of
     TGTextButton* fLEDShowChannelButton;                    // show the fit of a specific channel
-    TGNumberEntry* fLEDShowChannelEntry;                    // number of the channel to show the fit of
+    TGNumberEntry* fLEDThrEntry;                            // threshold value entry
+    TGTextButton* fLEDSetThrButton;                         // set thresholds to specified value
     
     TGVerticalFrame* fInputFrame;                           // input frame
     TGLabel* fTableTitle;                                   // displays the currently loaded table
@@ -142,10 +161,11 @@ private:
     TF1** fLEDFitFunctions;                                 // fit functions for the LED setting
     TGraph** fLEDGraphs;                                    // graph for the LED setting
     UInt_t fNLEDCalibSets;                                  // number of LED calibration values per channel
+    Bool_t fLEDEnergyCalib;                                 // use energy calibration in LED calibration or not
 
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
-    void CreateExternalCanvas();
+    void CreateExternalCanvas(Int_t n);
     Bool_t SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName);
     
 public:
@@ -156,14 +176,13 @@ public:
     void DoRangeManipulation();
     void ClearValues();
     void ReadTable(Int_t table);
+    void LEDRangeChange(Int_t id);
     void WriteTable();
     void WriteHVToHardware();
     void MarkChanges();
-    void SelectImportFile();
-    void SelectExportFile();
-    void SelectGMCalibFile();
-    void SelectLEDCalibFile();
-    void ShowLEDCalibChannel();
+    void SelectFile(Int_t ftype);
+    void ShowLEDCalibration();
+    void SetLEDThresholds();
     void ImportFile();
     void ExportFile();
     void DoGainMatch();
@@ -173,6 +192,7 @@ public:
 
     virtual void Init();
     virtual void ReadConfig() { }
+    virtual void Cleanup();
 
     ClassDef(TMHWConfigModule, 0) // Module for setting the TAPS hardware parameters
 };

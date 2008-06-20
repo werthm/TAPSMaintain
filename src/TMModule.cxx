@@ -36,6 +36,14 @@
 //                     dialog was displayed                             //
 //                                                                      //
 //                                                                      //
+// VIRTUAL METHODS                                                      //
+// The following method can be overwritten by any subclass of TMModule: //
+//                                                                      //
+// void Cleanup()    : module memory cleanup method. Will be called in  //
+//                     Finished() before emitting the Finished() sig-   //
+//                     nal.                                             //
+//                                                                      //
+//                                                                      // 
 // GUI                                                                  //
 // Add the module's GUI elements to the frame 'fFrame' which is the     //
 // main frame of every class derived from TMModule.                     //

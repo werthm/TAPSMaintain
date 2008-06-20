@@ -264,12 +264,17 @@ void TMTAPSMaintain::StopModule(Bool_t forced)
         fMainWindow->UnloadModuleFrame(fActiveModule->GetFrame());
         
         // unload configuration frame
+        /*
         if (fActiveModule->NeedsConfig())
         {
             TGTransientFrame* configDialog = fActiveModule->GetConfigDialog();
             configDialog->UnmapWindow();
             configDialog->ReparentWindow(0);
         }
+        */
+        
+        // cleanup module
+        fActiveModule->Cleanup();
  
         // clear module name in status bar
         fMainWindow->SetStatusBar("", 1);
