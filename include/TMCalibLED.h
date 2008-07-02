@@ -16,6 +16,7 @@
 #ifndef TAPSMaintain_TMCalibLED
 #define TAPSMaintain_TMCalibLED
 
+#include <cstdlib>
 #include "TH1.h"
 #include "TText.h"
 #include "TLine.h"

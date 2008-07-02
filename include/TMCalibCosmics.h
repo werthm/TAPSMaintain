@@ -16,6 +16,7 @@
 #ifndef TAPSMaintain_TMCalibCosmics
 #define TAPSMaintain_TMCalibCosmics
 
+#include <cstdlib>
 #include "TH1.h"
 #include "TF1.h"
 #include "TGTableLayout.h"
