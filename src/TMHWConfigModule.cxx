@@ -384,7 +384,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fProgressBar->Resize(200, 25);
     fProgressBar->SetMin(0);
     fProgressBar->SetMax(gMaxSize);
-    fProgressBar->ShowPosition(kTRUE, kFALSE, "Uploading channel %.0f");
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
     fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
 
     // add control frame to main frame
@@ -1432,6 +1432,9 @@ void TMHWConfigModule::WriteHVToHardware()
         if (val < 0 || val > 2000) return;
     }
 
+    // ask user to start HVServer
+    ModuleInfo("Please check that '/taps/HVServer' is running on vme-9! Otherwise the values will not be uploaded!");
+
     // ask user for confirmation
     ModuleQuestion("Are you sure you want to write the current values\nsaved in the database to the hardware?");
     if (GetDialogReturnValue() == kMBNo) return;
@@ -1439,6 +1442,9 @@ void TMHWConfigModule::WriteHVToHardware()
     // ask user for confirmation a second time
     ModuleQuestion("Are you REALLY sure?");
     if (GetDialogReturnValue() == kMBNo) return;
+    
+    // format progress bar
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Uploading channel %.0f");
 
     // write all values
     for (UInt_t i = 0; i < gMaxSize; i++)
@@ -1449,17 +1455,21 @@ void TMHWConfigModule::WriteHVToHardware()
         fProgressBar->SetPosition(i+1); 
         gSystem->ProcessEvents();
     }
-
+    
     // reset progress bar
     fProgressBar->Reset();
-
+ 
     // OLD CODE:
     // NOT USED AT THE MOMENT BECAUSE OF BAD STATUS MONITORING
     // call BaF2 init method
     //Init_BAF2_HV((char*)gTAPS_Server);
+    //ModuleInfo("The command for the initialization of the BaF2 HV was sent to the\n"
+    //           "TAPS hardware server. Please wait until all 544 elements were\n"
+    //           "initialized. This could take some time!");
+    
+    // re-format progress bar
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
 
-    ModuleInfo("The command for the initialization of the BaF2 HV was sent to the\n"
-               "TAPS hardware server. Please wait until all 544 elements were\n"
-               "initialized. This could take some time!");
+    ModuleInfo("Upload completed!");
 }
 

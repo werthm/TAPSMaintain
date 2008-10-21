@@ -46,7 +46,6 @@ private:
     
     TH1F* fHClone;                              // histogram pointer used for cloning
     TF1* fPedFunc;                              // function used for pedestal fitting
-    TF1* fPeakFunc;                             // function used for cosmic peak fitting
     TF1* fBgFunc;                               // cosmics peak background function
     TF1* fTotalFunc;                            // total cosmic peak function
     

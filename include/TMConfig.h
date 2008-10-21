@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.0";
+static const Char_t gTAPSMaintainVersion[] = "0.1.1";
 
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://taps01/taps";
@@ -36,7 +36,7 @@ const UInt_t gVetoSize  = 384;
 
 // energy loss of minimal ionizing particles in the TAPS detectors [MeV]
 const Double_t gTAPS_MIP_Loss_BaF2  = 37.7;
-const Double_t gTAPS_MIP_Loss_PbWO4 = 22.6;   // ?
+const Double_t gTAPS_MIP_Loss_PbWO4 = 29.5;
 const Double_t gTAPS_MIP_Loss_Veto  = 5;      // ?
 
 // BaF2 HV calibration gain slope
