@@ -39,7 +39,7 @@ void Set_BAF2_HV(char* server, int det, int value)
     cmd[3] = value;
     cmd[4] = 0;
       
-    //printf("<I> %-8s: Port %5d Command %3d %3d %3d %3d %3d\n", server, port, cmd[0], cmd[1], cmd[2], cmd[3], cmd[4]);
+    printf("<I> %-8s: Port %5d Command %3d %3d %3d %3d %3d\n", server, port, cmd[0], cmd[1], cmd[2], cmd[3], cmd[4]);
 
     // connect to server
     if((socket_id = do_connect(server, port, 0)) < 0) 
@@ -55,12 +55,12 @@ void Set_BAF2_HV(char* server, int det, int value)
     if (status) printf("ERROR IN TCP CONNECTION !!! :%d:\n", status);
     else
     {
-        //printf("    Returned:");
-	//for (i = 0; i < (cmd[0]/4); i++)
-        //{
-	//    printf(" %3d", (cmd[i]));
-        //}
-	//printf("\n");
+        printf("    Returned:");
+	for (i = 0; i < (cmd[0]/4); i++)
+        {
+	    printf(" %3d", (cmd[i]));
+        }
+	printf("\n");
     }
 }
 
@@ -77,7 +77,7 @@ void Init_BAF2_HV(char* server)
     cmd[0] = 2*4; 
     cmd[1] = HV_BAF_INIT;
 
-    //printf("<I> %-8s: Port %5d Command %3d %3d\n", server, port, cmd[0], cmd[1]);
+    printf("<I> %-8s: Port %5d Command %3d %3d\n", server, port, cmd[0], cmd[1]);
 
     // connect to server
     if((socket_id = do_connect(server, port, 0)) < 0) 
@@ -93,12 +93,12 @@ void Init_BAF2_HV(char* server)
     if (status) printf("ERROR IN TCP CONNECTION !!! :%d:\n", status);
     else
     {
-        //printf("    Returned:");
-	//for (i = 0; i < (cmd[0]/4); i++)
-        //{
-	//    printf(" %3d", (cmd[i]));
-        //}
-	//printf("\n");
+        printf("    Returned:");
+	for (i = 0; i < (cmd[0]/4); i++)
+        {
+	    printf(" %3d", (cmd[i]));
+        }
+	printf("\n");
     }
 }
 

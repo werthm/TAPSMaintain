@@ -24,7 +24,7 @@
 #include "TGTableLayout.h"
 #include "TG3DLine.h"
 #include "TGTab.h"
-//#include "TGProgressBar.h"
+#include "TGProgressBar.h"
 #include "TColor.h"
 #include "TSQLServer.h"
 #include "TSQLResult.h"
@@ -153,7 +153,7 @@ private:
     TGTextButton* fWriteHWButton;                           // will write the values to the DB
     TGTextButton* fQuitButton;                              // quit module button
 
-    //TGHProgressBar* fProgressBar;                           // progress bar
+    TGHProgressBar* fProgressBar;                           // progress bar
     
     TCanvas* fExternalCanvas;                               // external canvas
 

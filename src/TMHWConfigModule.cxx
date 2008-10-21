@@ -38,7 +38,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     
     // ------------------------------ Control frame ------------------------------
     fControlFrame = new TGCompositeFrame(fFrame, 50, 50);
-    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 6, 2));
+    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 7, 2));
     
     // DB URL
     TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
@@ -379,14 +379,13 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
 
 
     //// Progress bar
-    //fProgressBar = new TGHProgressBar(fControlFrame, TGProgressBar::kFancy, 10);
-    //fProgressBar->SetBarColor("green");
-    //fProgressBar->Resize(200, 25);
-    //fProgressBar->SetMin(0);
-    //fProgressBar->SetMax(gMaxSize);
-    //fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing element %.0f");
-    //fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 8, 9, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
-    
+    fProgressBar = new TGHProgressBar(fControlFrame, TGProgressBar::kFancy, 10);
+    fProgressBar->SetBarColor("green");
+    fProgressBar->Resize(200, 25);
+    fProgressBar->SetMin(0);
+    fProgressBar->SetMax(gMaxSize);
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Uploading channel %.0f");
+    fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
 
     // add control frame to main frame
     fFrame->AddFrame(fControlFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft | kLHintsFillX | kLHintsFillY, 10, 10, 10, 10));
@@ -1441,7 +1440,6 @@ void TMHWConfigModule::WriteHVToHardware()
     ModuleQuestion("Are you REALLY sure?");
     if (GetDialogReturnValue() == kMBNo) return;
 
-    /* Commented method of setting the HV using Set_BAF2_HV. Use Init_BAF2_HV instead
     // write all values
     for (UInt_t i = 0; i < gMaxSize; i++)
     {
@@ -1454,10 +1452,11 @@ void TMHWConfigModule::WriteHVToHardware()
 
     // reset progress bar
     fProgressBar->Reset();
-    */
 
+    // OLD CODE:
+    // NOT USED AT THE MOMENT BECAUSE OF BAD STATUS MONITORING
     // call BaF2 init method
-    Init_BAF2_HV((char*)gTAPS_Server);
+    //Init_BAF2_HV((char*)gTAPS_Server);
 
     ModuleInfo("The command for the initialization of the BaF2 HV was sent to the\n"
                "TAPS hardware server. Please wait until all 544 elements were\n"
