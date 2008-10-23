@@ -39,18 +39,22 @@ TMModuleLoader::TMModuleLoader(UInt_t startID)
     
     // ---------------------------- Load modules ----------------------------
     UInt_t numberOfModules = startID;
-    
-    // TAPS hardware settings module
-    TMHWConfigModule* m1 = new TMHWConfigModule("TAPS hardware settings", numberOfModules++);
+ 
+    // Spectra checking module
+    TMCheckSpectra* m1 = new TMCheckSpectra("Check spectra", numberOfModules++);
     fModules->Add(m1);
     
-    // LED calibration module
-    TMCalibCosmics* m2 = new TMCalibCosmics("Cosmics Calibration", numberOfModules++);
+    // TAPS hardware settings module
+    TMHWConfigModule* m2 = new TMHWConfigModule("TAPS hardware settings", numberOfModules++);
     fModules->Add(m2);
     
-    // LED calibration module
-    TMCalibLED* m3 = new TMCalibLED("LED Calibration", numberOfModules++);
+    // Cosmics calibration module
+    TMCalibCosmics* m3 = new TMCalibCosmics("Cosmics Calibration", numberOfModules++);
     fModules->Add(m3);
+    
+    // LED calibration module
+    TMCalibLED* m4 = new TMCalibLED("LED Calibration", numberOfModules++);
+    fModules->Add(m4);
 }
 
 //______________________________________________________________________________

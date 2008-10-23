@@ -18,6 +18,7 @@
 
 #include "TList.h"
 
+#include "TMCheckSpectra.h"
 #include "TMHWConfigModule.h"
 #include "TMCalibCosmics.h"
 #include "TMCalibLED.h"

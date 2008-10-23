@@ -36,6 +36,7 @@
 #pragma link C++ class TMHWConfigModule+; 
 #pragma link C++ class TMCalibCosmics+; 
 #pragma link C++ class TMCalibLED+; 
+#pragma link C++ class TMCheckSpectra+; 
 
 #endif
 
