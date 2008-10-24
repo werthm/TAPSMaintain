@@ -132,8 +132,6 @@ void TMCheckSpectra::SpectraSelectionChanged(Int_t id)
 {
     // Update the GUI after the user has changed the spectra combo box.
     
-    Char_t name[256];
-
     // Set detector number entry limits
     if (id == ESpec_PWO_LG      ||
         id == ESpec_PWO_LG_TIME ||
