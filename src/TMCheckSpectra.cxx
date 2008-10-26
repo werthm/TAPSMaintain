@@ -38,6 +38,7 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo = new TGComboBox(fControlFrame);
     fSpectraCombo->Resize(135, 22);
     fSpectraCombo->Connect("Selected(Int_t)", "TMCheckSpectra", this, "SpectraSelectionChanged(Int_t)");
+    fSpectraCombo->AddEntry("Select class"         , ESpec_Empty);           
     fSpectraCombo->AddEntry("BaF2 LG"              , ESpec_BaF2_LG);           
     fSpectraCombo->AddEntry("BaF2 LG_LED1"         , ESpec_BaF2_LG_LED1);
     fSpectraCombo->AddEntry("BaF2 LG_LED2"         , ESpec_BaF2_LG_LED2);
@@ -59,13 +60,11 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo->AddEntry("PWO TIME"             , ESpec_PWO_TIME);
     fSpectraCombo->AddEntry("PWO TIME MULT"        , ESpec_PWO_TIME_MULT);
     fControlFrame->AddFrame(fSpectraCombo, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fSpectraCombo->Select(ESpec_BaF2_LG, kFALSE);
     
     // add element number entry
     fElementNumberEntry = new TGNumberEntry(fControlFrame, 1, 3);
     fElementNumberEntry->Connect("ValueSet(Long_t)", "TMCheckSpectra", this, "DrawHistogram()");
     fElementNumberEntry->SetLimits(TGNumberFormat::kNELLimitMinMax);
-    fElementNumberEntry->SetLimitValues(1, gBaF2Size);
     fControlFrame->AddFrame(fElementNumberEntry, new TGTableLayoutHints(1, 2, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
 
     // add control frame to main frame
@@ -105,7 +104,10 @@ void TMCheckSpectra::DrawHistogram()
 
     Char_t name[256];
     Char_t hName[256];
-  
+
+    // exit if no class was selected
+    if (fSpectraCombo->GetSelected() == ESpec_Empty) return;
+ 
     // construct histogram name
     sprintf(hName, specNames[fSpectraCombo->GetSelected()], (Int_t)fElementNumberEntry->GetNumber());
 
@@ -132,6 +134,15 @@ void TMCheckSpectra::SpectraSelectionChanged(Int_t id)
 {
     // Update the GUI after the user has changed the spectra combo box.
     
+    // Reset spectrum class combo box and clear canvas
+    if (id == ESpec_Empty)
+    {
+        fElementNumberEntry->SetLimitValues(0, 0);
+        fCanvas->Clear();
+        fCanvas->Update();
+        return;
+    }
+
     // Set detector number entry limits
     if (id == ESpec_PWO_LG      ||
         id == ESpec_PWO_LG_TIME ||
@@ -155,9 +166,12 @@ void TMCheckSpectra::Init()
 {
     // (Re-)initalize the module.
     
-    // Draw default histogram
-    fElementNumberEntry->SetIntNumber(1);
-    fSpectraCombo->Select(ESpec_BaF2_LG, kFALSE);
-    DrawHistogram();
+    // Reset spectrum class combo box
+    fElementNumberEntry->SetIntNumber(0);
+    fElementNumberEntry->SetLimitValues(0, 0);
+    fSpectraCombo->Select(ESpec_Empty, kFALSE);
+
+    // clear canvas
+    fCanvas->Clear();
 }
 

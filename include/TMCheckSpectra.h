@@ -28,6 +28,7 @@
 
 
 enum {
+    ESpec_Empty,
     ESpec_BaF2_LG,
     ESpec_BaF2_LG_LED1,
     ESpec_BaF2_LG_LED2,
@@ -51,8 +52,9 @@ enum {
 };
 
 
-static const Char_t specNames[20][64] = 
-    {{"LG/baf2-LG-%03d"},
+static const Char_t specNames[21][64] = 
+    {{"nothing"},
+     {"LG/baf2-LG-%03d"},
      {"LG_LED1/baf2-LG_LED1-%03d"},
      {"LG_LED2/baf2-LG_LED2-%03d"},
      {"LGbed/baf2-LGbed-%03d"},
