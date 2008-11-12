@@ -282,7 +282,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     
     fLEDRangeCombo = new TGComboBox(fLEDFrame);
     fLEDRangeCombo->Resize(150, 22);
-    fLEDRangeCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "LEDRangeChange(Int_t)");
+    fLEDRangeCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "LEDRangeChanged(Int_t)");
     fLEDRangeCombo->AddEntry("Single element", ERange_Single_Element);
     fLEDRangeCombo->AddEntry("All elements", ERange_All_Elements);
     fLEDRangeCombo->AddEntry("Block A elements", ERange_Block_A);
@@ -315,7 +315,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fLEDFrame->AddFrame(fLEDShowChannelButton, 
                         new TGTableLayoutHints(3, 4, 6, 7, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
               
-    l = new TGLabel(fLEDFrame, "Set threshold of range to [MeV or channel]:");
+    l = new TGLabel(fLEDFrame, "Set threshold of range to [MeV]:");
     l->SetTextJustify(kTextRight);
     fLEDFrame->AddFrame(l, new TGTableLayoutHints(0, 2, 7, 8, kLHintsFillX | kLHintsLeft, 5, 15, 8, 2));                           
                                             
@@ -568,7 +568,7 @@ void TMHWConfigModule::HandleMouseWheel(Event_t* event)
 }
 
 //______________________________________________________________________________
-void TMHWConfigModule::LEDRangeChange(Int_t id)
+void TMHWConfigModule::LEDRangeChanged(Int_t id)
 {
     // Update the GUI after the user has changed the range of the LED 
     // elements in the combo box.
@@ -783,49 +783,22 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     Double_t voltages[gMaxSize];
     Double_t energyCalibPed[gMaxSize];
     Double_t energyCalibGain[gMaxSize];
-    fLEDEnergyCalib = kFALSE;
-    
-    // get the selected file name
+    FILE* fin;
+
+    // get the selected file name of the LED calib file
     const Char_t* filename = fLEDCalibFileEntry->GetText();
 
     // leave if import file entry is empty
     if (!strcmp(filename, "")) return;
-    
-    // clear file input entry
-    fLEDCalibFileEntry->SetText("");
-    
-    // init arrays
-    for (UInt_t i = 0; i < gMaxSize; i++)
-    {
-        thresholds[i] = 0;
-        voltages[i] = 0;
-    }
-    
-    // open the LED calibration file
-    FILE* fin;
-    fin = fopen(filename, "r");
-    
-    // read voltages and threshold from file
-    while (!feof(fin))
-    {
-        fgets(line, 256, fin);
-
-        // check if line is a comment
-        if (TMUtils::IsComment(line)) continue;
-        
-        // read id, LED threshold voltage and LED threshold channel
-        if (sscanf(line, "%d%d%f", &id, &voltageLED, &thr) == 3)
-        {
-            voltages[id-1] = (Double_t) voltageLED;
-            thresholds[id-1] = (Double_t) thr;
-        }
-    }
-    fclose(fin);
-    
-    
+     
     // check for energy calibration
     const Char_t* ecalfile = fLEDEnergyCalibFileEntry->GetText();
-    if (strcmp(ecalfile, ""))
+    if (!strcmp(ecalfile, ""))
+    {
+        ModuleError("Please load an energy calibration file before adding LED calibration files!");
+        return;
+    }
+    else
     {
         Int_t id;
         Float_t ped, peak, gain;
@@ -849,9 +822,37 @@ void TMHWConfigModule::AddFileToLEDCalibration()
             }
         }
         fclose(fin);
-        fLEDEnergyCalib = kTRUE;
     }
+    
+    // clear file input entry
+    fLEDCalibFileEntry->SetText("");
+    
+    // init arrays
+    for (UInt_t i = 0; i < gMaxSize; i++)
+    {
+        thresholds[i] = 0;
+        voltages[i] = 0;
+    }
+   
+    // open the LED calibration file
+    fin = fopen(filename, "r");
+    
+    // read voltages and threshold from file
+    while (!feof(fin))
+    {
+        fgets(line, 256, fin);
 
+        // check if line is a comment
+        if (TMUtils::IsComment(line)) continue;
+        
+        // read id, LED threshold voltage and LED threshold channel
+        if (sscanf(line, "%d%d%f", &id, &voltageLED, &thr) == 3)
+        {
+            voltages[id-1] = (Double_t) voltageLED;
+            thresholds[id-1] = (Double_t) thr;
+        }
+    }
+    fclose(fin);
     
     // check if fit functions exist
     if (!fLEDFitFunctions)
@@ -876,9 +877,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         // fill values into graphs
         for (UInt_t i = 0; i < gMaxSize; i++)
         {
-            if (fLEDEnergyCalib) fLEDGraphs[i]->SetPoint(0, energyCalibGain[i] * (thresholds[i] - energyCalibPed[i]), 
-                                                         voltages[i]);
-            else fLEDGraphs[i]->SetPoint(0, thresholds[i], voltages[i]);
+            fLEDGraphs[i]->SetPoint(0, energyCalibGain[i] * (thresholds[i] - energyCalibPed[i]), voltages[i]);
         }
         
         fNLEDCalibSets = 1;
@@ -914,16 +913,12 @@ void TMHWConfigModule::AddFileToLEDCalibration()
             }
             
             // add new point
-            if (fLEDEnergyCalib) fLEDGraphs[i]->SetPoint(fNLEDCalibSets, 
-                                                         energyCalibGain[i] * (thresholds[i] - energyCalibPed[i]), 
-                                                         voltages[i]);
-            else fLEDGraphs[i]->SetPoint(fNLEDCalibSets, thresholds[i], voltages[i]);
+            fLEDGraphs[i]->SetPoint(fNLEDCalibSets, energyCalibGain[i] * (thresholds[i] - energyCalibPed[i]), voltages[i]);
             
             // fit new graph
             fLEDFitFunctions[i]->SetParameters(0, 0);
             sprintf(line, "LED_fit_func_%d", i+1);
             fLEDGraphs[i]->Fit(line, "Q");
-            
         }
         
         // increment LED data set counter
@@ -1032,8 +1027,7 @@ void TMHWConfigModule::ShowLEDCalibration()
             fLEDGraphs[id-1]->Draw("ap");
             sprintf(text, "LED Calibration: Channel %d", id);
             fLEDGraphs[id-1]->SetTitle(text);
-            if (fLEDEnergyCalib) fLEDGraphs[id-1]->GetXaxis()->SetTitle("Threshold Energy [Mev]");
-            else fLEDGraphs[id-1]->GetXaxis()->SetTitle("Threshold Channel");
+            fLEDGraphs[id-1]->GetXaxis()->SetTitle("Threshold Energy [Mev]");
             fLEDGraphs[id-1]->GetYaxis()->SetTitle("Applied Voltage [mV]");
         
             sprintf(text, "constant: %f", fLEDFitFunctions[id-1]->GetParameter(0));

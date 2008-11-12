@@ -25,6 +25,17 @@ Char_t* TMUtils::fTmpCh = 0;
 
 
 //______________________________________________________________________________
+Int_t TMUtils::IndexOf(const Char_t* s1, const Char_t* s2)
+{
+    // Returns the position of the first occurence of the string s2
+    // in the string s1. Returns -1 if s2 was not found.
+
+    const Char_t* pos = strstr(s1, s2);
+    if (pos) return pos-s1;
+    else return -1;
+}
+
+//______________________________________________________________________________
 Char_t* TMUtils::Trim(const Char_t* s)
 {
     // Removes the leading and trailing whitespace of the string s.
@@ -115,5 +126,4 @@ UInt_t TMUtils::GetRingNumber(Int_t elem)
     else if (mid >= ringRange[10][0] && mid <= ringRange[10][1]) return 11;
     else return 99;
 }
-
 

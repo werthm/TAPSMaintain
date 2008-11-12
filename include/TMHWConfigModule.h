@@ -69,29 +69,6 @@ enum EFILE_BROWSE_SELECT {
 };
 
 
-enum {
-    ERange_Single_Element,
-    ERange_All_Elements,
-    ERange_Block_A,
-    ERange_Block_B,
-    ERange_Block_C,
-    ERange_Block_D,
-    ERange_Block_E,
-    ERange_Block_F,
-    ERange_Ring_1,
-    ERange_Ring_2,
-    ERange_Ring_3,
-    ERange_Ring_4,
-    ERange_Ring_5,
-    ERange_Ring_6,
-    ERange_Ring_7,
-    ERange_Ring_8,
-    ERange_Ring_9,
-    ERange_Ring_10,
-    ERange_Ring_11,
-};
-
-
 class TMHWConfigModule : public TMModule
 {
     RQ_OBJECT("TMHWConfigModule")
@@ -161,7 +138,6 @@ private:
     TF1** fLEDFitFunctions;                                 // fit functions for the LED setting
     TGraph** fLEDGraphs;                                    // graph for the LED setting
     UInt_t fNLEDCalibSets;                                  // number of LED calibration values per channel
-    Bool_t fLEDEnergyCalib;                                 // use energy calibration in LED calibration or not
 
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
@@ -176,7 +152,7 @@ public:
     void DoRangeManipulation();
     void ClearValues();
     void ReadTable(Int_t table);
-    void LEDRangeChange(Int_t id);
+    void LEDRangeChanged(Int_t id);
     void WriteTable();
     void WriteHVToHardware();
     void MarkChanges();

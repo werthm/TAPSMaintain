@@ -14,6 +14,8 @@
 * Set PbWO4 mips energy loss to 29.5 MeV
 * HV values are now written channel per channel to the HVServer
 * Improved fitting in cosmics calibration for PbWO4 detectors
+* Removed possibility to perform LED calibration without energy
+  calibration file
 
 0.1.0 : 02 Jul 2008
 * Initial release

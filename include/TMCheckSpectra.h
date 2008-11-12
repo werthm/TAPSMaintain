@@ -18,13 +18,16 @@
 
 #include "RQ_OBJECT.h"
 #include "TH1.h"
+#include "TKey.h"
 #include "TGTableLayout.h"
 #include "TGComboBox.h"
 #include "TGNumberEntry.h"
 #include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
+#include "TStyle.h"
 
 #include "TMModule.h"
+#include "TMUtils.h"
 
 
 enum {
@@ -83,20 +86,36 @@ class TMCheckSpectra : public TMModule
 private:
     TGCompositeFrame* fControlFrame;                        // frame for the control elements
     TGComboBox* fSpectraCombo;                              // spectra selection combo box
+    TGComboBox* fElementCombo;                              // element selection combo box
     TGNumberEntry* fElementNumberEntry;                     // entry for the detector number
-    
+    TGListBox* fSpList;                                     // spectra list
+     
     TGVerticalFrame* fCanvasFrame;                          // Canvas frame
     TRootEmbeddedCanvas* fEmbCanvas;                        // the embedded canvas
     TCanvas* fCanvas;                                       // the canvas
- 
+
+    TGCheckButton* fCheckLogy;                              // checkbox for log y-axis selection
+    TGNumberEntry* fXStart;                                 // x-axis range start
+    TGNumberEntry* fXEnd;                                   // x-axis range end
+
+    void DrawSingleHistogram();
+    void DrawMultipleHistograms();
+    
 public:
     TMCheckSpectra() : TMModule() { }
     TMCheckSpectra(const Char_t* name, UInt_t id);
     virtual ~TMCheckSpectra();
     
-    void DrawHistogram();
-    void SpectraSelectionChanged(Int_t id);
-
+    void DrawPatternHistogram(Int_t id);
+    void SpectraClassChanged(Int_t id);
+    void ElementRangeChanged(Int_t id);
+    void ElementNumberChanged();
+    void DrawHistogram()
+    {
+        if (fElementCombo->GetSelected() == ERange_Single_Element) DrawSingleHistogram();
+        else DrawMultipleHistograms();
+    }
+ 
     virtual void Init();
     virtual void ReadConfig() { }
     virtual void Cleanup();
