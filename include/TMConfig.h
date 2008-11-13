@@ -42,6 +42,16 @@ const Double_t gTAPS_MIP_Loss_Veto  = 5;      // ?
 // BaF2 HV calibration gain slope
 const Double_t gBaF2_Gain_Slope = 153;
 
+// TAPS DB limits
+const Double_t gDB_BaF2_HV_Min = 0.;
+const Double_t gDB_BaF2_HV_Max = 2000.;
+const Double_t gDB_BaF2_CFD_Min = 1.;
+const Double_t gDB_BaF2_CFD_Max = 10000.;
+const Double_t gDB_BaF2_LED_Min = -9999.;
+const Double_t gDB_BaF2_LED_Max = -1.;
+const Double_t gDB_Veto_LED_Min = -9999.;
+const Double_t gDB_Veto_LED_Max = -1.;
+
 // define TAPS detectors
 enum ETAPSDetector {
     kNo_Detector,

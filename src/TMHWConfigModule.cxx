@@ -115,6 +115,8 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "to"), new TGLayoutHints(kLHintsLeft, 7, 5, 35, 5));
     
     fRangeManipEntry = new TGNumberEntry(fRangeManipFrame, 0, 8);
+    fRangeManipEntry->SetLimits(TGNumberFormat::kNELLimitMinMax);
+    fRangeManipEntry->SetLimitValues(0., 0.);
     fRangeManipFrame->AddFrame(fRangeManipEntry, new TGLayoutHints(kLHintsLeft, 7, 5, 32, 2));
 
     fRangeManipButton = new TGTextButton(fRangeManipFrame, "    Set    ");
@@ -339,6 +341,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     // ------------------------------ End Tab ------------------------------
     fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
     fSettingsTab->SetEnabled(3, kFALSE);
+    fSettingsTab->SetEnabled(4, kFALSE);
 
 
 
@@ -453,6 +456,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
 
         // add new value entry
         fElementNewValue[i] = new TGNumberEntry(fTableFrame, 0, 10);
+        fElementNewValue[i]->SetLimits(TGNumberFormat::kNELLimitMinMax);
         fElementNewValue[i]->Connect("ValueSet(Long_t)", "TMHWConfigModule", this, "MarkChanges()");
         fTableFrame->AddFrame(fElementNewValue[i], 
                               new TGTableLayoutHints(2, 3, i+1, i+2, kLHintsFillX | kLHintsLeft, 4, 4, 4, 4));
@@ -637,8 +641,14 @@ void TMHWConfigModule::ImportFile()
     // get the selected file name
     const Char_t* filename = fImportFileEntry->GetText();
 
+    // get the selected table
+    Int_t table = fTableCombo->GetSelected();
+    
     // leave if import file entry is empty
     if (!strcmp(filename, "")) return;
+
+    // leave if no table is selected
+    if (table == EDB_Table_Empty) return;
 
     // open the file
     FILE* fin;
@@ -654,7 +664,7 @@ void TMHWConfigModule::ImportFile()
 
         if (sscanf(line, "%d%f", &id, &value) == 2)
         {
-            fElementNewValue[id-1]->SetNumber(value);
+            if (CheckValueLimits((EDB_TAPS_Table)table, value)) fElementNewValue[id-1]->SetNumber(value);
         }
     }
 
@@ -716,8 +726,10 @@ void TMHWConfigModule::DoGainMatch()
             // correct bad HV value
             if (hv_new < 0) hv_new = hv_old;
 
-            // set new HV value
-            fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
+            // check limits and set new HV value
+            if (hv_new < gDB_BaF2_HV_Min) fElementNewValue[id-1]->SetNumber((Int_t)gDB_BaF2_HV_Min);
+            else if (hv_new > gDB_BaF2_HV_Max) fElementNewValue[id-1]->SetNumber((Int_t)gDB_BaF2_HV_Max);
+            else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
         }
     }
 
@@ -946,10 +958,11 @@ void TMHWConfigModule::SetLEDThresholds()
         // selected channel
         Int_t id = (UInt_t) fLEDChannelEntry->GetNumber();
         
-        // set value
+        // check limits and set value 
         Int_t resValue = (Int_t)fLEDFitFunctions[id-1]->Eval(reqValue);
-        if (resValue >= 0) resValue = -999;
-        fElementNewValue[id-1]->SetNumber(resValue);
+        if (resValue < gDB_BaF2_LED_Min) fElementNewValue[id-1]->SetNumber(gDB_BaF2_LED_Min);
+        else if (resValue > gDB_BaF2_LED_Max) fElementNewValue[id-1]->SetNumber(gDB_BaF2_LED_Max);
+        else fElementNewValue[id-1]->SetNumber(resValue);
     }
     else if (selectedLEDRange == ERange_All_Elements)
     {
@@ -957,8 +970,9 @@ void TMHWConfigModule::SetLEDThresholds()
         for (UInt_t i = 0; i < gMaxSize; i++)
         {
             Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-            if (resValue >= 0) resValue = -999;
-            fElementNewValue[i]->SetNumber(resValue);
+            if (resValue < gDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Min);
+            else if (resValue > gDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Max);
+            else fElementNewValue[i]->SetNumber(resValue);
         }
     }
     else
@@ -989,8 +1003,9 @@ void TMHWConfigModule::SetLEDThresholds()
             if (ring == TMUtils::GetRingNumber(i))
             {
                 Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-                if (resValue >= 0) resValue = -999;
-                fElementNewValue[i]->SetNumber(resValue);
+                if (resValue < gDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Min);
+                else if (resValue > gDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Max);
+                else fElementNewValue[i]->SetNumber(resValue);
             }
         }
     }
@@ -1117,11 +1132,14 @@ void TMHWConfigModule::SetBlockValues(UInt_t block, Double_t value)
 
     // check bounds
     if (block > 6) return;
-
+    
+    // get the selected table
+    Int_t table = fTableCombo->GetSelected();
+ 
     // Set values
     for (UInt_t i = blockRange[block-1][0]; i < blockRange[block-1][1]; i++) 
     {
-        fElementNewValue[i]->SetNumber(value);
+        if (CheckValueLimits((EDB_TAPS_Table)table, value)) fElementNewValue[i]->SetNumber(value);
     }
 }
 
@@ -1133,7 +1151,10 @@ void TMHWConfigModule::SetRingValues(UInt_t ring, Double_t value)
 
     // check bounds
     if (ring > 11) return;
-
+    
+    // get the selected table
+    Int_t table = fTableCombo->GetSelected();
+ 
     // loop over all elements and change value if element belongs to the
     // specified ring
     for (UInt_t i = 0; i < gMaxSize; i++)
@@ -1141,7 +1162,7 @@ void TMHWConfigModule::SetRingValues(UInt_t ring, Double_t value)
         // element belongs to specified ring -> change value
         if (ring == TMUtils::GetRingNumber(i))
         {
-            fElementNewValue[i]->SetNumber(value);
+            if (CheckValueLimits((EDB_TAPS_Table)table, value)) fElementNewValue[i]->SetNumber(value);
         }
     }
 }
@@ -1161,7 +1182,8 @@ void TMHWConfigModule::ClearValues()
     for (UInt_t i = 0; i < gMaxSize; i++)
     {   
         fElementCurrentValue[i]->SetText("0");
-        fElementNewValue[i]->SetNumber(0);
+        fElementNewValue[i]->SetNumber(0.);
+        fElementNewValue[i]->SetLimitValues(0., 0.);
         fElementValueChanged[i]->SetText("       ");
         fElementValueChanged[i]->ChangeBackground(fTableFrame->GetBackground());
     }
@@ -1200,8 +1222,19 @@ void TMHWConfigModule::DoRangeManipulation()
     // get selected range and value
     Int_t range = fRangeManipCombo->GetSelected();
     Double_t value = fRangeManipEntry->GetNumber();
+    
+    // get the selected table
+    Int_t table = fTableCombo->GetSelected();
+ 
+    // leave if no table is selected
+    if (table == EDB_Table_Empty) return;
 
-    if (range == ERange_All_Elements) for (UInt_t i = 0; i < gMaxSize; i++) fElementNewValue[i]->SetNumber(value);
+    if (range == ERange_All_Elements) 
+    {
+        // check limits
+        if (CheckValueLimits((EDB_TAPS_Table)table, value)) 
+            for (UInt_t i = 0; i < gMaxSize; i++) fElementNewValue[i]->SetNumber(value);
+    }
     else if (range == ERange_Block_A) SetBlockValues(1, value);
     else if (range == ERange_Block_B) SetBlockValues(2, value);
     else if (range == ERange_Block_C) SetBlockValues(3, value);
@@ -1221,6 +1254,36 @@ void TMHWConfigModule::DoRangeManipulation()
     else if (range == ERange_Ring_11) SetRingValues(11, value);
 
     MarkChanges();
+}
+
+//______________________________________________________________________________
+Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
+{
+    // Check if the value 'value' lies within the limits of the accepted values
+    // for the table 'table'.
+
+    if (table == EDB_Table_BaF2_HV)
+    {
+        if (value >= gDB_BaF2_HV_Min && value <= gDB_BaF2_HV_Max) return kTRUE;
+        else return kFALSE;
+    }
+    if (table == EDB_Table_BaF2_CFD)
+    {
+        if (value >= gDB_BaF2_CFD_Min && value <= gDB_BaF2_CFD_Max) return kTRUE;
+        else return kFALSE;
+    }
+    if (table == EDB_Table_BaF2_LED1 || EDB_Table_BaF2_LED2)
+    {
+        if (value >= gDB_BaF2_LED_Min && value <= gDB_BaF2_LED_Max) return kTRUE;
+        else return kFALSE;
+    }
+    if (table == EDB_Table_Veto_LED)
+    {
+        if (value >= gDB_Veto_LED_Min && value <= gDB_Veto_LED_Max) return kTRUE;
+        else return kFALSE;
+    }
+
+    return kFALSE;
 }
 
 //______________________________________________________________________________
@@ -1276,22 +1339,40 @@ void TMHWConfigModule::ReadTable(Int_t table)
     Char_t badEntriesID[768];
     badEntriesID[0] = '\0';
 
-
     // Clear current displayed values
     ClearValues();
     
-    // activate BaF2 HV functions
+    // de-/activate GUI elements depending on the loaded table 
     if (table == EDB_Table_BaF2_HV) 
     {
         fWriteHWButton->SetEnabled(kTRUE);
         fSettingsTab->SetEnabled(3, kTRUE);
+        fSettingsTab->SetEnabled(4, kFALSE);
+    }
+    else if (table == EDB_Table_BaF2_LED1 || table == EDB_Table_BaF2_LED2)
+    {
+        fSettingsTab->SetEnabled(3, kFALSE);
+        fSettingsTab->SetEnabled(4, kTRUE);
     }
     else 
     {
         fWriteHWButton->SetEnabled(kFALSE);
         fSettingsTab->SetEnabled(3, kFALSE);
+        fSettingsTab->SetEnabled(4, kFALSE);
     }
 
+    // set standard tab
+    fSettingsTab->SetTab(0, kFALSE);
+    
+    // set range manipulation number entry limits
+    if (table == EDB_Table_Empty) fRangeManipEntry->SetLimitValues(0., 0.);
+    else if (table == EDB_Table_BaF2_HV) fRangeManipEntry->SetLimitValues(gDB_BaF2_HV_Min, gDB_BaF2_HV_Max);
+    else if (table == EDB_Table_BaF2_CFD) fRangeManipEntry->SetLimitValues(gDB_BaF2_CFD_Min, gDB_BaF2_CFD_Max);
+    else if (table == EDB_Table_BaF2_LED1) fRangeManipEntry->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
+    else if (table == EDB_Table_BaF2_LED2) fRangeManipEntry->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
+    else if (table == EDB_Table_Veto_LED) fRangeManipEntry->SetLimitValues(gDB_Veto_LED_Min, gDB_Veto_LED_Max);
+
+    
     // Leave if the dummy entry in the combo was selected
     if (table == EDB_Table_Empty) return;
 
@@ -1343,12 +1424,23 @@ void TMHWConfigModule::ReadTable(Int_t table)
         sprintf(value, "%.f", val);
         fElementCurrentValue[i]->SetText(value);
         fElementNewValue[i]->SetNumber(val);
+        
+        // set limits of new value entries
+        if (table == EDB_Table_BaF2_HV) fElementNewValue[i]->SetLimitValues(gDB_BaF2_HV_Min, gDB_BaF2_HV_Max);
+        else if (table == EDB_Table_BaF2_CFD) fElementNewValue[i]->SetLimitValues(gDB_BaF2_CFD_Min, gDB_BaF2_CFD_Max);
+        else if (table == EDB_Table_BaF2_LED1) fElementNewValue[i]->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
+        else if (table == EDB_Table_BaF2_LED2) fElementNewValue[i]->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
+        else if (table == EDB_Table_Veto_LED) fElementNewValue[i]->SetLimitValues(gDB_Veto_LED_Min, gDB_Veto_LED_Max);
 
         delete res;
     }
 
     // deconnect from server
     delete tapsDB;
+
+    // mark changes in case values from DB are out of the limits
+    // of the number entries
+    MarkChanges();
 
     // create SQL error if necessary
     if (badEntries)

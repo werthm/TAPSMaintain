@@ -140,9 +140,9 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
 
     sprintf(pixel, "TAPSMaintain v%s", gTAPSMaintainVersion);
     TGLabel* l = new TGLabel(fWelcomeFrame, pixel);
-    l->SetTextFont("-adobe-helvetica-bold-r-*-*-64-*-*-*-*-*-iso8859-1");
+    l->SetTextFont("-adobe-helvetica-bold-r-*-*-34-*-*-*-*-*-iso8859-1");
     l->ChangeBackground(TColor::RGB2Pixel(255, 255, 255));
-    fWelcomeFrame->AddFrame(l, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 10, 10, 10, 10));
+    fWelcomeFrame->AddFrame(l, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 10, 10, 50, 10));
 
     // create new icon
     fTAPSIcon = new TGIcon(fWelcomeFrame);
