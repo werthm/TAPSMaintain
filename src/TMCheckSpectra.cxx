@@ -36,6 +36,8 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     gStyle->SetStatBorderSize(1);
     gStyle->SetLegendBorderSize(1);
      
+    fPatternSpectrumLoaded = kFALSE;
+
     fFrame->SetLayoutManager(new TGHorizontalLayout(fFrame));
     
     // ------------------------------ Control frame ------------------------------
@@ -99,13 +101,13 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     
     // create spectra list 
     fSpList = new TGListBox(fControlFrame);
-    fSpList->Resize(200, 400);
+    fSpList->Resize(200, 410);
     fSpList->Connect("Selected(Int_t)", "TMCheckSpectra", this, "DrawPatternHistogram(Int_t)");
     fControlFrame->AddFrame(fSpList, new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
 
     // log y-axis checkbox
     fCheckLogy = new TGCheckButton(fControlFrame, "Logarithmic y-Axis");
-    fCheckLogy->Connect("Clicked()", "TMCheckSpectra", this, "DrawHistogram()");
+    fCheckLogy->Connect("Clicked()", "TMCheckSpectra", this, "UpdateHistogram()");
     fCheckLogy->SetState(kButtonDown, kFALSE);
     fControlFrame->AddFrame(fCheckLogy, new TGTableLayoutHints(0, 2, 5, 6, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
     
@@ -114,11 +116,13 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     l->SetTextJustify(kTextRight);
     fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 6, 7, kLHintsFillX | kLHintsLeft, 5, 5, 7, 2));
     fXStart = new TGNumberEntry(fControlFrame, 0, 6);
+    fXStart->Connect("ValueSet(Long_t)", "TMCheckSpectra", this, "UpdateHistogram()");
     fControlFrame->AddFrame(fXStart, new TGTableLayoutHints(1, 2, 6, 7, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
     l = new TGLabel(fControlFrame, "x-Axis end:");
     l->SetTextJustify(kTextRight);
     fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 7, 8, kLHintsFillX | kLHintsLeft, 5, 5, 7, 2));
     fXEnd = new TGNumberEntry(fControlFrame, 0, 6);
+    fXEnd->Connect("ValueSet(Long_t)", "TMCheckSpectra", this, "UpdateHistogram()");
     fControlFrame->AddFrame(fXEnd, new TGTableLayoutHints(1, 2, 7, 8, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
       
     // add control frame to main frame
@@ -177,12 +181,13 @@ void TMCheckSpectra::DrawSingleHistogram()
         else pad->SetLogy(kFALSE);
 
         // check for x-axis range ajustment
-        if (fXStart->GetNumber() != 0 || fXEnd->GetNumber() != 0) 
-            h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
+        h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
         
         // draw
         h->Draw();
         fCanvas->Update();
+        
+        fPatternSpectrumLoaded = kFALSE;
     }
     else 
     {
@@ -198,8 +203,8 @@ void TMCheckSpectra::DrawMultipleHistograms()
     // Draw multiple histograms of a certain detector element range.
 
     Char_t hName[256];
+    Char_t name[256];
     Int_t elements[gMaxSize];
-    TH1F* histos[gMaxSize];
     UInt_t nelements = 0;
     UInt_t divisions[2] = {1, 1};
 
@@ -269,26 +274,37 @@ void TMCheckSpectra::DrawMultipleHistograms()
     for (UInt_t i = 0; i < nelements; i++)
     {
         sprintf(hName, specNames[fSpectraCombo->GetSelected()], elements[i]);
-        histos[i] = (TH1F*) fFile->Get(hName);
         
-        TVirtualPad* pad = fCanvas->cd(i+1);
-        pad->SetLeftMargin(0.0000001);
-        pad->SetRightMargin(0.0000001);
-        pad->SetTopMargin(0.00000001);
-        pad->SetBottomMargin(0.0000001);
+        TH1F* h = (TH1F*) fFile->Get(hName);
         
-        // check for log. y-axis
-        if (fCheckLogy->IsOn()) pad->SetLogy(kTRUE);
-        else pad->SetLogy(kFALSE);
-        
-        // check for x-axis range ajustment
-        if (fXStart->GetNumber() != 0 || fXEnd->GetNumber() != 0) 
-            histos[i]->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
+        if (h)
+        {
+            TVirtualPad* pad = fCanvas->cd(i+1);
+            pad->SetLeftMargin(0.0000001);
+            pad->SetRightMargin(0.0000001);
+            pad->SetTopMargin(0.00000001);
+            pad->SetBottomMargin(0.0000001);
+            
+            // check for log. y-axis
+            if (fCheckLogy->IsOn()) pad->SetLogy(kTRUE);
+            else pad->SetLogy(kFALSE);
+            
+            // check for x-axis range ajustment
+            h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
    
-        histos[i]->Draw();
+            h->Draw();
+        }
+        else
+        {
+            sprintf(name, "Spectrum '%s' was not found in ROOT file!", hName);
+            //ModuleError(name);
+            printf("%s\n", name);
+        }
     }
     
     fCanvas->Update();
+
+    fPatternSpectrumLoaded = kFALSE;
 }
 
 //______________________________________________________________________________
@@ -297,11 +313,15 @@ void TMCheckSpectra::DrawPatternHistogram(Int_t id)
     // Load a pattern histogram from the ROOT input file and draw it
     // in the embedded canvas.
 
+    Char_t name[256];
+    const Char_t* hName;
+
     // get selected entry
     TGTextLBEntry* anEntry = (TGTextLBEntry*) fSpList->GetEntry(id);
 
     // load histogram
-    TH1F* h = (TH1F*) fFile->Get(anEntry->GetText()->GetString());
+    hName = anEntry->GetText()->GetString();
+    TH1F* h = (TH1F*) fFile->Get(hName);
 
     // draw if histogram exists
     if (h) 
@@ -313,12 +333,19 @@ void TMCheckSpectra::DrawPatternHistogram(Int_t id)
         else pad->SetLogy(kFALSE);
         
         // check for x-axis range ajustment
-        if (fXStart->GetNumber() != 0 || fXEnd->GetNumber() != 0) 
-            h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
+        h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
      
         // draw
         h->Draw();
         fCanvas->Update();
+
+        fPatternSpectrumLoaded = kTRUE;
+    }
+    else
+    {
+        sprintf(name, "Spectrum '%s' was not found in ROOT file!", hName);
+        //ModuleError(name);
+        printf("%s\n", name);
     }
 }
 
@@ -372,6 +399,7 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
         fElementCombo->AddEntry("All elements", ERange_All_PWO_Elements);
         fElementCombo->GetListBox()->Resize(150, 40);
         fElementCombo->Select(ERange_Single_Element, kFALSE);
+        fElementNumberEntry->SetState(kTRUE);
     }
     else 
     {
@@ -389,6 +417,7 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
         fElementCombo->AddEntry("Block F elements", ERange_Block_F);
         fElementCombo->GetListBox()->Resize(150, 120);
         fElementCombo->Select(ERange_Single_Element, kFALSE);
+        fElementNumberEntry->SetState(kTRUE);
     }
 
     DrawHistogram();
@@ -410,12 +439,16 @@ void TMCheckSpectra::Init()
     fElementNumberEntry->SetIntNumber(0);
     fElementNumberEntry->SetLimitValues(0, 0);
     fSpectraCombo->Select(ESpec_Empty, kFALSE);
+    fElementCombo->Select(ERange_Single_Element, kFALSE);
+    fElementNumberEntry->SetState(kTRUE);
 
     // reset axis settings
     fCheckLogy->SetState(kButtonDown, kFALSE);
     fXStart->SetNumber(0.);
     fXEnd->SetNumber(0.);
     
+    fPatternSpectrumLoaded = kFALSE;
+
     // clear canvas
     fCanvas->Clear();
 

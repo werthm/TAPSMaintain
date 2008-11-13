@@ -98,6 +98,8 @@ private:
     TGNumberEntry* fXStart;                                 // x-axis range start
     TGNumberEntry* fXEnd;                                   // x-axis range end
 
+    Bool_t fPatternSpectrumLoaded;                          // used to check if a pattern spectrum is loaded
+
     void DrawSingleHistogram();
     void DrawMultipleHistograms();
     
@@ -110,6 +112,11 @@ public:
     void SpectraClassChanged(Int_t id);
     void ElementRangeChanged(Int_t id);
     void ElementNumberChanged();
+    void UpdateHistogram()
+    {
+        if (fPatternSpectrumLoaded) DrawPatternHistogram(fSpList->GetSelected());
+        else DrawHistogram();
+    }
     void DrawHistogram()
     {
         if (fElementCombo->GetSelected() == ERange_Single_Element) DrawSingleHistogram();
