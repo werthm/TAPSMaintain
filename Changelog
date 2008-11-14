@@ -10,7 +10,7 @@
 #####################################################################
 
 
-0.1.1 : 16 Oct 2008
+0.1.1 : 14 Nov 2008
 * Peak can be corrected manually in cosmics calibration module
 * HV values are now written channel per channel to the HVServer
 * Protection against bad value setting in TAPS database module

@@ -1,0 +1,14 @@
+# SVN Info: $Id$
+
+#####################################################################
+##                           TAPSMaintain                          ##
+##                                                                 ##
+##               Universal TAPS maintenance software               ##
+##                                                                 ##
+##                            To do list                           ##
+##                                                                 ##
+#####################################################################
+
+
+* add Veto and PbWO4 high voltage to TAPS database and integrate it
+  into TAPSMaintain
