@@ -34,6 +34,7 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     // create members
     fHClone = 0;
     fPedFunc = new TF1("PedFunc", "gaus", 0 , 200);
+    fPeakFunc = new TF1("PeakFunc", "gaus", 0, 4000);
     fBgFunc = new TF1("BgFunc", "expo", 0, 4000);
     fTotalFunc = new TF1("TotalFunc", "gaus(0)+expo(3)", 0, 4000);
     fPedFunc->SetLineColor(kRed);
@@ -218,12 +219,22 @@ void TMCalibCosmics::Process(Int_t index)
     if (fHClone) delete fHClone;
     fHClone = (TH1F*) h1->Clone();
     
-    // fit histogram
+    // fit bg
+    fBgFunc->SetParameters(0, 0);
+    fBgFunc->SetRange(pedPos + 20, 1000);
+    fHClone->Fit("BgFunc", "RB0Q");
+    
+    // fit peak
     fHClone->GetXaxis()->SetRangeUser(pedPos + 50, 1000);
     Double_t peakPos = fHClone->GetXaxis()->GetBinCenter(fHClone->GetMaximumBin());
     Double_t peakHeight = fHClone->GetBinContent(fHClone->GetMaximumBin());
     fHClone->GetXaxis()->SetRangeUser(pedPos, 1000);
     
+    fPeakFunc->SetRange(peakPos - 200, peakPos + 200);
+    fPeakFunc->SetParameters(peakHeight, peakPos, 10);
+    fHClone->Fit("PeakFunc", "RB0Q");
+    
+    // fit both
     if (fDetID == kPbWO4_Detector) 
     {
         fTotalFunc->SetParameters(peakHeight, peakPos, 25, 8, -1.3e-2);
@@ -231,13 +242,18 @@ void TMCalibCosmics::Process(Int_t index)
         fTotalFunc->SetParLimits(1, 100, 300);
         fTotalFunc->SetParLimits(2, 10, 40);
     }
-    else fTotalFunc->SetParameters(peakHeight, peakPos, 10, 8, -1.3e-2);
-    fTotalFunc->SetRange(pedPos + fCStart, fCEnd);
-    fHClone->Fit("TotalFunc", "RB0Q"); 
-    peakPos = fTotalFunc->GetParameter(1);  
+    else 
+    {
+        fTotalFunc->SetParameters(fPeakFunc->GetParameter(0), fPeakFunc->GetParameter(1), fPeakFunc->GetParameter(2),
+                              fBgFunc->GetParameter(0), fBgFunc->GetParameter(1));
+        fTotalFunc->SetParLimits(0, 10, peakHeight);
+        fTotalFunc->SetParLimits(1, 100, 500);
+        fTotalFunc->SetParLimits(2, 10, 60);
+    }
     
-    // format background function
-    fBgFunc->SetRange(pedPos + fCStart, fCEnd);
+    fTotalFunc->SetRange(pedPos + fCStart, fCEnd);
+    fHClone->Fit("TotalFunc", "RBQ0"); 
+    peakPos = fTotalFunc->GetParameter(1);  
     fBgFunc->SetParameters(fTotalFunc->GetParameter(3), fTotalFunc->GetParameter(4));
     
     // cosmics peak pad
