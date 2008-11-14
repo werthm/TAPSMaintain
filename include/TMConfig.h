@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.1beta";
+static const Char_t gTAPSMaintainVersion[] = "0.1.1";
 
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://taps01/taps";
@@ -47,13 +47,16 @@ const Double_t gDB_BaF2_HV_Min = 0.;
 const Double_t gDB_BaF2_HV_Max = 2000.;
 const Double_t gDB_BaF2_CFD_Min = 1.;
 const Double_t gDB_BaF2_CFD_Max = 10000.;
-const Double_t gDB_BaF2_LED_Min = -9999.;
+const Double_t gDB_BaF2_LED_Min = -999.;
 const Double_t gDB_BaF2_LED_Max = -1.;
-const Double_t gDB_Veto_LED_Min = -9999.;
+const Double_t gDB_Veto_LED_Min = -999.;
 const Double_t gDB_Veto_LED_Max = -1.;
+const Double_t gDB_Veto_HV_Min = 0.;
+const Double_t gDB_Veto_HV_Max = 1000.;
 
 // define TAPS detectors
-enum ETAPSDetector {
+enum ETAPSDetector 
+{
     kNo_Detector,
     kBaF2_Detector,
     kPbWO4_Detector,
