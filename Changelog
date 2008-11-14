@@ -11,12 +11,13 @@
 
 
 0.1.1 : 16 Oct 2008
-* Set PbWO4 mips energy loss to 29.5 MeV
+* Peak can be corrected manually in cosmics calibration module
 * HV values are now written channel per channel to the HVServer
-* Improved fitting in cosmics calibration for PbWO4 detectors
-* Removed possibility to perform LED calibration without energy
-  calibration file
 * Protection against bad value setting in TAPS database module
+* Removed possibility to perform LED calibration without energy
+  calibration (possibly dangerous)
+* Improved fitting in cosmics calibration for PbWO4 detectors
+* Set PbWO4 mips energy loss to 29.5 MeV
 * various bugfixes
 
 0.1.0 : 02 Jul 2008

@@ -874,7 +874,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         for (UInt_t i = 0; i < gMaxSize; i++)
         {
             sprintf(line, "LED_fit_func_%i", i+1);
-            fLEDFitFunctions[i] = new TF1(line, "pol1", 0, 1000);
+            fLEDFitFunctions[i] = new TF1(line, "pol1", 0, 2000);
             fLEDFitFunctions[i]->SetLineColor(kRed);
         }
     }

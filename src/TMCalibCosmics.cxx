@@ -39,7 +39,7 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fPedFunc->SetLineColor(kRed);
     fBgFunc->SetLineColor(kGreen);
     fTotalFunc->SetLineColor(kRed);
-    
+
     // Detector type
     TGLabel* l = new TGLabel(fConfigFrame, "Detector Type:");
     l->SetTextJustify(kTextRight);
@@ -138,11 +138,34 @@ void TMCalibCosmics::Cleanup()
 //______________________________________________________________________________
 void TMCalibCosmics::Redo()
 {
-    // Redo the current elements but change x-Axis range to 
-    // look for the threshold limit in.
+    // Take the position of the line that was moved manually by the user as 
+    // the position of the cosmics peak.
 
-    ProcessElement(fCurrentElement);
+    Char_t msg[256];
 
+    // get peak position from line
+    Double_t peakPos = fPeakLine->GetX1();
+
+    // get fitted pedestal position
+    Double_t pedPos = GetResult(fCurrentElement, 0);
+    
+    // calculate gain
+    Double_t energyLoss = 0;
+    
+    // check detector type
+    if (fDetID == kBaF2_Detector)       energyLoss = gTAPS_MIP_Loss_BaF2;
+    else if (fDetID == kPbWO4_Detector) energyLoss = gTAPS_MIP_Loss_PbWO4;
+    else if (fDetID == kVeto_Detector)  energyLoss = gTAPS_MIP_Loss_Veto;
+    
+    Double_t gain = energyLoss / (peakPos - pedPos); 
+    
+    // save updated results: cosmic peak position, gain
+    SetResult(fCurrentElement, 1, peakPos);
+    SetResult(fCurrentElement, 2, gain);
+
+    // inform the user
+    sprintf(msg, "The cosmics peak position was manually set to %6.2f", peakPos);
+    ModuleInfo(msg);
 }
 
 //______________________________________________________________________________
@@ -227,8 +250,7 @@ void TMCalibCosmics::Process(Int_t index)
     fHClone->GetYaxis()->SetTitle("Counts");
     
     // draw position line
-    aLine.DrawLine(peakPos, 0, peakPos, fHClone->GetMaximum());
-    
+    fPeakLine = aLine.DrawLine(peakPos, 0, peakPos, fHClone->GetMaximum());
     
     // ----------------------------- calculate and set results -----------------------------
     

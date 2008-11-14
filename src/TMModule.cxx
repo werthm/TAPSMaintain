@@ -149,6 +149,18 @@ TMModule::~TMModule()
 }
 
 //______________________________________________________________________________
+Double_t TMModule::GetResult(UInt_t element, UInt_t resultNumber) const
+{
+    // Get the result #resultNumber of the element 'element'.
+    
+    // check bounds
+    if (element < 0 || element >= gMaxSize) return 0.;
+    if (resultNumber < 0 || resultNumber >= fNresults) return 0.;
+    
+    return fResults[element][resultNumber];
+}
+
+//______________________________________________________________________________
 void TMModule::SetResult(UInt_t element, UInt_t resultNumber, Double_t result)
 {
     // Set the result #resultNumber of the element 'element' to 'result'.

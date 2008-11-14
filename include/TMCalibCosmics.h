@@ -48,7 +48,8 @@ private:
     TF1* fPedFunc;                              // function used for pedestal fitting
     TF1* fBgFunc;                               // cosmics peak background function
     TF1* fTotalFunc;                            // total cosmic peak function
-    
+    TLine* fPeakLine;                           // line indicating the peak position
+
     // Config dialog elements
     TGComboBox* fTypeCombo;                     // LED type selection combo box
     TGTextEntry* fHNameEntry;                   // name of the ADC spectra

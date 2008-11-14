@@ -113,6 +113,7 @@ public:
     Bool_t NeedsConfig() const { return fNeedsConfig; }
     UInt_t GetNresults() const { return fNresults; }
     Double_t** GetResults() const { return fResults; }
+    Double_t GetResult(UInt_t element, UInt_t resultNumber) const;
     TGCompositeFrame* GetFrame() const { return fFrame; }
     TGTransientFrame* GetConfigDialog() const { return fConfigDialog; }
     TGCompositeFrame* GetConfigFrame() const { return fConfigFrame; }

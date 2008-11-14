@@ -82,7 +82,7 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
     fNext->Connect("Clicked()", "TMSeqCalibModule", this, "ProcessNextElement()");
     fControlFrame->AddFrame(fNext, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
  
-    fRedo = new TGTextButton(fControlFrame, "Redo");
+    fRedo = new TGTextButton(fControlFrame, "Redo/Correct");
     fRedo->Connect("Clicked()", "TMSeqCalibModule", this, "Redo()");
     fControlFrame->AddFrame(fRedo, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
     
