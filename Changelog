@@ -10,6 +10,10 @@
 #####################################################################
 
 
+0.1.2 : xx Feb 2008
+* Support for 72 PbWO4 elements
+* Fixed some fitting problems with ROOT 5.22
+
 0.1.1 : 14 Nov 2008
 * Peak can be corrected manually in cosmics calibration module
 * HV values are now written channel per channel to the HVServer

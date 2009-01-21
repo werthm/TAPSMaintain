@@ -258,10 +258,10 @@ void TMCheckSpectra::DrawMultipleHistograms()
             break;
          // all PWO elements
          case ERange_All_PWO_Elements:
-            nelements = 24;
+            nelements = gPbWO4Size;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+1;
-            divisions[0] = 4;
-            divisions[1] = 6;
+            divisions[0] = 8;
+            divisions[1] = 9;
             break;
         default:
             break;

@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.1";
+static const Char_t gTAPSMaintainVersion[] = "0.1.2beta";
 
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://taps01/taps";
@@ -31,7 +31,7 @@ static const Char_t gTAPS_Server[] = "taps01";
 // number of TAPS detector elements
 const UInt_t gMaxSize   = 384;
 const UInt_t gBaF2Size  = 384;
-const UInt_t gPbWO4Size = 24;
+const UInt_t gPbWO4Size = 72;
 const UInt_t gVetoSize  = 384;
 
 // energy loss of minimal ionizing particles in the TAPS detectors [MeV]

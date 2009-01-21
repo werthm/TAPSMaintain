@@ -220,15 +220,16 @@ void TMCalibCosmics::Process(Int_t index)
     fHClone = (TH1F*) h1->Clone();
     
     // fit bg
-    fBgFunc->SetParameters(0, 0);
-    fBgFunc->SetRange(pedPos + 20, 1000);
+    fBgFunc->SetParameters(1, -0.01);
+    fBgFunc->SetRange(pedPos + 20, fCEnd);
+    fHClone->GetXaxis()->SetRangeUser(pedPos, fCEnd);
     fHClone->Fit("BgFunc", "RB0Q");
     
     // fit peak
-    fHClone->GetXaxis()->SetRangeUser(pedPos + 50, 1000);
+    fHClone->GetXaxis()->SetRangeUser(pedPos + 50, fCEnd);
     Double_t peakPos = fHClone->GetXaxis()->GetBinCenter(fHClone->GetMaximumBin());
     Double_t peakHeight = fHClone->GetBinContent(fHClone->GetMaximumBin());
-    fHClone->GetXaxis()->SetRangeUser(pedPos, 1000);
+    fHClone->GetXaxis()->SetRangeUser(pedPos, fCEnd);
     
     fPeakFunc->SetRange(peakPos - 200, peakPos + 200);
     fPeakFunc->SetParameters(peakHeight, peakPos, 10);
@@ -252,7 +253,7 @@ void TMCalibCosmics::Process(Int_t index)
     }
     
     fTotalFunc->SetRange(pedPos + fCStart, fCEnd);
-    fHClone->Fit("TotalFunc", "RBQ0"); 
+    fHClone->Fit("TotalFunc", "RB0Q"); 
     peakPos = fTotalFunc->GetParameter(1);  
     fBgFunc->SetParameters(fTotalFunc->GetParameter(3), fTotalFunc->GetParameter(4));
     
