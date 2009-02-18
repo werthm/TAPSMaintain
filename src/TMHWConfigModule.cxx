@@ -657,7 +657,7 @@ void TMHWConfigModule::ImportFile()
     // read file and set values
     while (!feof(fin))
     {
-        if (!fgets(line, 256, fin)) Error("ImportFile", "File read error!");
+        if (!fgets(line, 256, fin) && !feof(fin)) Error("ImportFile", "File read error!");
 
         // check if line is a comment
         if (TMUtils::IsComment(line)) continue;
@@ -705,7 +705,7 @@ void TMHWConfigModule::DoGainMatch()
     // read file and set values
     while (!feof(fin))
     {
-        if (!fgets(line, 256, fin)) Error("DoGainMatch", "File read error!");
+        if (!fgets(line, 256, fin) && !feof(fin)) Error("DoGainMatch", "File read error!");
 
         // check if line is a comment
         if (TMUtils::IsComment(line)) continue;
@@ -821,7 +821,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         // read voltages and threshold from file
         while (!feof(fin))
         {
-            if (!fgets(line, 256, fin)); Error("AddFileToLEDCalibration", "File read error!");
+            if (!fgets(line, 256, fin) && !feof(fin)) Error("AddFileToLEDCalibration", "File read error!");
 
             // check if line is a comment
             if (TMUtils::IsComment(line)) continue;
@@ -852,7 +852,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     // read voltages and threshold from file
     while (!feof(fin))
     {
-        if (!fgets(line, 256, fin)); Error("AddFileToLEDCalibration", "File read error!");
+        if (!fgets(line, 256, fin) && !feof(fin)) Error("AddFileToLEDCalibration", "File read error!");
 
         // check if line is a comment
         if (TMUtils::IsComment(line)) continue;
