@@ -223,7 +223,7 @@ void TMModule::SaveResults(const Char_t* filename)
     fout = fopen(filename, "w");
     
     // save module result header
-    fprintf(fout, fResultHeader);
+    fprintf(fout, "%s", fResultHeader);
     fprintf(fout, "\n");
     
     // print array content

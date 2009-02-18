@@ -43,6 +43,8 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fTypeCombo->Resize(200, 22);
     fTypeCombo->AddEntry("BaF2 LG LED 1", ELED_Calib_Type_LG_LED1);
     fTypeCombo->AddEntry("BaF2 LG LED 2", ELED_Calib_Type_LG_LED2);
+    fTypeCombo->AddEntry("BaF2 LG LED 1 (AcquRoot)", ELED_Calib_Type_LG_LED1_AR);
+    fTypeCombo->AddEntry("BaF2 LG LED 2 (AcquRoot)", ELED_Calib_Type_LG_LED2_AR);
     fTypeCombo->AddEntry("Manual", ELED_Calib_Type_MANUAL);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
@@ -316,7 +318,7 @@ void TMCalibLED::SaveResults(const Char_t* filename)
     fout = fopen(filename, "w");
     
     // save module result header
-    fprintf(fout, GetResultHeader());
+    fprintf(fout, "%s", GetResultHeader());
     fprintf(fout, "\n");
     
     Double_t** results = GetResults();
@@ -396,6 +398,20 @@ void TMCalibLED::UpdateLEDType(Int_t id)
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
+    else if (id == ELED_Calib_Type_LG_LED1_AR)
+    {
+        fUncut->SetText("Calib.TAPS.LG_%d");
+        fCut->SetText("Calib.TAPS.LG_LED1_%d");
+        fUncut->SetEnabled(kFALSE);
+        fCut->SetEnabled(kFALSE);
+    }
+    else if (id == ELED_Calib_Type_LG_LED2_AR)
+    {
+        fUncut->SetText("Calib.TAPS.LG_%d");
+        fCut->SetText("Calib.TAPS.LG_LED2_%d");
+        fUncut->SetEnabled(kFALSE);
+        fCut->SetEnabled(kFALSE);
+    }
     else if (id == ELED_Calib_Type_MANUAL)
     {
         fUncut->SetText("");
@@ -412,9 +428,11 @@ void TMCalibLED::ReadConfig()
     
     // set detector id
     Int_t type = fTypeCombo->GetSelected();
-    if (type == ELED_Calib_Type_LG_LED1)        fDetID = kBaF2_Detector;
-    else if (type == ELED_Calib_Type_LG_LED2)   fDetID = kBaF2_Detector;
-    else if (type == ELED_Calib_Type_MANUAL)    fDetID = kBaF2_Detector;
+    if (type == ELED_Calib_Type_LG_LED1)         fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_LG_LED2)    fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_LG_LED1_AR) fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_LG_LED2_AR) fDetID = kBaF2_Detector;
+    else if (type == ELED_Calib_Type_MANUAL)     fDetID = kBaF2_Detector;
     
     // copy histogram names
     strcpy(fUncutHName, fUncut->GetText());

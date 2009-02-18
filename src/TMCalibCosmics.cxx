@@ -298,7 +298,7 @@ void TMCalibCosmics::SaveResults(const Char_t* filename)
     fout = fopen(filename, "w");
     
     // save module result header
-    fprintf(fout, GetResultHeader());
+    fprintf(fout, "%s", GetResultHeader());
     fprintf(fout, "\n");
     
     Double_t** results = GetResults();
