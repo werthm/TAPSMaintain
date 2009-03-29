@@ -1,7 +1,7 @@
 // SVN Info: $Id$
 
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008
+ * Author: Dominik Werthmueller, 2008-2009
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -73,6 +73,9 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo->AddEntry("PWO LGS"              , ESpec_PWO_LGS);
     fSpectraCombo->AddEntry("PWO TIME"             , ESpec_PWO_TIME);
     fSpectraCombo->AddEntry("PWO TIME MULT"        , ESpec_PWO_TIME_MULT);
+    fSpectraCombo->AddEntry("PWO Veto LG"          , ESpec_PWO_VETO_LG);
+    fSpectraCombo->AddEntry("PWO Veto LGS"         , ESpec_PWO_VETO_LGS);
+    fSpectraCombo->AddEntry("PWO Veto Time"        , ESpec_PWO_VETO_TIME);
     fControlFrame->AddFrame(fSpectraCombo, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
     
     // add element selection type combo box
@@ -263,6 +266,13 @@ void TMCheckSpectra::DrawMultipleHistograms()
             divisions[0] = 8;
             divisions[1] = 9;
             break;
+         // all PWO Veto elements
+         case ERange_All_PWO_VETO_Elements:
+            nelements = gPWOVetoSize;
+            for (UInt_t i = 0; i < nelements; i++) elements[i] = i+1;
+            divisions[0] = 3;
+            divisions[1] = 6;
+            break;
         default:
             break;
     }
@@ -397,6 +407,21 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
         fElementCombo->RemoveAll();
         fElementCombo->AddEntry("Single element", ERange_Single_Element);
         fElementCombo->AddEntry("All elements", ERange_All_PWO_Elements);
+        fElementCombo->GetListBox()->Resize(150, 40);
+        fElementCombo->Select(ERange_Single_Element, kFALSE);
+        fElementNumberEntry->SetState(kTRUE);
+    }
+    else if (id == ESpec_PWO_VETO_LG  ||
+             id == ESpec_PWO_VETO_LGS ||
+             id == ESpec_PWO_VETO_TIME)
+    {
+        // limit element numbers
+        fElementNumberEntry->SetLimitValues(1, gPWOVetoSize);
+        
+        // recreate element combo box
+        fElementCombo->RemoveAll();
+        fElementCombo->AddEntry("Single element", ERange_Single_Element);
+        fElementCombo->AddEntry("All elements", ERange_All_PWO_VETO_Elements);
         fElementCombo->GetListBox()->Resize(150, 40);
         fElementCombo->Select(ERange_Single_Element, kFALSE);
         fElementNumberEntry->SetState(kTRUE);

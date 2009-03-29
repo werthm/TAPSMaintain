@@ -1,7 +1,7 @@
 // SVN Info: $Id$
 
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008
+ * Author: Dominik Werthmueller, 2008-2009
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -51,12 +51,15 @@ enum {
     ESpec_PWO_LG_TIME,
     ESpec_PWO_LGS,
     ESpec_PWO_TIME,
-    ESpec_PWO_TIME_MULT
+    ESpec_PWO_TIME_MULT,
+    ESpec_PWO_VETO_LG,
+    ESpec_PWO_VETO_LGS,
+    ESpec_PWO_VETO_TIME
 };
 
 
-static const Char_t specNames[21][64] = 
-    {{"nothing"},
+static const Char_t specNames[24][64] = {
+     {"nothing"},
      {"LG/baf2-LG-%03d"},
      {"LG_LED1/baf2-LG_LED1-%03d"},
      {"LG_LED2/baf2-LG_LED2-%03d"},
@@ -76,7 +79,11 @@ static const Char_t specNames[21][64] =
      {"PWO-LG-TIME/pwo-LG-TIME-%03d"},
      {"PWO-LGS/pwo-LGS-%03d"},
      {"PWO-TIME/pwo-TIME-%03d"},
-     {"PWO-TIME/pwo-TIME-MULT-%03d"}};
+     {"PWO-TIME/pwo-TIME-MULT-%03d"},
+     {"PWO-VETO-LG/pwo-veto-LG-%03d"},
+     {"PWO-VETO-LGS/pwo-veto-LGS-%03d"},
+     {"PWO-VETO-TIME/pwo-veto-TIME-%03d"}
+};
 
 
 class TMCheckSpectra : public TMModule

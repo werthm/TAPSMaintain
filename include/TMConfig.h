@@ -1,7 +1,7 @@
 // SVN Info: $Id$
 
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008
+ * Author: Dominik Werthmueller, 2008-2009
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -29,10 +29,11 @@ static const Char_t gTAPS_DB_Passwd[] = "";
 static const Char_t gTAPS_Server[] = "taps01";
 
 // number of TAPS detector elements
-const UInt_t gMaxSize   = 384;
-const UInt_t gBaF2Size  = 384;
-const UInt_t gPbWO4Size = 72;
-const UInt_t gVetoSize  = 384;
+const UInt_t gMaxSize     = 384;
+const UInt_t gBaF2Size    = 384;
+const UInt_t gPbWO4Size   = 72;
+const UInt_t gVetoSize    = 384;
+const UInt_t gPWOVetoSize = 18;
 
 // energy loss of minimal ionizing particles in the TAPS detectors [MeV]
 const Double_t gTAPS_MIP_Loss_BaF2  = 37.7;

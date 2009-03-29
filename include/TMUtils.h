@@ -1,7 +1,7 @@
 // SVN Info: $Id$
 
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008
+ * Author: Dominik Werthmueller, 2008-2009
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -27,6 +27,7 @@ enum EElement_Selection {
     ERange_Single_Element,
     ERange_All_Elements,
     ERange_All_PWO_Elements,
+    ERange_All_PWO_VETO_Elements,
     ERange_Block_A,
     ERange_Block_B,
     ERange_Block_C,
