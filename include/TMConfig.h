@@ -18,15 +18,15 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.2beta";
+static const Char_t gTAPSMaintainVersion[] = "0.1.3beta";
 
 // default TAPS database settings
-static const Char_t gTAPS_DB_URL[] = "mysql://taps01/taps";
-static const Char_t gTAPS_DB_User[] = "root";
-static const Char_t gTAPS_DB_Passwd[] = "";
+static const Char_t gTAPS_DB_URL[] = "mysql://taps00/taps";
+static const Char_t gTAPS_DB_User[] = "taps";
+static const Char_t gTAPS_DB_Passwd[] = "taps2003";
 
 // default TAPS hardware server
-static const Char_t gTAPS_Server[] = "taps01";
+static const Char_t gTAPS_Server[] = "taps00";
 
 // number of TAPS detector elements
 const UInt_t gMaxSize     = 384;
