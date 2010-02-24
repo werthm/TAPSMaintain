@@ -10,6 +10,10 @@
 #####################################################################
 
 
+0.1.3 : 24 Feb 2010
+* Support for the new taps00 server
+* Various small improvements and bugfixes
+
 0.1.2 : xx Feb 2008
 * Support for 72 PbWO4 elements
 * Fixed some fitting problems with ROOT 5.22

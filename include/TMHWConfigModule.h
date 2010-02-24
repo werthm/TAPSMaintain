@@ -141,7 +141,7 @@ private:
 
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
-    void CreateExternalCanvas(Int_t n);
+    void CreateExternalCanvas(UInt_t n);
     Bool_t SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName);
     Bool_t CheckValueLimits(EDB_TAPS_Table table, Double_t value);    
 

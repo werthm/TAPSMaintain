@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.3beta";
+static const Char_t gTAPSMaintainVersion[] = "0.1.3";
 
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://localhost/taps";

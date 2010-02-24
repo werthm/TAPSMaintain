@@ -92,12 +92,6 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fRangeManipCombo = new TGComboBox(fRangeManipFrame);
     fRangeManipCombo->Resize(150, 22);
     fRangeManipCombo->AddEntry("elements", ERange_All_Elements);
-    fRangeManipCombo->AddEntry("Block A elements", ERange_Block_A);
-    fRangeManipCombo->AddEntry("Block B elements", ERange_Block_B);
-    fRangeManipCombo->AddEntry("Block C elements", ERange_Block_C);
-    fRangeManipCombo->AddEntry("Block D elements", ERange_Block_D);
-    fRangeManipCombo->AddEntry("Block E elements", ERange_Block_E);
-    fRangeManipCombo->AddEntry("Block F elements", ERange_Block_F);
     fRangeManipCombo->AddEntry("Ring 1 elements", ERange_Ring_1);
     fRangeManipCombo->AddEntry("Ring 2 elements", ERange_Ring_2);
     fRangeManipCombo->AddEntry("Ring 3 elements", ERange_Ring_3);
@@ -109,6 +103,12 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fRangeManipCombo->AddEntry("Ring 9 elements", ERange_Ring_9);
     fRangeManipCombo->AddEntry("Ring 10 elements", ERange_Ring_10);
     fRangeManipCombo->AddEntry("Ring 11 elements", ERange_Ring_11);
+    fRangeManipCombo->AddEntry("Block A elements", ERange_Block_A);
+    fRangeManipCombo->AddEntry("Block B elements", ERange_Block_B);
+    fRangeManipCombo->AddEntry("Block C elements", ERange_Block_C);
+    fRangeManipCombo->AddEntry("Block D elements", ERange_Block_D);
+    fRangeManipCombo->AddEntry("Block E elements", ERange_Block_E);
+    fRangeManipCombo->AddEntry("Block F elements", ERange_Block_F);
     fRangeManipFrame->AddFrame(fRangeManipCombo, new TGLayoutHints(kLHintsLeft, 7, 5, 32, 2));
     fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
 
@@ -1053,6 +1053,31 @@ void TMHWConfigModule::ShowLEDCalibration()
             //fExternalCanvas->Update();
         }
     }
+    else if (selectedLEDRange == ERange_All_Elements)
+    {
+        Char_t text[256];
+        
+        // create block canvas
+        CreateExternalCanvas(gMaxSize);
+        
+        // draw block elements
+        for (UInt_t i = 0; i < gMaxSize; i++)
+        {
+            TVirtualPad* aPad = fExternalCanvas->cd(i+1);
+            
+            aPad->SetLeftMargin(0.11);
+            aPad->SetRightMargin(0.08);
+            aPad->SetTopMargin(0.08);
+            aPad->SetBottomMargin(0.1);
+            
+            fLEDGraphs[i]->SetMarkerStyle(20);
+            fLEDGraphs[i]->Draw("ap"); 
+            sprintf(text, "LED Calibration: Channel %d", i+1);
+            fLEDGraphs[i]->SetTitle(text);
+        }
+        
+        //fExternalCanvas->Update();
+    }
     else
     {
         Char_t text[256];
@@ -1095,7 +1120,7 @@ void TMHWConfigModule::ShowLEDCalibration()
 }
 
 //______________________________________________________________________________
-void TMHWConfigModule::CreateExternalCanvas(Int_t n)
+void TMHWConfigModule::CreateExternalCanvas(UInt_t n)
 {
     // Create the external canvas if necessary. Divide for n elements.
     
@@ -1109,6 +1134,7 @@ void TMHWConfigModule::CreateExternalCanvas(Int_t n)
     // divide canvas
     if (n == 1) fExternalCanvas->Divide(1, 1);
     else if (n == 64) fExternalCanvas->Divide(8, 8, 0.001, 0.001);
+    else if (n == gMaxSize) fExternalCanvas->Divide(24, 16, 0.001, 0.001);
 }
 
 //______________________________________________________________________________
