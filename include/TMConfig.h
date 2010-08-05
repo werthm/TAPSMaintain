@@ -1,7 +1,7 @@
 // SVN Info: $Id$
 
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2009
+ * Author: Dominik Werthmueller, 2008-2010
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.3";
+static const Char_t gTAPSMaintainVersion[] = "0.1.4";
 
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://localhost/taps";
