@@ -181,6 +181,11 @@ void TMCalibCosmics::Process(Int_t index)
     sprintf(name, fHName, index + 1);
     h1 = (TH1F*) fFile->Get(name);
 
+    // set title
+    sprintf(name, "%s (Ring %d, Block %c)", 
+            h1->GetName(), TMUtils::GetRingNumber(index), TMUtils::GetBlock(index));
+    h1->SetTitle(name);
+
     // check if spectra could be loaded
     if (!h1)
     {

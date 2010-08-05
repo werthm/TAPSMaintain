@@ -101,7 +101,7 @@ Bool_t TMUtils::IsComment(const Char_t* s)
 }
 
 //______________________________________________________________________________
-UInt_t TMUtils::GetRingNumber(Int_t elem)
+UInt_t TMUtils::GetRingNumber(Int_t element)
 {
     // Returns the number of the ring (1 to 11 for 384 BaF2 layout) the element
     // 'elem' belongs to (element counting starts at 0).
@@ -111,7 +111,7 @@ UInt_t TMUtils::GetRingNumber(Int_t elem)
                               {21, 27}, {28, 35}, {36, 44}, {45, 54}, {55, 63}};
                               
     // map element to first block
-    UInt_t mid = elem % 64;
+    UInt_t mid = element % 64;
 
     if (mid >= ringRange[0][0] && mid <= ringRange[0][1]) return 1;
     else if (mid >= ringRange[1][0] && mid <= ringRange[1][1]) return 2;
@@ -125,5 +125,24 @@ UInt_t TMUtils::GetRingNumber(Int_t elem)
     else if (mid >= ringRange[9][0] && mid <= ringRange[9][1]) return 10;
     else if (mid >= ringRange[10][0] && mid <= ringRange[10][1]) return 11;
     else return 99;
+}
+
+//______________________________________________________________________________
+Char_t TMUtils::GetBlock(Int_t element)
+{
+    // Returns the block (A-F) the element 'elem' belongs to (element counting
+    // starts at 0).
+    
+    Int_t block = element / 64;
+    switch (block)
+    {
+        case 0: return 'A';
+        case 1: return 'B';
+        case 2: return 'C';
+        case 3: return 'D';
+        case 4: return 'E';
+        case 5: return 'F';
+        default: return 'X';
+    }
 }
 

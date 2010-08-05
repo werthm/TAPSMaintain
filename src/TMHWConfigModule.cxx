@@ -712,8 +712,13 @@ void TMHWConfigModule::DoGainMatch()
         
         // read id, pedestal pos., cosmic peak pos. and gain
         if (sscanf(line, "%d%f%f%f", &id, &ped, &peak, &cosm_gain) == 4)
-        {
+        {	
+            // skip bad calibration
             if (ped == 0 && peak == 0) continue;
+            
+            // skip empty BaF2 channels
+            Int_t ring = TMUtils::GetRingNumber(id-1);
+            if (ring == 1 || ring == 2) continue;
 
             // read old HV value
             hv_old = atof(fElementCurrentValue[id-1]->GetText()->Data());
