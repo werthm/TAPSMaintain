@@ -303,7 +303,7 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
                "Version %s\n"
                "Compiled on %s\n"
                "Linked to ROOT %s and libtcpip\n\n"
-               "(C) 2008-2009 by Dominik Werthmueller, University of Basel\n"
+               "(C) 2008-2010 by Dominik Werthmueller, University of Basel\n"
                "TAPS Slowcontrol libtcpip by J.G. Messchendorp",
                gTAPSMaintainVersion, __DATE__, ROOT_RELEASE);
         
