@@ -55,7 +55,11 @@ enum EDB_TAPS_Table {
     EDB_Table_BaF2_CFD,
     EDB_Table_BaF2_LED1,
     EDB_Table_BaF2_LED2,
-    EDB_Table_Veto_LED
+    EDB_Table_Veto_LED,
+    EDB_Table_QAC_LG,
+    EDB_Table_QAC_LGS,
+    EDB_Table_QAC_SG,
+    EDB_Table_QAC_SGS
 };
 
 
@@ -82,6 +86,8 @@ private:
 
     TGTab* fSettingsTab;                                    // tab for different settings
 
+    TGCompositeFrame* fSetValueFrame;                       // frame for value setting controls
+    TGCheckButton* fHexFormat;                              // display in hex format
     TGCompositeFrame* fRangeManipFrame;                     // frame for range manipulation elements
     TGComboBox* fRangeManipCombo;                           // combo box for range manipulation
     TGNumberEntry* fRangeManipEntry;                        // entry for range manipulation
@@ -91,7 +97,7 @@ private:
     TGTextEntry* fImportFileEntry;                          // import file path entry
     TGTextButton* fImportBrowse;                            // import "Browse" button
     TGTextButton* fImportButton;                            // do import button
-    
+
     TGCompositeFrame* fExportFrame;                         // export frame
     TGTextEntry* fExportFileEntry;                          // export file path entry
     TGTextButton* fExportBrowse;                            // export "Browse" button
@@ -165,6 +171,7 @@ public:
     void DoGainMatch();
     void AddFileToLEDCalibration();
     void HandleMouseWheel(Event_t* event);
+    void ToggleHexFormat();
     void DestroyExternalCanvas();
 
     virtual void Init();

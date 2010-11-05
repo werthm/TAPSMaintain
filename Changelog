@@ -10,6 +10,10 @@
 #####################################################################
 
 
+0.1.5 : Nov 5 2010
+* support for QAC pedestal database setting
+* support for hexadecimal value input
+
 0.1.4 : Aug 5 2010
 * show block/ring numbers during cosmics calibration
 * skip BaF2 modules of ring 1 and 2 in gain match procedure

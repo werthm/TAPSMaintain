@@ -77,6 +77,10 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableCombo->AddEntry("BaF2 LED1 Threshold", EDB_Table_BaF2_LED1);
     fTableCombo->AddEntry("BaF2 LED2 Threshold", EDB_Table_BaF2_LED2);
     fTableCombo->AddEntry("Veto LED Threshold", EDB_Table_Veto_LED);
+    fTableCombo->AddEntry("QAC Pedestal LG", EDB_Table_QAC_LG);
+    fTableCombo->AddEntry("QAC Pedestal LGS", EDB_Table_QAC_LGS);
+    fTableCombo->AddEntry("QAC Pedestal SG", EDB_Table_QAC_SG);
+    fTableCombo->AddEntry("QAC Pedestal SGS", EDB_Table_QAC_SGS);
     fControlFrame->AddFrame(fTableCombo, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     fTableCombo->Select(EDB_Table_Empty, kFALSE);
 
@@ -84,9 +88,18 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     // ------------------------------ Begin Tab ------------------------------
     fSettingsTab = new TGTab(fControlFrame, 50, 50);   
 
+    // ------------------------------ Value setting frame ------------------------------
+    fSetValueFrame = fSettingsTab->AddTab("Set Values");
+    fSetValueFrame->SetLayoutManager(new TGTableLayout(fSetValueFrame, 2, 1));
+    
+    fHexFormat = new TGCheckButton(fSetValueFrame, "Hexadecimal value input");
+    fHexFormat->Connect("Clicked()", "TMHWConfigModule", this, "ToggleHexFormat()");
+    fSetValueFrame->AddFrame(fHexFormat, new TGTableLayoutHints(0, 1, 0, 1, kLHintsLeft, 15, 5, 15, 5));
+    
     // ------------------------------ Range manipulation frame ------------------------------
-    fRangeManipFrame = fSettingsTab->AddTab("Set Values");
+    fRangeManipFrame = new TGCompositeFrame(fSetValueFrame, 5, 5);
     fRangeManipFrame->SetLayoutManager(new TGHorizontalLayout(fRangeManipFrame));
+  
     fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "Set all"), new TGLayoutHints(kLHintsLeft, 15, 5, 35, 5));
     
     fRangeManipCombo = new TGComboBox(fRangeManipFrame);
@@ -122,7 +135,9 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fRangeManipButton = new TGTextButton(fRangeManipFrame, "    Set    ");
     fRangeManipButton->Connect("Clicked()", "TMHWConfigModule", this, "DoRangeManipulation()");
     fRangeManipFrame->AddFrame(fRangeManipButton, new TGLayoutHints(kLHintsLeft, 7, 15, 32, 2));
-
+    
+    fSetValueFrame->AddFrame(fRangeManipFrame, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 0, 5, 5, 5));
+    
     
     // ------------------------------ Import frame ------------------------------
     fImportFrame = fSettingsTab->AddTab("Import");
@@ -328,8 +343,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fLEDSetThrButton = new TGTextButton(fLEDFrame, " Set ");
     fLEDSetThrButton->Connect("Clicked()", "TMHWConfigModule", this, "SetLEDThresholds()");
     fLEDFrame->AddFrame(fLEDSetThrButton, 
-                        new TGTableLayoutHints(3, 4, 7, 8, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));                                                                                 
-                                                                                                                                                                                                                
+                        new TGTableLayoutHints(3, 4, 7, 8, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
     
     l = new TGLabel(fLEDFrame, "Open several LED calibration files and add them to the LED setting\n"
                                "calculation. A linear fit is performed for every TAPS channel using\n"
@@ -342,7 +356,6 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
     fSettingsTab->SetEnabled(3, kFALSE);
     fSettingsTab->SetEnabled(4, kFALSE);
-
 
 
     // ------------------------------ Main control buttons ------------------------------
@@ -537,6 +550,9 @@ void TMHWConfigModule::Init()
     fTableCombo->Select(EDB_Table_Empty, kTRUE);
     fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
     fLEDRangeCombo->Select(ERange_Single_Element, kFALSE);
+    
+    // select decimal format
+    fHexFormat->SetState(kButtonUp);
 }
 
 //______________________________________________________________________________
@@ -568,6 +584,36 @@ void TMHWConfigModule::HandleMouseWheel(Event_t* event)
         // scroll down
         Int_t newpos = fTableCanvas->GetVsbPosition() + page;
         fTableCanvas->SetVsbPosition(newpos);
+    }
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::ToggleHexFormat()
+{
+    // Change the user input fields to decimal or hexadecimal format.
+    
+    //Int_t val;
+
+    // evaluate check-button
+    if (fHexFormat->IsOn())
+    {
+        fRangeManipEntry->SetFormat(TGNumberFormat::kNESHex);
+        for (UInt_t i = 0; i < gMaxSize; i++)
+        {
+            //sscanf(fElementCurrentValue[i]->GetText()->Data(), "%d", &val);
+            //fElementCurrentValue[i]->SetText(TString::Format("%x", val));
+            fElementNewValue[i]->SetFormat(TGNumberFormat::kNESHex);
+        }
+    }
+    else
+    {
+        fRangeManipEntry->SetFormat(TGNumberFormat::kNESInteger);
+        for (UInt_t i = 0; i < gMaxSize; i++) 
+        {
+            //sscanf(fElementCurrentValue[i]->GetText()->Data(), "%x", &val);
+            //fElementCurrentValue[i]->SetText(TString::Format("%d", val));
+            fElementNewValue[i]->SetFormat(TGNumberFormat::kNESInteger);
+        }
     }
 }
 
@@ -1293,28 +1339,62 @@ Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
     // Check if the value 'value' lies within the limits of the accepted values
     // for the table 'table'.
 
-    if (table == EDB_Table_BaF2_HV)
+    switch (table)
     {
-        if (value >= gDB_BaF2_HV_Min && value <= gDB_BaF2_HV_Max) return kTRUE;
-        else return kFALSE;
+        case EDB_Table_BaF2_HV:
+        {
+            if (value >= gDB_BaF2_HV_Min && value <= gDB_BaF2_HV_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_BaF2_CFD:
+        {
+            if (value >= gDB_BaF2_CFD_Min && value <= gDB_BaF2_CFD_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_BaF2_LED1:
+        {
+            if (value >= gDB_BaF2_LED_Min && value <= gDB_BaF2_LED_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_BaF2_LED2:
+        {
+            if (value >= gDB_BaF2_LED_Min && value <= gDB_BaF2_LED_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_Veto_LED:
+        {
+            if (value >= gDB_Veto_LED_Min && value <= gDB_Veto_LED_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_QAC_LG:
+        {
+            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_QAC_LGS:
+        {
+            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_QAC_SG:
+        {
+            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_QAC_SGS:
+        {
+            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            else return kFALSE;
+        }
+        case EDB_Table_Empty:
+        {
+            return kFALSE;
+        }
+        default:
+        {
+            return kFALSE;
+        }
     }
-    if (table == EDB_Table_BaF2_CFD)
-    {
-        if (value >= gDB_BaF2_CFD_Min && value <= gDB_BaF2_CFD_Max) return kTRUE;
-        else return kFALSE;
-    }
-    if (table == EDB_Table_BaF2_LED1 || EDB_Table_BaF2_LED2)
-    {
-        if (value >= gDB_BaF2_LED_Min && value <= gDB_BaF2_LED_Max) return kTRUE;
-        else return kFALSE;
-    }
-    if (table == EDB_Table_Veto_LED)
-    {
-        if (value >= gDB_Veto_LED_Min && value <= gDB_Veto_LED_Max) return kTRUE;
-        else return kFALSE;
-    }
-
-    return kFALSE;
 }
 
 //______________________________________________________________________________
@@ -1324,37 +1404,67 @@ Bool_t TMHWConfigModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableNam
     // name of the data column in columnName.
     // Return kTRUE on success.
   
-    if (table == EDB_Table_BaF2_HV) 
+    switch (table)
     {
-        strcpy(tableName, "hvbaf_par");
-        strcpy(columnName, "th");
-        return kTRUE;
+        case EDB_Table_BaF2_HV:
+        {
+            strcpy(tableName, "hvbaf_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_BaF2_CFD:
+        {
+            strcpy(tableName, "cfd_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_BaF2_LED1:
+        {
+            strcpy(tableName, "ledl_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_BaF2_LED2:
+        {
+            strcpy(tableName, "ledh_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_Veto_LED:
+        {
+            strcpy(tableName, "vled_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_QAC_LG:
+        {
+            strcpy(tableName, "qaclg_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_QAC_LGS:
+        {
+            strcpy(tableName, "qaclgs_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_QAC_SG:
+        {
+            strcpy(tableName, "qacsg_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        case EDB_Table_QAC_SGS:
+        {
+            strcpy(tableName, "qacsgs_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
+        default:
+        {
+            return kFALSE;
+        }
     }
-    else if (table == EDB_Table_BaF2_CFD)
-    {
-        strcpy(tableName, "cfd_par");
-        strcpy(columnName, "th");
-        return kTRUE;
-    }
-    else if (table == EDB_Table_BaF2_LED1)
-    {
-        strcpy(tableName, "ledl_par");
-        strcpy(columnName, "th");
-        return kTRUE;
-    }
-    else if (table == EDB_Table_BaF2_LED2)
-    {
-        strcpy(tableName, "ledh_par");
-        strcpy(columnName, "th");
-        return kTRUE;
-    }
-    else if (table == EDB_Table_Veto_LED)
-    {
-        strcpy(tableName, "vled_par");
-        strcpy(columnName, "th");
-        return kTRUE;
-    }
-    else return kFALSE;
 }
 
 //______________________________________________________________________________
@@ -1402,7 +1512,10 @@ void TMHWConfigModule::ReadTable(Int_t table)
     else if (table == EDB_Table_BaF2_LED1) fRangeManipEntry->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
     else if (table == EDB_Table_BaF2_LED2) fRangeManipEntry->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
     else if (table == EDB_Table_Veto_LED) fRangeManipEntry->SetLimitValues(gDB_Veto_LED_Min, gDB_Veto_LED_Max);
-
+    else if (table == EDB_Table_QAC_LG) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+    else if (table == EDB_Table_QAC_LGS) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+    else if (table == EDB_Table_QAC_SG) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+    else if (table == EDB_Table_QAC_SGS) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
     
     // Leave if the dummy entry in the combo was selected
     if (table == EDB_Table_Empty) return;
@@ -1462,6 +1575,10 @@ void TMHWConfigModule::ReadTable(Int_t table)
         else if (table == EDB_Table_BaF2_LED1) fElementNewValue[i]->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
         else if (table == EDB_Table_BaF2_LED2) fElementNewValue[i]->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
         else if (table == EDB_Table_Veto_LED) fElementNewValue[i]->SetLimitValues(gDB_Veto_LED_Min, gDB_Veto_LED_Max);
+        else if (table == EDB_Table_QAC_LG) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+        else if (table == EDB_Table_QAC_LGS) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+        else if (table == EDB_Table_QAC_SG) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+        else if (table == EDB_Table_QAC_SGS) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
 
         delete res;
     }

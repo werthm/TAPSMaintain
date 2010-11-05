@@ -18,7 +18,7 @@
 
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.4";
+static const Char_t gTAPSMaintainVersion[] = "0.1.5";
 
 // default TAPS database settings
 static const Char_t gTAPS_DB_URL[] = "mysql://localhost/taps";
@@ -54,6 +54,8 @@ const Double_t gDB_Veto_LED_Min = -999.;
 const Double_t gDB_Veto_LED_Max = -1.;
 const Double_t gDB_Veto_HV_Min = 0.;
 const Double_t gDB_Veto_HV_Max = 1000.;
+const Double_t gDB_QAC_Ped_Min = 1.;
+const Double_t gDB_QAC_Ped_Max = 10000.;
 
 // define TAPS detectors
 enum ETAPSDetector 
