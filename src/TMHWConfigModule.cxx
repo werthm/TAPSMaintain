@@ -553,6 +553,7 @@ void TMHWConfigModule::Init()
     
     // select decimal format
     fHexFormat->SetState(kButtonUp);
+    ToggleHexFormat();
 }
 
 //______________________________________________________________________________
