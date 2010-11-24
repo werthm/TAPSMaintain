@@ -184,7 +184,8 @@ void TMCheckSpectra::DrawSingleHistogram()
         else pad->SetLogy(kFALSE);
 
         // check for x-axis range ajustment
-        h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
+        if (fXEnd->GetNumber() != 0)
+            h->GetXaxis()->SetRangeUser(fXStart->GetNumber(), fXEnd->GetNumber());
         
         // draw
         h->Draw();
@@ -300,7 +301,8 @@ void TMCheckSpectra::DrawMultipleHistograms()
             else pad->SetLogy(kFALSE);
             
             // check for x-axis range ajustment
-            h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
+            if (fXEnd->GetNumber() != 0)
+                h->GetXaxis()->SetRangeUser(fXStart->GetNumber(), fXEnd->GetNumber());
    
             h->Draw();
         }
@@ -343,7 +345,8 @@ void TMCheckSpectra::DrawPatternHistogram(Int_t id)
         else pad->SetLogy(kFALSE);
         
         // check for x-axis range ajustment
-        h->GetXaxis()->SetRange(fXStart->GetNumber(), fXEnd->GetNumber());
+        if (fXEnd->GetNumber() != 0)
+            h->GetXaxis()->SetRangeUser(fXStart->GetNumber(), fXEnd->GetNumber());
      
         // draw
         h->Draw();
