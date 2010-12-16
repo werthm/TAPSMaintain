@@ -29,10 +29,10 @@
 
 
 enum {
-    ECosmics_Calib_Type_BAF2_LG,
-    ECosmics_Calib_Type_BAF2_SG,
-    ECosmics_Calib_Type_PBWO4_LG,
-    ECosmics_Calib_Type_VETO
+    kCosmics_Calib_Type_BAF2_LG,
+    kCosmics_Calib_Type_BAF2_SG,
+    kCosmics_Calib_Type_PBWO4_LG,
+    kCosmics_Calib_Type_VETO
 };
 
 

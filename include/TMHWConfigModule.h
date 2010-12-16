@@ -50,26 +50,26 @@ extern "C"
 
 
 enum EDB_TAPS_Table {
-    EDB_Table_Empty, 
-    EDB_Table_BaF2_HV, 
-    EDB_Table_BaF2_CFD,
-    EDB_Table_BaF2_LED1,
-    EDB_Table_BaF2_LED2,
-    EDB_Table_Veto_LED,
-    EDB_Table_QAC_LG,
-    EDB_Table_QAC_LGS,
-    EDB_Table_QAC_SG,
-    EDB_Table_QAC_SGS
+    kDB_Table_Empty, 
+    kDB_Table_BaF2_HV, 
+    kDB_Table_BaF2_CFD,
+    kDB_Table_BaF2_LED1,
+    kDB_Table_BaF2_LED2,
+    kDB_Table_Veto_LED,
+    kDB_Table_QAC_LG,
+    kDB_Table_QAC_LGS,
+    kDB_Table_QAC_SG,
+    kDB_Table_QAC_SGS
 };
 
 
 // Hardcoded values used for QT signal connections
 enum EFILE_BROWSE_SELECT {
-    EFILE_SELECT_IMPORT             = 1,
-    EFILE_SELECT_EXPORT             = 2,
-    EFILE_SELECT_GM_ENERGY_CALIB    = 3,
-    EFILE_SELECT_LED_ENERGY_CALIB   = 4,
-    EFILE_SELECT_LED_CALIB          = 5
+    kFILE_SELECT_IMPORT             = 1,
+    kFILE_SELECT_EXPORT             = 2,
+    kFILE_SELECT_GM_ENERGY_CALIB    = 3,
+    kFILE_SELECT_LED_ENERGY_CALIB   = 4,
+    kFILE_SELECT_LED_CALIB          = 5
 };
 
 

@@ -109,9 +109,9 @@ Int_t TMSeqCalibModule::GetCurrentDetectorSize() const
 {
     // Return the number of elements in the current detector (check fDetID).
 
-    if (fDetID == kBaF2_Detector) return gBaF2Size;
-    else if (fDetID == kPbWO4_Detector) return gPbWO4Size;
-    else if (fDetID == kVeto_Detector) return gVetoSize;
+    if (fDetID == kBaF2_Detector) return kBaF2Size;
+    else if (fDetID == kPbWO4_Detector) return kPbWO4Size;
+    else if (fDetID == kVeto_Detector) return kVetoSize;
     else return 0;
 }
 

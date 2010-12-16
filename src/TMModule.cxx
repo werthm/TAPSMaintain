@@ -108,8 +108,8 @@ TMModule::TMModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t need
     fMiscFileName[0] = '\0';
 
     // create result array
-    fResults = new Double_t*[gMaxSize];
-    for (UInt_t i = 0; i < gMaxSize; i++) fResults[i] = new Double_t[fNresults];
+    fResults = new Double_t*[kMaxSize];
+    for (UInt_t i = 0; i < kMaxSize; i++) fResults[i] = new Double_t[fNresults];
     
     // create frame
     fFrame = new TGCompositeFrame(0, 800, 600, kVerticalFrame);
@@ -138,7 +138,7 @@ TMModule::~TMModule()
 
     // delete results array
     if (fResults) {
-        for (UInt_t i = 0; i < gMaxSize; i++) delete [] fResults[i];
+        for (UInt_t i = 0; i < kMaxSize; i++) delete [] fResults[i];
     }
     
     // delete frame
@@ -154,7 +154,7 @@ Double_t TMModule::GetResult(UInt_t element, UInt_t resultNumber) const
     // Get the result #resultNumber of the element 'element'.
     
     // check bounds
-    if (element < 0 || element >= gMaxSize) return 0.;
+    if (element < 0 || element >= kMaxSize) return 0.;
     if (resultNumber < 0 || resultNumber >= fNresults) return 0.;
     
     return fResults[element][resultNumber];
@@ -166,7 +166,7 @@ void TMModule::SetResult(UInt_t element, UInt_t resultNumber, Double_t result)
     // Set the result #resultNumber of the element 'element' to 'result'.
     
     // check bounds
-    if (element < 0 || element >= gMaxSize) return;
+    if (element < 0 || element >= kMaxSize) return;
     if (resultNumber < 0 || resultNumber >= fNresults) return;
     
     // set result
@@ -178,7 +178,7 @@ void TMModule::ClearResults()
 {
     // Clear the results array.
     
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         for (UInt_t j = 0; j < fNresults; j++)
         {
@@ -199,7 +199,7 @@ void TMModule::DumpResults(const Char_t* numberFormat) const
     printf("\nDumping result array of module '%s'\n\n", GetName());
     
     // print array content
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         printf(" %3d ", i+1);
         for (UInt_t j = 0; j < fNresults; j++)
@@ -227,7 +227,7 @@ void TMModule::SaveResults(const Char_t* filename)
     fprintf(fout, "\n");
     
     // print array content
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         fprintf(fout, " %3d ", i+1);
         for (UInt_t j = 0; j < fNresults; j++)

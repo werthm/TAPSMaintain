@@ -49,10 +49,10 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fTypeCombo = new TGComboBox(fConfigFrame);
     fTypeCombo->Connect("Selected(Int_t)", "TMCalibCosmics", this, "UpdateDetectorType(Int_t)");
     fTypeCombo->Resize(200, 22);
-    fTypeCombo->AddEntry("BaF2 LG", ECosmics_Calib_Type_BAF2_LG);
-    fTypeCombo->AddEntry("BaF2 SG", ECosmics_Calib_Type_BAF2_SG);
-    fTypeCombo->AddEntry("PbWO4 LG", ECosmics_Calib_Type_PBWO4_LG);
-    fTypeCombo->AddEntry("Veto", ECosmics_Calib_Type_VETO);
+    fTypeCombo->AddEntry("BaF2 LG", kCosmics_Calib_Type_BAF2_LG);
+    fTypeCombo->AddEntry("BaF2 SG", kCosmics_Calib_Type_BAF2_SG);
+    fTypeCombo->AddEntry("PbWO4 LG", kCosmics_Calib_Type_PBWO4_LG);
+    fTypeCombo->AddEntry("Veto", kCosmics_Calib_Type_VETO);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
 
@@ -90,7 +90,7 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fConfigFrame->Layout();
     
     // select detector type
-    fTypeCombo->Select(ECosmics_Calib_Type_BAF2_LG, kTRUE);
+    fTypeCombo->Select(kCosmics_Calib_Type_BAF2_LG, kTRUE);
 
     // divide canvas
     fCanvas->Divide(2, 1);
@@ -154,9 +154,9 @@ void TMCalibCosmics::Redo()
     Double_t energyLoss = 0;
     
     // check detector type
-    if (fDetID == kBaF2_Detector)       energyLoss = gTAPS_MIP_Loss_BaF2;
-    else if (fDetID == kPbWO4_Detector) energyLoss = gTAPS_MIP_Loss_PbWO4;
-    else if (fDetID == kVeto_Detector)  energyLoss = gTAPS_MIP_Loss_Veto;
+    if (fDetID == kBaF2_Detector)       energyLoss = kTAPS_MIP_Loss_BaF2;
+    else if (fDetID == kPbWO4_Detector) energyLoss = kTAPS_MIP_Loss_PbWO4;
+    else if (fDetID == kVeto_Detector)  energyLoss = kTAPS_MIP_Loss_Veto;
     
     Double_t gain = energyLoss / (peakPos - pedPos); 
     
@@ -280,9 +280,9 @@ void TMCalibCosmics::Process(Int_t index)
     Double_t energyLoss = 0;
     
     // check detector type
-    if (fDetID == kBaF2_Detector)       energyLoss = gTAPS_MIP_Loss_BaF2;
-    else if (fDetID == kPbWO4_Detector) energyLoss = gTAPS_MIP_Loss_PbWO4;
-    else if (fDetID == kVeto_Detector)  energyLoss = gTAPS_MIP_Loss_Veto;
+    if (fDetID == kBaF2_Detector)       energyLoss = kTAPS_MIP_Loss_BaF2;
+    else if (fDetID == kPbWO4_Detector) energyLoss = kTAPS_MIP_Loss_PbWO4;
+    else if (fDetID == kVeto_Detector)  energyLoss = kTAPS_MIP_Loss_Veto;
     
     Double_t gain = energyLoss / (peakPos - pedPos); 
     
@@ -346,19 +346,19 @@ void TMCalibCosmics::UpdateDetectorType(Int_t id)
     // Update the settings in the configuration dialog for the detector type the
     // user chose in the combo box
     
-    if (id == ECosmics_Calib_Type_BAF2_LG)
+    if (id == kCosmics_Calib_Type_BAF2_LG)
     {
         fHNameEntry->SetText("LG/baf2-LG-%03d");
     }
-    if (id == ECosmics_Calib_Type_BAF2_SG)
+    if (id == kCosmics_Calib_Type_BAF2_SG)
     {
         fHNameEntry->SetText("SG/baf2-SG-%03d");
     }
-    if (id == ECosmics_Calib_Type_PBWO4_LG)
+    if (id == kCosmics_Calib_Type_PBWO4_LG)
     {
         fHNameEntry->SetText("PWO-LG/pwo-LG-%03d");
     }
-    if (id == ECosmics_Calib_Type_VETO)
+    if (id == kCosmics_Calib_Type_VETO)
     {
         fHNameEntry->SetText("Veto-Q/veto-Q-%03d");
     }
@@ -371,10 +371,10 @@ void TMCalibCosmics::ReadConfig()
     
     // set detector id
     Int_t type = fTypeCombo->GetSelected();
-    if (type == ECosmics_Calib_Type_BAF2_LG)       fDetID = kBaF2_Detector;
-    else if (type == ECosmics_Calib_Type_BAF2_SG)  fDetID = kBaF2_Detector;
-    else if (type == ECosmics_Calib_Type_PBWO4_LG) fDetID = kPbWO4_Detector;
-    else if (type == ECosmics_Calib_Type_VETO)     fDetID = kVeto_Detector;
+    if (type == kCosmics_Calib_Type_BAF2_LG)       fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_BAF2_SG)  fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_PBWO4_LG) fDetID = kPbWO4_Detector;
+    else if (type == kCosmics_Calib_Type_VETO)     fDetID = kVeto_Detector;
     
     // copy histogram name
     strcpy(fHName, fHNameEntry->GetText());

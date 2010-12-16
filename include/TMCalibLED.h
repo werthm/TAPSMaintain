@@ -30,11 +30,11 @@
 
 
 enum {
-    ELED_Calib_Type_LG_LED1,
-    ELED_Calib_Type_LG_LED2,
-    ELED_Calib_Type_LG_LED1_AR,
-    ELED_Calib_Type_LG_LED2_AR,
-    ELED_Calib_Type_MANUAL
+    kLED_Calib_Type_LG_LED1,
+    kLED_Calib_Type_LG_LED2,
+    kLED_Calib_Type_LG_LED1_AR,
+    kLED_Calib_Type_LG_LED2_AR,
+    kLED_Calib_Type_MANUAL
 };
 
 

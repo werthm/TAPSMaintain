@@ -31,30 +31,30 @@
 
 
 enum {
-    ESpec_Empty,
-    ESpec_BaF2_LG,
-    ESpec_BaF2_LG_LED1,
-    ESpec_BaF2_LG_LED2,
-    ESpec_BaF2_LGbed,
-    ESpec_BaF2_LGnoP,
-    ESpec_BaF2_LGS,
-    ESpec_BaF2_SG,
-    ESpec_BaF2_SGS,  
-    ESpec_BaF2_TIME, 
-    ESpec_BaF2_T,
-    ESpec_BaF2_TDIFF,
-    ESpec_Veto_Q,
-    ESpec_Veto_QLED,
-    ESpec_Veto_T,
-    ESpec_T_DIFF_BAFVETO_single,
-    ESpec_PWO_LG,
-    ESpec_PWO_LG_TIME,
-    ESpec_PWO_LGS,
-    ESpec_PWO_TIME,
-    ESpec_PWO_TIME_MULT,
-    ESpec_PWO_VETO_LG,
-    ESpec_PWO_VETO_LGS,
-    ESpec_PWO_VETO_TIME
+    kSpec_Empty,
+    kSpec_BaF2_LG,
+    kSpec_BaF2_LG_LED1,
+    kSpec_BaF2_LG_LED2,
+    kSpec_BaF2_LGbed,
+    kSpec_BaF2_LGnoP,
+    kSpec_BaF2_LGS,
+    kSpec_BaF2_SG,
+    kSpec_BaF2_SGS,  
+    kSpec_BaF2_TIME, 
+    kSpec_BaF2_T,
+    kSpec_BaF2_TDIFF,
+    kSpec_Veto_Q,
+    kSpec_Veto_QLED,
+    kSpec_Veto_T,
+    kSpec_T_DIFF_BAFVETO_single,
+    kSpec_PWO_LG,
+    kSpec_PWO_LG_TIME,
+    kSpec_PWO_LGS,
+    kSpec_PWO_TIME,
+    kSpec_PWO_TIME_MULT,
+    kSpec_PWO_VETO_LG,
+    kSpec_PWO_VETO_LGS,
+    kSpec_PWO_VETO_TIME
 };
 
 
@@ -126,7 +126,7 @@ public:
     }
     void DrawHistogram()
     {
-        if (fElementCombo->GetSelected() == ERange_Single_Element) DrawSingleHistogram();
+        if (fElementCombo->GetSelected() == kRange_Single_Element) DrawSingleHistogram();
         else DrawMultipleHistograms();
     }
  

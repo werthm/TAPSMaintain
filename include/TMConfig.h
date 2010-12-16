@@ -8,7 +8,7 @@
 //                                                                      //
 // TMConfig                                                             //
 //                                                                      //
-// TAPSMaintain configuration header file.                              //
+// TAPSMaintain configuration.                                          //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -16,46 +16,48 @@
 #ifndef TAPSMaintain_TMConfig
 #define TAPSMaintain_TMConfig
 
+#include "Rtypes.h"
+
 
 // TAPSMaintain version
-static const Char_t gTAPSMaintainVersion[] = "0.1.6";
+extern const Char_t kTAPSMaintainVersion[];
 
 // default TAPS database settings
-static const Char_t gTAPS_DB_URL[] = "mysql://localhost/taps";
-static const Char_t gTAPS_DB_User[] = "taps";
-static const Char_t gTAPS_DB_Passwd[] = "taps2003";
+extern const Char_t kTAPS_DB_URL[];
+extern const Char_t kTAPS_DB_User[];
+extern const Char_t kTAPS_DB_Passwd[];
 
 // default TAPS hardware server
-static const Char_t gTAPS_Server[] = "localhost";
+extern const Char_t kTAPS_Server[];
 
 // number of TAPS detector elements
-const UInt_t gMaxSize     = 384;
-const UInt_t gBaF2Size    = 384;
-const UInt_t gPbWO4Size   = 72;
-const UInt_t gVetoSize    = 384;
-const UInt_t gPWOVetoSize = 18;
+extern const UInt_t kMaxSize;
+extern const UInt_t kBaF2Size;
+extern const UInt_t kPbWO4Size;
+extern const UInt_t kVetoSize;
+extern const UInt_t kPWOVetoSize;
 
 // energy loss of minimal ionizing particles in the TAPS detectors [MeV]
-const Double_t gTAPS_MIP_Loss_BaF2  = 37.7;
-const Double_t gTAPS_MIP_Loss_PbWO4 = 29.5;
-const Double_t gTAPS_MIP_Loss_Veto  = 5;      // ?
+extern const Double_t kTAPS_MIP_Loss_BaF2;
+extern const Double_t kTAPS_MIP_Loss_PbWO4;
+extern const Double_t kTAPS_MIP_Loss_Veto;
 
 // BaF2 HV calibration gain slope
-const Double_t gBaF2_Gain_Slope = 153;
+extern const Double_t kBaF2_Gain_Slope;
 
 // TAPS DB limits
-const Double_t gDB_BaF2_HV_Min = 0.;
-const Double_t gDB_BaF2_HV_Max = 2000.;
-const Double_t gDB_BaF2_CFD_Min = 1.;
-const Double_t gDB_BaF2_CFD_Max = 10000.;
-const Double_t gDB_BaF2_LED_Min = -999.;
-const Double_t gDB_BaF2_LED_Max = -1.;
-const Double_t gDB_Veto_LED_Min = -999.;
-const Double_t gDB_Veto_LED_Max = -1.;
-const Double_t gDB_Veto_HV_Min = 0.;
-const Double_t gDB_Veto_HV_Max = 1000.;
-const Double_t gDB_QAC_Ped_Min = 1.;
-const Double_t gDB_QAC_Ped_Max = 10000.;
+extern const Double_t kDB_BaF2_HV_Min;
+extern const Double_t kDB_BaF2_HV_Max;
+extern const Double_t kDB_BaF2_CFD_Min;
+extern const Double_t kDB_BaF2_CFD_Max;
+extern const Double_t kDB_BaF2_LED_Min;
+extern const Double_t kDB_BaF2_LED_Max;
+extern const Double_t kDB_Veto_LED_Min;
+extern const Double_t kDB_Veto_LED_Max;
+extern const Double_t kDB_Veto_HV_Min;
+extern const Double_t kDB_Veto_HV_Max;
+extern const Double_t kDB_QAC_Ped_Min;
+extern const Double_t kDB_QAC_Ped_Max;
 
 // define TAPS detectors
 enum ETAPSDetector 

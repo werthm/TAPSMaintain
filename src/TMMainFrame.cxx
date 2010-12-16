@@ -50,18 +50,18 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
     
     
     // ------------------------------ TAPS Logo and icon ------------------------------
-    fTAPSLogo = new TASImage(gTAPSLogo_width, gTAPSLogo_height);
+    fTAPSLogo = new TASImage(kTAPSLogo_width, kTAPSLogo_height);
 
     Char_t pix[3];
     Char_t pixel[256];
     
     // loop over pixel data
-    for (UInt_t i = 0; i < gTAPSLogo_height; i++)
+    for (UInt_t i = 0; i < kTAPSLogo_height; i++)
     {
-        for (UInt_t j = 0; j < gTAPSLogo_width; j++)
+        for (UInt_t j = 0; j < kTAPSLogo_width; j++)
         {
             // read pixel data
-            HEADER_PIXEL(fgTAPSLogo_data, pix);
+            HEADER_PIXEL(kTAPSLogo_data, pix);
             
             // convert to hex format
             sprintf(pixel, "#%02x%02x%02x", (UChar_t)pix[0], (UChar_t)pix[1], (UChar_t)pix[2]);
@@ -78,9 +78,9 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
     
     // create the "File" menu
     fFileMenu = new TGPopupMenu(gClient->GetRoot());
-    fFileMenu->AddEntry("&Open ROOT file", EACTION_OPEN_ROOT_FILE);
+    fFileMenu->AddEntry("&Open ROOT file", kACTION_OPEN_ROOT_FILE);
     fFileMenu->AddSeparator();
-    fFileMenu->AddEntry("&Quit", EACTION_FILE_QUIT);
+    fFileMenu->AddEntry("&Quit", kACTION_FILE_QUIT);
     fFileMenu->Connect("Activated(Int_t)", "TMTAPSMaintain", menuHandler, "HandleMenu(Int_t)");
 
     // create the "Modules" menu
@@ -89,7 +89,7 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
 
     // create the "Help" menu
     fHelpMenu = new TGPopupMenu(gClient->GetRoot());
-    fHelpMenu->AddEntry("About", EACTION_HELP_ABOUT);
+    fHelpMenu->AddEntry("About", kACTION_HELP_ABOUT);
     fHelpMenu->Connect("Activated(Int_t)", "TMTAPSMaintain", menuHandler, "HandleMenu(Int_t)");
 
     // create the layout and add all menus
@@ -112,17 +112,17 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
     
     toolBarData.fPixmap = "quit.xpm"; 
     toolBarData.fTipText = "Quit TAPSMaintain"; 
-    toolBarData.fId = EACTION_FILE_QUIT;          
+    toolBarData.fId = kACTION_FILE_QUIT;          
     fToolBar->AddButton(this, &toolBarData, 0);
     
     toolBarData.fPixmap = "open.xpm"; 
     toolBarData.fTipText = "Open ROOT file"; 
-    toolBarData.fId = EACTION_OPEN_ROOT_FILE;          
+    toolBarData.fId = kACTION_OPEN_ROOT_FILE;          
     fToolBar->AddButton(this, &toolBarData, 10);
     
     toolBarData.fPixmap = "stop_t.xpm"; 
     toolBarData.fTipText = "Stop active module"; 
-    toolBarData.fId = EACTION_MODULE_STOP;          
+    toolBarData.fId = kACTION_MODULE_STOP;          
     fToolBar->AddButton(this, &toolBarData, 10);
 
     AddFrame(new TGHorizontal3DLine(this), new TGLayoutHints(kLHintsTop | kLHintsExpandX));
@@ -138,7 +138,7 @@ TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
     fWelcomeFrame = new TGCompositeFrame(fModuleFrame, 800, 600, kVerticalFrame);
     fWelcomeFrame->ChangeBackground(TColor::RGB2Pixel(255, 255, 255));
 
-    sprintf(pixel, "TAPSMaintain v%s", gTAPSMaintainVersion);
+    sprintf(pixel, "TAPSMaintain v%s", kTAPSMaintainVersion);
     TGLabel* l = new TGLabel(fWelcomeFrame, pixel);
     l->SetTextFont("-adobe-helvetica-bold-r-*-*-34-*-*-*-*-*-iso8859-1");
     l->ChangeBackground(TColor::RGB2Pixel(255, 255, 255));

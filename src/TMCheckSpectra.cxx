@@ -52,45 +52,45 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo = new TGComboBox(fControlFrame);
     fSpectraCombo->Resize(150, 22);
     fSpectraCombo->Connect("Selected(Int_t)", "TMCheckSpectra", this, "SpectraClassChanged(Int_t)");
-    fSpectraCombo->AddEntry("Select class"         , ESpec_Empty);           
-    fSpectraCombo->AddEntry("BaF2 LG"              , ESpec_BaF2_LG);           
-    fSpectraCombo->AddEntry("BaF2 LG_LED1"         , ESpec_BaF2_LG_LED1);
-    fSpectraCombo->AddEntry("BaF2 LG_LED2"         , ESpec_BaF2_LG_LED2);
-    fSpectraCombo->AddEntry("BaF2 LGbed"           , ESpec_BaF2_LGbed);
-    fSpectraCombo->AddEntry("BaF2 LGnoP"           , ESpec_BaF2_LGnoP);
-    fSpectraCombo->AddEntry("BaF2 LGS"             , ESpec_BaF2_LGS);
-    fSpectraCombo->AddEntry("BaF2 SG"              , ESpec_BaF2_SG);
-    fSpectraCombo->AddEntry("BaF2 SGS"             , ESpec_BaF2_SGS); 
-    fSpectraCombo->AddEntry("BaF2 TIME"            , ESpec_BaF2_TIME);
-    fSpectraCombo->AddEntry("BaF2 T"               , ESpec_BaF2_T);
-    fSpectraCombo->AddEntry("BaF2 TDIFF"           , ESpec_BaF2_TDIFF);
-    fSpectraCombo->AddEntry("Veto Q"               , ESpec_Veto_Q);
-    fSpectraCombo->AddEntry("Veto QLED"            , ESpec_Veto_QLED);
-    fSpectraCombo->AddEntry("Veto T"               , ESpec_Veto_T);
-    fSpectraCombo->AddEntry("T_DIFF_BAFVETO"       , ESpec_T_DIFF_BAFVETO_single);
-    fSpectraCombo->AddEntry("PWO LG"               , ESpec_PWO_LG);
-    fSpectraCombo->AddEntry("PWO LG-TIME"          , ESpec_PWO_LG_TIME);
-    fSpectraCombo->AddEntry("PWO LGS"              , ESpec_PWO_LGS);
-    fSpectraCombo->AddEntry("PWO TIME"             , ESpec_PWO_TIME);
-    fSpectraCombo->AddEntry("PWO TIME MULT"        , ESpec_PWO_TIME_MULT);
-    fSpectraCombo->AddEntry("PWO Veto LG"          , ESpec_PWO_VETO_LG);
-    fSpectraCombo->AddEntry("PWO Veto LGS"         , ESpec_PWO_VETO_LGS);
-    fSpectraCombo->AddEntry("PWO Veto Time"        , ESpec_PWO_VETO_TIME);
+    fSpectraCombo->AddEntry("Select class"         , kSpec_Empty);           
+    fSpectraCombo->AddEntry("BaF2 LG"              , kSpec_BaF2_LG);           
+    fSpectraCombo->AddEntry("BaF2 LG_LED1"         , kSpec_BaF2_LG_LED1);
+    fSpectraCombo->AddEntry("BaF2 LG_LED2"         , kSpec_BaF2_LG_LED2);
+    fSpectraCombo->AddEntry("BaF2 LGbed"           , kSpec_BaF2_LGbed);
+    fSpectraCombo->AddEntry("BaF2 LGnoP"           , kSpec_BaF2_LGnoP);
+    fSpectraCombo->AddEntry("BaF2 LGS"             , kSpec_BaF2_LGS);
+    fSpectraCombo->AddEntry("BaF2 SG"              , kSpec_BaF2_SG);
+    fSpectraCombo->AddEntry("BaF2 SGS"             , kSpec_BaF2_SGS); 
+    fSpectraCombo->AddEntry("BaF2 TIME"            , kSpec_BaF2_TIME);
+    fSpectraCombo->AddEntry("BaF2 T"               , kSpec_BaF2_T);
+    fSpectraCombo->AddEntry("BaF2 TDIFF"           , kSpec_BaF2_TDIFF);
+    fSpectraCombo->AddEntry("Veto Q"               , kSpec_Veto_Q);
+    fSpectraCombo->AddEntry("Veto QLED"            , kSpec_Veto_QLED);
+    fSpectraCombo->AddEntry("Veto T"               , kSpec_Veto_T);
+    fSpectraCombo->AddEntry("T_DIFF_BAFVETO"       , kSpec_T_DIFF_BAFVETO_single);
+    fSpectraCombo->AddEntry("PWO LG"               , kSpec_PWO_LG);
+    fSpectraCombo->AddEntry("PWO LG-TIME"          , kSpec_PWO_LG_TIME);
+    fSpectraCombo->AddEntry("PWO LGS"              , kSpec_PWO_LGS);
+    fSpectraCombo->AddEntry("PWO TIME"             , kSpec_PWO_TIME);
+    fSpectraCombo->AddEntry("PWO TIME MULT"        , kSpec_PWO_TIME_MULT);
+    fSpectraCombo->AddEntry("PWO Veto LG"          , kSpec_PWO_VETO_LG);
+    fSpectraCombo->AddEntry("PWO Veto LGS"         , kSpec_PWO_VETO_LGS);
+    fSpectraCombo->AddEntry("PWO Veto Time"        , kSpec_PWO_VETO_TIME);
     fControlFrame->AddFrame(fSpectraCombo, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
     
     // add element selection type combo box
     fElementCombo = new TGComboBox(fControlFrame);
     fElementCombo->Resize(150, 22);
     fElementCombo->Connect("Selected(Int_t)", "TMCheckSpectra", this, "ElementRangeChanged(Int_t)");
-    fElementCombo->AddEntry("Single element", ERange_Single_Element);
-    fElementCombo->AddEntry("Block A elements", ERange_Block_A);
-    fElementCombo->AddEntry("Block B elements", ERange_Block_B);
-    fElementCombo->AddEntry("Block C elements", ERange_Block_C);
-    fElementCombo->AddEntry("Block D elements", ERange_Block_D);
-    fElementCombo->AddEntry("Block E elements", ERange_Block_E);
-    fElementCombo->AddEntry("Block F elements", ERange_Block_F);
+    fElementCombo->AddEntry("Single element", kRange_Single_Element);
+    fElementCombo->AddEntry("Block A elements", kRange_Block_A);
+    fElementCombo->AddEntry("Block B elements", kRange_Block_B);
+    fElementCombo->AddEntry("Block C elements", kRange_Block_C);
+    fElementCombo->AddEntry("Block D elements", kRange_Block_D);
+    fElementCombo->AddEntry("Block E elements", kRange_Block_E);
+    fElementCombo->AddEntry("Block F elements", kRange_Block_F);
     fControlFrame->AddFrame(fElementCombo, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fElementCombo->Select(ERange_Single_Element, kFALSE);
+    fElementCombo->Select(kRange_Single_Element, kFALSE);
      
     // add element number entry
     fElementNumberEntry = new TGNumberEntry(fControlFrame, 1, 3);
@@ -166,7 +166,7 @@ void TMCheckSpectra::DrawSingleHistogram()
     Char_t hName[256];
 
     // exit if no class was selected
-    if (fSpectraCombo->GetSelected() == ESpec_Empty) return;
+    if (fSpectraCombo->GetSelected() == kSpec_Empty) return;
  
     // construct histogram name
     sprintf(hName, specNames[fSpectraCombo->GetSelected()], (Int_t)fElementNumberEntry->GetNumber());
@@ -208,68 +208,68 @@ void TMCheckSpectra::DrawMultipleHistograms()
 
     Char_t hName[256];
     Char_t name[256];
-    Int_t elements[gMaxSize];
+    Int_t elements[kMaxSize];
     UInt_t nelements = 0;
     UInt_t divisions[2] = {1, 1};
 
     // exit if no class was selected
-    if (fSpectraCombo->GetSelected() == ESpec_Empty) return;
+    if (fSpectraCombo->GetSelected() == kSpec_Empty) return;
  
     // fill element array
     switch (fElementCombo->GetSelected())
     {
         // block A
-        case ERange_Block_A:
+        case kRange_Block_A:
             nelements = 64;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+1;
             divisions[0] = 8;
             divisions[1] = 8;
             break;
         // block B
-        case ERange_Block_B:
+        case kRange_Block_B:
             nelements = 64;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+65;
             divisions[0] = 8;
             divisions[1] = 8;
             break;
          // block C
-         case ERange_Block_C:
+         case kRange_Block_C:
             nelements = 64;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+129;
             divisions[0] = 8;
             divisions[1] = 8;
             break;
          // block D
-         case ERange_Block_D:
+         case kRange_Block_D:
             nelements = 64;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+193;
             divisions[0] = 8;
             divisions[1] = 8;
             break;
          // block E
-         case ERange_Block_E:
+         case kRange_Block_E:
             nelements = 64;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+257;
             divisions[0] = 8;
             divisions[1] = 8;
             break;
          // block F
-         case ERange_Block_F:
+         case kRange_Block_F:
             nelements = 64;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+321;
             divisions[0] = 8;
             divisions[1] = 8;
             break;
          // all PWO elements
-         case ERange_All_PWO_Elements:
-            nelements = gPbWO4Size;
+         case kRange_All_PWO_Elements:
+            nelements = kPbWO4Size;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+1;
             divisions[0] = 8;
             divisions[1] = 9;
             break;
          // all PWO Veto elements
-         case ERange_All_PWO_VETO_Elements:
-            nelements = gPWOVetoSize;
+         case kRange_All_PWO_VETO_Elements:
+            nelements = kPWOVetoSize;
             for (UInt_t i = 0; i < nelements; i++) elements[i] = i+1;
             divisions[0] = 3;
             divisions[1] = 6;
@@ -376,7 +376,7 @@ void TMCheckSpectra::ElementRangeChanged(Int_t id)
 {
     // Called when the user changed the element range.
     
-    if (id == ERange_Single_Element) fElementNumberEntry->SetState(kTRUE);
+    if (id == kRange_Single_Element) fElementNumberEntry->SetState(kTRUE);
     else fElementNumberEntry->SetState(kFALSE);
 
     DrawHistogram();
@@ -388,7 +388,7 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
     // Called when the user changed the spectra class.
     
     // Reset spectrum class combo box and clear canvas
-    if (id == ESpec_Empty)
+    if (id == kSpec_Empty)
     {
         fElementNumberEntry->SetLimitValues(0, 0);
         fCanvas->Clear();
@@ -397,54 +397,54 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
     }
 
     // Set detector number entry limits
-    if (id == ESpec_PWO_LG      ||
-        id == ESpec_PWO_LG_TIME ||
-        id == ESpec_PWO_LGS     ||
-        id == ESpec_PWO_TIME    ||
-        id == ESpec_PWO_TIME_MULT) 
+    if (id == kSpec_PWO_LG      ||
+        id == kSpec_PWO_LG_TIME ||
+        id == kSpec_PWO_LGS     ||
+        id == kSpec_PWO_TIME    ||
+        id == kSpec_PWO_TIME_MULT) 
     {
         // limit element numbers
-        fElementNumberEntry->SetLimitValues(1, gPbWO4Size);
+        fElementNumberEntry->SetLimitValues(1, kPbWO4Size);
         
         // recreate element combo box
         fElementCombo->RemoveAll();
-        fElementCombo->AddEntry("Single element", ERange_Single_Element);
-        fElementCombo->AddEntry("All elements", ERange_All_PWO_Elements);
+        fElementCombo->AddEntry("Single element", kRange_Single_Element);
+        fElementCombo->AddEntry("All elements", kRange_All_PWO_Elements);
         fElementCombo->GetListBox()->Resize(150, 40);
-        fElementCombo->Select(ERange_Single_Element, kFALSE);
+        fElementCombo->Select(kRange_Single_Element, kFALSE);
         fElementNumberEntry->SetState(kTRUE);
     }
-    else if (id == ESpec_PWO_VETO_LG  ||
-             id == ESpec_PWO_VETO_LGS ||
-             id == ESpec_PWO_VETO_TIME)
+    else if (id == kSpec_PWO_VETO_LG  ||
+             id == kSpec_PWO_VETO_LGS ||
+             id == kSpec_PWO_VETO_TIME)
     {
         // limit element numbers
-        fElementNumberEntry->SetLimitValues(1, gPWOVetoSize);
+        fElementNumberEntry->SetLimitValues(1, kPWOVetoSize);
         
         // recreate element combo box
         fElementCombo->RemoveAll();
-        fElementCombo->AddEntry("Single element", ERange_Single_Element);
-        fElementCombo->AddEntry("All elements", ERange_All_PWO_VETO_Elements);
+        fElementCombo->AddEntry("Single element", kRange_Single_Element);
+        fElementCombo->AddEntry("All elements", kRange_All_PWO_VETO_Elements);
         fElementCombo->GetListBox()->Resize(150, 40);
-        fElementCombo->Select(ERange_Single_Element, kFALSE);
+        fElementCombo->Select(kRange_Single_Element, kFALSE);
         fElementNumberEntry->SetState(kTRUE);
     }
     else 
     {
         // limit element numbers
-        fElementNumberEntry->SetLimitValues(1, gBaF2Size);
+        fElementNumberEntry->SetLimitValues(1, kBaF2Size);
     
         // recreate element combo box
         fElementCombo->RemoveAll();
-        fElementCombo->AddEntry("Single element", ERange_Single_Element);
-        fElementCombo->AddEntry("Block A elements", ERange_Block_A);
-        fElementCombo->AddEntry("Block B elements", ERange_Block_B);
-        fElementCombo->AddEntry("Block C elements", ERange_Block_C);
-        fElementCombo->AddEntry("Block D elements", ERange_Block_D);
-        fElementCombo->AddEntry("Block E elements", ERange_Block_E);
-        fElementCombo->AddEntry("Block F elements", ERange_Block_F);
+        fElementCombo->AddEntry("Single element", kRange_Single_Element);
+        fElementCombo->AddEntry("Block A elements", kRange_Block_A);
+        fElementCombo->AddEntry("Block B elements", kRange_Block_B);
+        fElementCombo->AddEntry("Block C elements", kRange_Block_C);
+        fElementCombo->AddEntry("Block D elements", kRange_Block_D);
+        fElementCombo->AddEntry("Block E elements", kRange_Block_E);
+        fElementCombo->AddEntry("Block F elements", kRange_Block_F);
         fElementCombo->GetListBox()->Resize(150, 120);
-        fElementCombo->Select(ERange_Single_Element, kFALSE);
+        fElementCombo->Select(kRange_Single_Element, kFALSE);
         fElementNumberEntry->SetState(kTRUE);
     }
 
@@ -466,8 +466,8 @@ void TMCheckSpectra::Init()
     // Reset spectrum class combo box
     fElementNumberEntry->SetIntNumber(0);
     fElementNumberEntry->SetLimitValues(0, 0);
-    fSpectraCombo->Select(ESpec_Empty, kFALSE);
-    fElementCombo->Select(ERange_Single_Element, kFALSE);
+    fSpectraCombo->Select(kSpec_Empty, kFALSE);
+    fElementCombo->Select(kRange_Single_Element, kFALSE);
     fElementNumberEntry->SetState(kTRUE);
 
     // reset axis settings

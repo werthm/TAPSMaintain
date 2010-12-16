@@ -50,7 +50,7 @@ Int_t TMTAPSMaintain::Start()
     // check for window server
     if (!gClient) return -1;
     
-    printf("\nStarting up TAPSMaintain Version %s ...\n\n", gTAPSMaintainVersion);
+    printf("\nStarting up TAPSMaintain Version %s ...\n\n", kTAPSMaintainVersion);
 
     // set current directory
     strcpy(fCurrentDir, ".");
@@ -289,10 +289,10 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
 {
     // Handle events of the menu.
     
-    if (id == EACTION_FILE_QUIT) Quit();
-    else if (id == EACTION_OPEN_ROOT_FILE) SelectAndOpenFile();
-    else if (id == EACTION_MODULE_STOP) StopModule();
-    else if (id == EACTION_HELP_ABOUT)
+    if (id == kACTION_FILE_QUIT) Quit();
+    else if (id == kACTION_OPEN_ROOT_FILE) SelectAndOpenFile();
+    else if (id == kACTION_MODULE_STOP) StopModule();
+    else if (id == kACTION_HELP_ABOUT)
     {
         Int_t retval;
         Char_t cAbout[256];
@@ -305,7 +305,7 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
                "Linked to ROOT %s and libtcpip\n\n"
                "(C) 2008-2010 by Dominik Werthmueller, University of Basel\n"
                "TAPS Slowcontrol libtcpip by J.G. Messchendorp",
-               gTAPSMaintainVersion, __DATE__, ROOT_RELEASE);
+               kTAPSMaintainVersion, __DATE__, ROOT_RELEASE);
         
         new TGMsgBox(gClient->GetRoot(), fMainWindow, "About TAPSMaintain", cAbout, 
                                  kMBIconAsterisk, kMBOk, &retval, kFitWidth | kFitHeight, kTextLeft);

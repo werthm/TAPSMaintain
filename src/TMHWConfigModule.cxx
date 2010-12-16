@@ -44,21 +44,21 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
     l->SetTextJustify(kTextRight);
     fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fDBURLEntry = new TGTextEntry(fControlFrame, gTAPS_DB_URL);
+    fDBURLEntry = new TGTextEntry(fControlFrame, kTAPS_DB_URL);
     fControlFrame->AddFrame(fDBURLEntry, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
     // DB User
     l = new TGLabel(fControlFrame, "DB User:");
     l->SetTextJustify(kTextRight);
     fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fDBUserEntry = new TGTextEntry(fControlFrame, gTAPS_DB_User);
+    fDBUserEntry = new TGTextEntry(fControlFrame, kTAPS_DB_User);
     fControlFrame->AddFrame(fDBUserEntry, new TGTableLayoutHints(1, 2, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
 
     // DB password
     l = new TGLabel(fControlFrame, "DB Password:");
     l->SetTextJustify(kTextRight);
     fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fDBPasswdEntry = new TGTextEntry(fControlFrame, gTAPS_DB_Passwd);
+    fDBPasswdEntry = new TGTextEntry(fControlFrame, kTAPS_DB_Passwd);
     fDBPasswdEntry->SetEchoMode(TGTextEntry::kPassword);
     fControlFrame->AddFrame(fDBPasswdEntry, new TGTableLayoutHints(1, 2, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
 
@@ -71,18 +71,18 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableCombo = new TGComboBox(fControlFrame);
     fTableCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "ReadTable(Int_t)");
     fTableCombo->Resize(200, 22);
-    fTableCombo->AddEntry("Select TAPS table here", EDB_Table_Empty);
-    fTableCombo->AddEntry("BaF2 High Voltage", EDB_Table_BaF2_HV);
-    fTableCombo->AddEntry("BaF2 CFD Threshold", EDB_Table_BaF2_CFD);
-    fTableCombo->AddEntry("BaF2 LED1 Threshold", EDB_Table_BaF2_LED1);
-    fTableCombo->AddEntry("BaF2 LED2 Threshold", EDB_Table_BaF2_LED2);
-    fTableCombo->AddEntry("Veto LED Threshold", EDB_Table_Veto_LED);
-    fTableCombo->AddEntry("QAC Pedestal LG", EDB_Table_QAC_LG);
-    fTableCombo->AddEntry("QAC Pedestal LGS", EDB_Table_QAC_LGS);
-    fTableCombo->AddEntry("QAC Pedestal SG", EDB_Table_QAC_SG);
-    fTableCombo->AddEntry("QAC Pedestal SGS", EDB_Table_QAC_SGS);
+    fTableCombo->AddEntry("Select TAPS table here", kDB_Table_Empty);
+    fTableCombo->AddEntry("BaF2 High Voltage", kDB_Table_BaF2_HV);
+    fTableCombo->AddEntry("BaF2 CFD Threshold", kDB_Table_BaF2_CFD);
+    fTableCombo->AddEntry("BaF2 LED1 Threshold", kDB_Table_BaF2_LED1);
+    fTableCombo->AddEntry("BaF2 LED2 Threshold", kDB_Table_BaF2_LED2);
+    fTableCombo->AddEntry("Veto LED Threshold", kDB_Table_Veto_LED);
+    fTableCombo->AddEntry("QAC Pedestal LG", kDB_Table_QAC_LG);
+    fTableCombo->AddEntry("QAC Pedestal LGS", kDB_Table_QAC_LGS);
+    fTableCombo->AddEntry("QAC Pedestal SG", kDB_Table_QAC_SG);
+    fTableCombo->AddEntry("QAC Pedestal SGS", kDB_Table_QAC_SGS);
     fControlFrame->AddFrame(fTableCombo, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
-    fTableCombo->Select(EDB_Table_Empty, kFALSE);
+    fTableCombo->Select(kDB_Table_Empty, kFALSE);
 
 
     // ------------------------------ Begin Tab ------------------------------
@@ -104,26 +104,26 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     
     fRangeManipCombo = new TGComboBox(fRangeManipFrame);
     fRangeManipCombo->Resize(150, 22);
-    fRangeManipCombo->AddEntry("elements", ERange_All_Elements);
-    fRangeManipCombo->AddEntry("Ring 1 elements", ERange_Ring_1);
-    fRangeManipCombo->AddEntry("Ring 2 elements", ERange_Ring_2);
-    fRangeManipCombo->AddEntry("Ring 3 elements", ERange_Ring_3);
-    fRangeManipCombo->AddEntry("Ring 4 elements", ERange_Ring_4);
-    fRangeManipCombo->AddEntry("Ring 5 elements", ERange_Ring_5);
-    fRangeManipCombo->AddEntry("Ring 6 elements", ERange_Ring_6);
-    fRangeManipCombo->AddEntry("Ring 7 elements", ERange_Ring_7);
-    fRangeManipCombo->AddEntry("Ring 8 elements", ERange_Ring_8);
-    fRangeManipCombo->AddEntry("Ring 9 elements", ERange_Ring_9);
-    fRangeManipCombo->AddEntry("Ring 10 elements", ERange_Ring_10);
-    fRangeManipCombo->AddEntry("Ring 11 elements", ERange_Ring_11);
-    fRangeManipCombo->AddEntry("Block A elements", ERange_Block_A);
-    fRangeManipCombo->AddEntry("Block B elements", ERange_Block_B);
-    fRangeManipCombo->AddEntry("Block C elements", ERange_Block_C);
-    fRangeManipCombo->AddEntry("Block D elements", ERange_Block_D);
-    fRangeManipCombo->AddEntry("Block E elements", ERange_Block_E);
-    fRangeManipCombo->AddEntry("Block F elements", ERange_Block_F);
+    fRangeManipCombo->AddEntry("elements", kRange_All_Elements);
+    fRangeManipCombo->AddEntry("Ring 1 elements", kRange_Ring_1);
+    fRangeManipCombo->AddEntry("Ring 2 elements", kRange_Ring_2);
+    fRangeManipCombo->AddEntry("Ring 3 elements", kRange_Ring_3);
+    fRangeManipCombo->AddEntry("Ring 4 elements", kRange_Ring_4);
+    fRangeManipCombo->AddEntry("Ring 5 elements", kRange_Ring_5);
+    fRangeManipCombo->AddEntry("Ring 6 elements", kRange_Ring_6);
+    fRangeManipCombo->AddEntry("Ring 7 elements", kRange_Ring_7);
+    fRangeManipCombo->AddEntry("Ring 8 elements", kRange_Ring_8);
+    fRangeManipCombo->AddEntry("Ring 9 elements", kRange_Ring_9);
+    fRangeManipCombo->AddEntry("Ring 10 elements", kRange_Ring_10);
+    fRangeManipCombo->AddEntry("Ring 11 elements", kRange_Ring_11);
+    fRangeManipCombo->AddEntry("Block A elements", kRange_Block_A);
+    fRangeManipCombo->AddEntry("Block B elements", kRange_Block_B);
+    fRangeManipCombo->AddEntry("Block C elements", kRange_Block_C);
+    fRangeManipCombo->AddEntry("Block D elements", kRange_Block_D);
+    fRangeManipCombo->AddEntry("Block E elements", kRange_Block_E);
+    fRangeManipCombo->AddEntry("Block F elements", kRange_Block_F);
     fRangeManipFrame->AddFrame(fRangeManipCombo, new TGLayoutHints(kLHintsLeft, 7, 5, 32, 2));
-    fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
+    fRangeManipCombo->Select(kRange_All_Elements, kFALSE);
 
     fRangeManipFrame->AddFrame(new TGLabel(fRangeManipFrame, "to"), new TGLayoutHints(kLHintsLeft, 7, 5, 35, 5));
     
@@ -300,27 +300,27 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fLEDRangeCombo = new TGComboBox(fLEDFrame);
     fLEDRangeCombo->Resize(150, 22);
     fLEDRangeCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "LEDRangeChanged(Int_t)");
-    fLEDRangeCombo->AddEntry("Single element", ERange_Single_Element);
-    fLEDRangeCombo->AddEntry("All elements", ERange_All_Elements);
-    fLEDRangeCombo->AddEntry("Block A elements", ERange_Block_A);
-    fLEDRangeCombo->AddEntry("Block B elements", ERange_Block_B);
-    fLEDRangeCombo->AddEntry("Block C elements", ERange_Block_C);
-    fLEDRangeCombo->AddEntry("Block D elements", ERange_Block_D);
-    fLEDRangeCombo->AddEntry("Block E elements", ERange_Block_E);
-    fLEDRangeCombo->AddEntry("Block F elements", ERange_Block_F);
-    fLEDRangeCombo->AddEntry("Ring 1 elements", ERange_Ring_1);
-    fLEDRangeCombo->AddEntry("Ring 2 elements", ERange_Ring_2);
-    fLEDRangeCombo->AddEntry("Ring 3 elements", ERange_Ring_3);
-    fLEDRangeCombo->AddEntry("Ring 4 elements", ERange_Ring_4);
-    fLEDRangeCombo->AddEntry("Ring 5 elements", ERange_Ring_5);
-    fLEDRangeCombo->AddEntry("Ring 6 elements", ERange_Ring_6);
-    fLEDRangeCombo->AddEntry("Ring 7 elements", ERange_Ring_7);
-    fLEDRangeCombo->AddEntry("Ring 8 elements", ERange_Ring_8);
-    fLEDRangeCombo->AddEntry("Ring 9 elements", ERange_Ring_9);
-    fLEDRangeCombo->AddEntry("Ring 10 elements", ERange_Ring_10);
-    fLEDRangeCombo->AddEntry("Ring 11 elements", ERange_Ring_11);
+    fLEDRangeCombo->AddEntry("Single element", kRange_Single_Element);
+    fLEDRangeCombo->AddEntry("All elements", kRange_All_Elements);
+    fLEDRangeCombo->AddEntry("Block A elements", kRange_Block_A);
+    fLEDRangeCombo->AddEntry("Block B elements", kRange_Block_B);
+    fLEDRangeCombo->AddEntry("Block C elements", kRange_Block_C);
+    fLEDRangeCombo->AddEntry("Block D elements", kRange_Block_D);
+    fLEDRangeCombo->AddEntry("Block E elements", kRange_Block_E);
+    fLEDRangeCombo->AddEntry("Block F elements", kRange_Block_F);
+    fLEDRangeCombo->AddEntry("Ring 1 elements", kRange_Ring_1);
+    fLEDRangeCombo->AddEntry("Ring 2 elements", kRange_Ring_2);
+    fLEDRangeCombo->AddEntry("Ring 3 elements", kRange_Ring_3);
+    fLEDRangeCombo->AddEntry("Ring 4 elements", kRange_Ring_4);
+    fLEDRangeCombo->AddEntry("Ring 5 elements", kRange_Ring_5);
+    fLEDRangeCombo->AddEntry("Ring 6 elements", kRange_Ring_6);
+    fLEDRangeCombo->AddEntry("Ring 7 elements", kRange_Ring_7);
+    fLEDRangeCombo->AddEntry("Ring 8 elements", kRange_Ring_8);
+    fLEDRangeCombo->AddEntry("Ring 9 elements", kRange_Ring_9);
+    fLEDRangeCombo->AddEntry("Ring 10 elements", kRange_Ring_10);
+    fLEDRangeCombo->AddEntry("Ring 11 elements", kRange_Ring_11);
     fLEDFrame->AddFrame(fLEDRangeCombo, new TGTableLayoutHints(1, 2, 6, 7, kLHintsFillX | kLHintsLeft, 5, 15, 5, 5));
-    fLEDRangeCombo->Select(ERange_Single_Element, kFALSE);
+    fLEDRangeCombo->Select(kRange_Single_Element, kFALSE);
     
     
     fLEDChannelEntry = new TGNumberEntry(fLEDFrame, 1, 4);
@@ -399,7 +399,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fProgressBar->SetBarColor("green");
     fProgressBar->Resize(200, 25);
     fProgressBar->SetMin(0);
-    fProgressBar->SetMax(gMaxSize);
+    fProgressBar->SetMax(kMaxSize);
     fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
     fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
 
@@ -420,7 +420,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     // table scroll canvas
     fTableCanvas = new TGCanvas(fInputFrame, 250, 500, kSunkenFrame, TGCanvas::GetWhitePixel());
     fTableFrame = new TGCompositeFrame(fTableCanvas->GetViewPort(), 250, 500, kVerticalFrame | kOwnBackground);
-    fTableFrame->SetLayoutManager(new TGTableLayout(fTableFrame, gMaxSize+1, 4));
+    fTableFrame->SetLayoutManager(new TGTableLayout(fTableFrame, kMaxSize+1, 4));
     
     // mouse wheel scrolling
     fTableFrame->Connect("ProcessedEvent(Event_t*)", "TMHWConfigModule", this, "HandleMouseWheel(Event_t*)");
@@ -430,9 +430,9 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
                           kButtonPressMask | kButtonReleaseMask | kPointerMotionMask, kNone, kNone);
 
     // create table 
-    fElementCurrentValue = new TGLabel*[gMaxSize];
-    fElementNewValue = new TGNumberEntry*[gMaxSize];
-    fElementValueChanged = new TGLabel*[gMaxSize];
+    fElementCurrentValue = new TGLabel*[kMaxSize];
+    fElementNewValue = new TGNumberEntry*[kMaxSize];
+    fElementValueChanged = new TGLabel*[kMaxSize];
 
     // add header
     l = new TGLabel(fTableFrame, "Element");
@@ -452,7 +452,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableFrame->AddFrame(l, new TGTableLayoutHints(3, 4, 0, 1, kLHintsFillX | kLHintsLeft, 10, 10, 10, 10));
     
     // add element rows
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         sprintf(aName, "%d", i+1);
 
@@ -506,7 +506,7 @@ void TMHWConfigModule::Cleanup()
     // cleanup old LED calibration memory
     if (fNLEDCalibSets)
     {
-        for (UInt_t i = 0; i < gMaxSize; i++) 
+        for (UInt_t i = 0; i < kMaxSize; i++) 
         {
             delete fLEDFitFunctions[i];
             delete fLEDGraphs[i];
@@ -547,9 +547,9 @@ void TMHWConfigModule::Init()
     fSettingsTab->SetTab(0, kFALSE);
 
     // select default entry in combos
-    fTableCombo->Select(EDB_Table_Empty, kTRUE);
-    fRangeManipCombo->Select(ERange_All_Elements, kFALSE);
-    fLEDRangeCombo->Select(ERange_Single_Element, kFALSE);
+    fTableCombo->Select(kDB_Table_Empty, kTRUE);
+    fRangeManipCombo->Select(kRange_All_Elements, kFALSE);
+    fLEDRangeCombo->Select(kRange_Single_Element, kFALSE);
     
     // select decimal format
     fHexFormat->SetState(kButtonUp);
@@ -599,7 +599,7 @@ void TMHWConfigModule::ToggleHexFormat()
     if (fHexFormat->IsOn())
     {
         fRangeManipEntry->SetFormat(TGNumberFormat::kNESHex);
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {
             //sscanf(fElementCurrentValue[i]->GetText()->Data(), "%d", &val);
             //fElementCurrentValue[i]->SetText(TString::Format("%x", val));
@@ -609,7 +609,7 @@ void TMHWConfigModule::ToggleHexFormat()
     else
     {
         fRangeManipEntry->SetFormat(TGNumberFormat::kNESInteger);
-        for (UInt_t i = 0; i < gMaxSize; i++) 
+        for (UInt_t i = 0; i < kMaxSize; i++) 
         {
             //sscanf(fElementCurrentValue[i]->GetText()->Data(), "%x", &val);
             //fElementCurrentValue[i]->SetText(TString::Format("%d", val));
@@ -624,7 +624,7 @@ void TMHWConfigModule::LEDRangeChanged(Int_t id)
     // Update the GUI after the user has changed the range of the LED 
     // elements in the combo box.
     
-    if (id == ERange_Single_Element) fLEDChannelEntry->SetState(kTRUE);
+    if (id == kRange_Single_Element) fLEDChannelEntry->SetState(kTRUE);
     else fLEDChannelEntry->SetState(kFALSE);
 }
 
@@ -637,7 +637,7 @@ void TMHWConfigModule::SelectFile(Int_t ftype)
     Char_t filename[256];
 
     // Let TAPSMaintain open the "Save file" or "Open file" dialog
-    if (ftype == EFILE_SELECT_EXPORT) ShowFileDialog(kFDSave);
+    if (ftype == kFILE_SELECT_EXPORT) ShowFileDialog(kFDSave);
     else ShowFileDialog(kFDOpen);
 
     // copy file name
@@ -652,23 +652,23 @@ void TMHWConfigModule::SelectFile(Int_t ftype)
     gSystem->GetPathInfo(filename, &id, &size, &flags, &modtime);
     
     // Use the selected file name
-    if (ftype == EFILE_SELECT_EXPORT)
+    if (ftype == kFILE_SELECT_EXPORT)
     {
         fExportFileEntry->SetText(filename);
     }
-    else if (ftype == EFILE_SELECT_IMPORT)
+    else if (ftype == kFILE_SELECT_IMPORT)
     {
         if (flags == 0 || flags == 1) fImportFileEntry->SetText(filename);
     }
-    else if (ftype == EFILE_SELECT_GM_ENERGY_CALIB)
+    else if (ftype == kFILE_SELECT_GM_ENERGY_CALIB)
     {
         if (flags == 0 || flags == 1) fGMCalibFileEntry->SetText(filename);
     }
-    else if (ftype == EFILE_SELECT_LED_CALIB)
+    else if (ftype == kFILE_SELECT_LED_CALIB)
     {
         if (flags == 0 || flags == 1) fLEDCalibFileEntry->SetText(filename);
     }
-    else if (ftype == EFILE_SELECT_LED_ENERGY_CALIB)
+    else if (ftype == kFILE_SELECT_LED_ENERGY_CALIB)
     {
         if (flags == 0 || flags == 1) fLEDEnergyCalibFileEntry->SetText(filename);
     }
@@ -695,7 +695,7 @@ void TMHWConfigModule::ImportFile()
     if (!strcmp(filename, "")) return;
 
     // leave if no table is selected
-    if (table == EDB_Table_Empty) return;
+    if (table == kDB_Table_Empty) return;
 
     // open the file
     FILE* fin;
@@ -772,15 +772,15 @@ void TMHWConfigModule::DoGainMatch()
 
             // calculate new HV value
             nom_gain = range / (res - ped);
-            gain_bias = hv_old - gBaF2_Gain_Slope * TMath::Log(peak - ped);
-            hv_new = gBaF2_Gain_Slope * TMath::Log(gTAPS_MIP_Loss_BaF2 / nom_gain) + gain_bias;
+            gain_bias = hv_old - kBaF2_Gain_Slope * TMath::Log(peak - ped);
+            hv_new = kBaF2_Gain_Slope * TMath::Log(kTAPS_MIP_Loss_BaF2 / nom_gain) + gain_bias;
             
             // correct bad HV value
             if (hv_new < 0) hv_new = hv_old;
 
             // check limits and set new HV value
-            if (hv_new < gDB_BaF2_HV_Min) fElementNewValue[id-1]->SetNumber((Int_t)gDB_BaF2_HV_Min);
-            else if (hv_new > gDB_BaF2_HV_Max) fElementNewValue[id-1]->SetNumber((Int_t)gDB_BaF2_HV_Max);
+            if (hv_new < kDB_BaF2_HV_Min) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Min);
+            else if (hv_new > kDB_BaF2_HV_Max) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Max);
             else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
         }
     }
@@ -818,7 +818,7 @@ void TMHWConfigModule::ExportFile()
     fprintf(fout, "# ID    Value\n");
     
     // write current values to file
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         if (fExportColumn->IsOn()) fprintf(fout, "%3d    %d\n", i+1, (Int_t)fElementNewValue[i]->GetNumber());
         else fprintf(fout, "%3d    %s\n", i+1, fElementCurrentValue[i]->GetText()->Data());
@@ -843,10 +843,10 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     Char_t line[256];
     Int_t id, voltageLED;
     Float_t thr;
-    Double_t thresholds[gMaxSize];
-    Double_t voltages[gMaxSize];
-    Double_t energyCalibPed[gMaxSize];
-    Double_t energyCalibGain[gMaxSize];
+    Double_t thresholds[kMaxSize];
+    Double_t voltages[kMaxSize];
+    Double_t energyCalibPed[kMaxSize];
+    Double_t energyCalibGain[kMaxSize];
     FILE* fin;
 
     // get the selected file name of the LED calib file
@@ -892,7 +892,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     fLEDCalibFileEntry->SetText("");
     
     // init arrays
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         thresholds[i] = 0;
         voltages[i] = 0;
@@ -922,8 +922,8 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     if (!fLEDFitFunctions)
     {
         // generate LED fit functions
-        fLEDFitFunctions = new TF1*[gMaxSize];
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        fLEDFitFunctions = new TF1*[kMaxSize];
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {
             sprintf(line, "LED_fit_func_%i", i+1);
             fLEDFitFunctions[i] = new TF1(line, "pol1", 0, 2000);
@@ -935,11 +935,11 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     if (!fLEDGraphs)
     {
         // create graphs
-        fLEDGraphs = new TGraph*[gMaxSize];
-        for (UInt_t i = 0; i < gMaxSize; i++) fLEDGraphs[i] = new TGraph(1);
+        fLEDGraphs = new TGraph*[kMaxSize];
+        for (UInt_t i = 0; i < kMaxSize; i++) fLEDGraphs[i] = new TGraph(1);
         
         // fill values into graphs
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {
             fLEDGraphs[i]->SetPoint(0, energyCalibGain[i] * (thresholds[i] - energyCalibPed[i]), voltages[i]);
         }
@@ -952,7 +952,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         Double_t oldVoltages[fNLEDCalibSets];
         Double_t oldThresholds[fNLEDCalibSets];
         
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {            
             // backup current values
             Double_t* graphX = fLEDGraphs[i]->GetX();
@@ -1005,25 +1005,25 @@ void TMHWConfigModule::SetLEDThresholds()
     // get requested value
     Double_t reqValue = fLEDThrEntry->GetNumber();
 
-    if (selectedLEDRange == ERange_Single_Element)
+    if (selectedLEDRange == kRange_Single_Element)
     {
         // selected channel
         Int_t id = (UInt_t) fLEDChannelEntry->GetNumber();
         
         // check limits and set value 
         Int_t resValue = (Int_t)fLEDFitFunctions[id-1]->Eval(reqValue);
-        if (resValue < gDB_BaF2_LED_Min) fElementNewValue[id-1]->SetNumber(gDB_BaF2_LED_Min);
-        else if (resValue > gDB_BaF2_LED_Max) fElementNewValue[id-1]->SetNumber(gDB_BaF2_LED_Max);
+        if (resValue < kDB_BaF2_LED_Min) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Min);
+        else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Max);
         else fElementNewValue[id-1]->SetNumber(resValue);
     }
-    else if (selectedLEDRange == ERange_All_Elements)
+    else if (selectedLEDRange == kRange_All_Elements)
     {
         // loop over all elements
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {
             Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-            if (resValue < gDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Min);
-            else if (resValue > gDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Max);
+            if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);
+            else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);
             else fElementNewValue[i]->SetNumber(resValue);
         }
     }
@@ -1033,30 +1033,30 @@ void TMHWConfigModule::SetLEDThresholds()
         UInt_t ring = 99;
         
         // set ring numbers if ring range was selected
-        if (selectedLEDRange == ERange_Ring_1) ring = 1;
-        if (selectedLEDRange == ERange_Ring_2) ring = 2;
-        if (selectedLEDRange == ERange_Ring_3) ring = 3;
-        if (selectedLEDRange == ERange_Ring_4) ring = 4;
-        if (selectedLEDRange == ERange_Ring_5) ring = 5;
-        if (selectedLEDRange == ERange_Ring_6) ring = 6;
-        if (selectedLEDRange == ERange_Ring_7) ring = 7;
-        if (selectedLEDRange == ERange_Ring_8) ring = 8;
-        if (selectedLEDRange == ERange_Ring_9) ring = 9;
-        if (selectedLEDRange == ERange_Ring_10) ring = 10;
-        if (selectedLEDRange == ERange_Ring_11) ring = 11;
+        if (selectedLEDRange == kRange_Ring_1) ring = 1;
+        if (selectedLEDRange == kRange_Ring_2) ring = 2;
+        if (selectedLEDRange == kRange_Ring_3) ring = 3;
+        if (selectedLEDRange == kRange_Ring_4) ring = 4;
+        if (selectedLEDRange == kRange_Ring_5) ring = 5;
+        if (selectedLEDRange == kRange_Ring_6) ring = 6;
+        if (selectedLEDRange == kRange_Ring_7) ring = 7;
+        if (selectedLEDRange == kRange_Ring_8) ring = 8;
+        if (selectedLEDRange == kRange_Ring_9) ring = 9;
+        if (selectedLEDRange == kRange_Ring_10) ring = 10;
+        if (selectedLEDRange == kRange_Ring_11) ring = 11;
         
         // leave if no ring range was selected
         if (ring == 99) return;
         
         // loop over all elements and update members of selected ring
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {
             // element belongs to specified ring -> change value
             if (ring == TMUtils::GetRingNumber(i))
             {
                 Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-                if (resValue < gDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Min);
-                else if (resValue > gDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(gDB_BaF2_LED_Max);
+                if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);
+                else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);
                 else fElementNewValue[i]->SetNumber(resValue);
             }
         }
@@ -1077,12 +1077,12 @@ void TMHWConfigModule::ShowLEDCalibration()
     // get selected LED range
     Int_t selectedLEDRange = fLEDRangeCombo->GetSelected();
     
-    if (selectedLEDRange == ERange_Single_Element)
+    if (selectedLEDRange == kRange_Single_Element)
     {
         // selected channel
         UInt_t id = (UInt_t) fLEDChannelEntry->GetNumber();
     
-        if (id > 0 && id <= gMaxSize)
+        if (id > 0 && id <= kMaxSize)
         {
             TText aText;
             Char_t text[256];
@@ -1105,15 +1105,15 @@ void TMHWConfigModule::ShowLEDCalibration()
             //fExternalCanvas->Update();
         }
     }
-    else if (selectedLEDRange == ERange_All_Elements)
+    else if (selectedLEDRange == kRange_All_Elements)
     {
         Char_t text[256];
         
         // create block canvas
-        CreateExternalCanvas(gMaxSize);
+        CreateExternalCanvas(kMaxSize);
         
         // draw block elements
-        for (UInt_t i = 0; i < gMaxSize; i++)
+        for (UInt_t i = 0; i < kMaxSize; i++)
         {
             TVirtualPad* aPad = fExternalCanvas->cd(i+1);
             
@@ -1138,12 +1138,12 @@ void TMHWConfigModule::ShowLEDCalibration()
         Int_t start = -99;
         
         // set start value for blocks
-        if (selectedLEDRange == ERange_Block_A) start = 0;
-        if (selectedLEDRange == ERange_Block_B) start = 64;
-        if (selectedLEDRange == ERange_Block_C) start = 128;
-        if (selectedLEDRange == ERange_Block_D) start = 192;
-        if (selectedLEDRange == ERange_Block_E) start = 256;
-        if (selectedLEDRange == ERange_Block_F) start = 320;
+        if (selectedLEDRange == kRange_Block_A) start = 0;
+        if (selectedLEDRange == kRange_Block_B) start = 64;
+        if (selectedLEDRange == kRange_Block_C) start = 128;
+        if (selectedLEDRange == kRange_Block_D) start = 192;
+        if (selectedLEDRange == kRange_Block_E) start = 256;
+        if (selectedLEDRange == kRange_Block_F) start = 320;
         
         // leave if no block was selected
         if (start == -99) return;
@@ -1186,7 +1186,7 @@ void TMHWConfigModule::CreateExternalCanvas(UInt_t n)
     // divide canvas
     if (n == 1) fExternalCanvas->Divide(1, 1);
     else if (n == 64) fExternalCanvas->Divide(8, 8, 0.001, 0.001);
-    else if (n == gMaxSize) fExternalCanvas->Divide(24, 16, 0.001, 0.001);
+    else if (n == kMaxSize) fExternalCanvas->Divide(24, 16, 0.001, 0.001);
 }
 
 //______________________________________________________________________________
@@ -1235,7 +1235,7 @@ void TMHWConfigModule::SetRingValues(UInt_t ring, Double_t value)
  
     // loop over all elements and change value if element belongs to the
     // specified ring
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         // element belongs to specified ring -> change value
         if (ring == TMUtils::GetRingNumber(i))
@@ -1257,7 +1257,7 @@ void TMHWConfigModule::ClearValues()
     fCurrentTable[0] = '\0';
 
     // clear values
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {   
         fElementCurrentValue[i]->SetText("0");
         fElementNewValue[i]->SetNumber(0.);
@@ -1275,7 +1275,7 @@ void TMHWConfigModule::MarkChanges()
     Double_t currValue;
 
     // loop over all elements
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         currValue = atof(fElementCurrentValue[i]->GetText()->Data());
 
@@ -1305,31 +1305,31 @@ void TMHWConfigModule::DoRangeManipulation()
     Int_t table = fTableCombo->GetSelected();
  
     // leave if no table is selected
-    if (table == EDB_Table_Empty) return;
+    if (table == kDB_Table_Empty) return;
 
-    if (range == ERange_All_Elements) 
+    if (range == kRange_All_Elements) 
     {
         // check limits
         if (CheckValueLimits((EDB_TAPS_Table)table, value)) 
-            for (UInt_t i = 0; i < gMaxSize; i++) fElementNewValue[i]->SetNumber(value);
+            for (UInt_t i = 0; i < kMaxSize; i++) fElementNewValue[i]->SetNumber(value);
     }
-    else if (range == ERange_Block_A) SetBlockValues(1, value);
-    else if (range == ERange_Block_B) SetBlockValues(2, value);
-    else if (range == ERange_Block_C) SetBlockValues(3, value);
-    else if (range == ERange_Block_D) SetBlockValues(4, value);
-    else if (range == ERange_Block_E) SetBlockValues(5, value);
-    else if (range == ERange_Block_F) SetBlockValues(6, value);
-    else if (range == ERange_Ring_1) SetRingValues(1, value);
-    else if (range == ERange_Ring_2) SetRingValues(2, value);
-    else if (range == ERange_Ring_3) SetRingValues(3, value);
-    else if (range == ERange_Ring_4) SetRingValues(4, value);
-    else if (range == ERange_Ring_5) SetRingValues(5, value);
-    else if (range == ERange_Ring_6) SetRingValues(6, value);
-    else if (range == ERange_Ring_7) SetRingValues(7, value);
-    else if (range == ERange_Ring_8) SetRingValues(8, value);
-    else if (range == ERange_Ring_9) SetRingValues(9, value);
-    else if (range == ERange_Ring_10) SetRingValues(10, value);
-    else if (range == ERange_Ring_11) SetRingValues(11, value);
+    else if (range == kRange_Block_A) SetBlockValues(1, value);
+    else if (range == kRange_Block_B) SetBlockValues(2, value);
+    else if (range == kRange_Block_C) SetBlockValues(3, value);
+    else if (range == kRange_Block_D) SetBlockValues(4, value);
+    else if (range == kRange_Block_E) SetBlockValues(5, value);
+    else if (range == kRange_Block_F) SetBlockValues(6, value);
+    else if (range == kRange_Ring_1) SetRingValues(1, value);
+    else if (range == kRange_Ring_2) SetRingValues(2, value);
+    else if (range == kRange_Ring_3) SetRingValues(3, value);
+    else if (range == kRange_Ring_4) SetRingValues(4, value);
+    else if (range == kRange_Ring_5) SetRingValues(5, value);
+    else if (range == kRange_Ring_6) SetRingValues(6, value);
+    else if (range == kRange_Ring_7) SetRingValues(7, value);
+    else if (range == kRange_Ring_8) SetRingValues(8, value);
+    else if (range == kRange_Ring_9) SetRingValues(9, value);
+    else if (range == kRange_Ring_10) SetRingValues(10, value);
+    else if (range == kRange_Ring_11) SetRingValues(11, value);
 
     MarkChanges();
 }
@@ -1342,52 +1342,52 @@ Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
 
     switch (table)
     {
-        case EDB_Table_BaF2_HV:
+        case kDB_Table_BaF2_HV:
         {
-            if (value >= gDB_BaF2_HV_Min && value <= gDB_BaF2_HV_Max) return kTRUE;
+            if (value >= kDB_BaF2_HV_Min && value <= kDB_BaF2_HV_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_BaF2_CFD:
+        case kDB_Table_BaF2_CFD:
         {
-            if (value >= gDB_BaF2_CFD_Min && value <= gDB_BaF2_CFD_Max) return kTRUE;
+            if (value >= kDB_BaF2_CFD_Min && value <= kDB_BaF2_CFD_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_BaF2_LED1:
+        case kDB_Table_BaF2_LED1:
         {
-            if (value >= gDB_BaF2_LED_Min && value <= gDB_BaF2_LED_Max) return kTRUE;
+            if (value >= kDB_BaF2_LED_Min && value <= kDB_BaF2_LED_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_BaF2_LED2:
+        case kDB_Table_BaF2_LED2:
         {
-            if (value >= gDB_BaF2_LED_Min && value <= gDB_BaF2_LED_Max) return kTRUE;
+            if (value >= kDB_BaF2_LED_Min && value <= kDB_BaF2_LED_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_Veto_LED:
+        case kDB_Table_Veto_LED:
         {
-            if (value >= gDB_Veto_LED_Min && value <= gDB_Veto_LED_Max) return kTRUE;
+            if (value >= kDB_Veto_LED_Min && value <= kDB_Veto_LED_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_QAC_LG:
+        case kDB_Table_QAC_LG:
         {
-            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_QAC_LGS:
+        case kDB_Table_QAC_LGS:
         {
-            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_QAC_SG:
+        case kDB_Table_QAC_SG:
         {
-            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_QAC_SGS:
+        case kDB_Table_QAC_SGS:
         {
-            if (value >= gDB_QAC_Ped_Min && value <= gDB_QAC_Ped_Max) return kTRUE;
+            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
             else return kFALSE;
         }
-        case EDB_Table_Empty:
+        case kDB_Table_Empty:
         {
             return kFALSE;
         }
@@ -1407,55 +1407,55 @@ Bool_t TMHWConfigModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableNam
   
     switch (table)
     {
-        case EDB_Table_BaF2_HV:
+        case kDB_Table_BaF2_HV:
         {
             strcpy(tableName, "hvbaf_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_BaF2_CFD:
+        case kDB_Table_BaF2_CFD:
         {
             strcpy(tableName, "cfd_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_BaF2_LED1:
+        case kDB_Table_BaF2_LED1:
         {
             strcpy(tableName, "ledl_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_BaF2_LED2:
+        case kDB_Table_BaF2_LED2:
         {
             strcpy(tableName, "ledh_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_Veto_LED:
+        case kDB_Table_Veto_LED:
         {
             strcpy(tableName, "vled_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_QAC_LG:
+        case kDB_Table_QAC_LG:
         {
             strcpy(tableName, "qaclg_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_QAC_LGS:
+        case kDB_Table_QAC_LGS:
         {
             strcpy(tableName, "qaclgs_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_QAC_SG:
+        case kDB_Table_QAC_SG:
         {
             strcpy(tableName, "qacsg_par");
             strcpy(columnName, "th");
             return kTRUE;
         }
-        case EDB_Table_QAC_SGS:
+        case kDB_Table_QAC_SGS:
         {
             strcpy(tableName, "qacsgs_par");
             strcpy(columnName, "th");
@@ -1485,13 +1485,13 @@ void TMHWConfigModule::ReadTable(Int_t table)
     ClearValues();
     
     // de-/activate GUI elements depending on the loaded table 
-    if (table == EDB_Table_BaF2_HV) 
+    if (table == kDB_Table_BaF2_HV) 
     {
         fWriteHWButton->SetEnabled(kTRUE);
         fSettingsTab->SetEnabled(3, kTRUE);
         fSettingsTab->SetEnabled(4, kFALSE);
     }
-    else if (table == EDB_Table_BaF2_LED1 || table == EDB_Table_BaF2_LED2)
+    else if (table == kDB_Table_BaF2_LED1 || table == kDB_Table_BaF2_LED2)
     {
         fSettingsTab->SetEnabled(3, kFALSE);
         fSettingsTab->SetEnabled(4, kTRUE);
@@ -1507,19 +1507,19 @@ void TMHWConfigModule::ReadTable(Int_t table)
     fSettingsTab->SetTab(0, kFALSE);
     
     // set range manipulation number entry limits
-    if (table == EDB_Table_Empty) fRangeManipEntry->SetLimitValues(0., 0.);
-    else if (table == EDB_Table_BaF2_HV) fRangeManipEntry->SetLimitValues(gDB_BaF2_HV_Min, gDB_BaF2_HV_Max);
-    else if (table == EDB_Table_BaF2_CFD) fRangeManipEntry->SetLimitValues(gDB_BaF2_CFD_Min, gDB_BaF2_CFD_Max);
-    else if (table == EDB_Table_BaF2_LED1) fRangeManipEntry->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
-    else if (table == EDB_Table_BaF2_LED2) fRangeManipEntry->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
-    else if (table == EDB_Table_Veto_LED) fRangeManipEntry->SetLimitValues(gDB_Veto_LED_Min, gDB_Veto_LED_Max);
-    else if (table == EDB_Table_QAC_LG) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
-    else if (table == EDB_Table_QAC_LGS) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
-    else if (table == EDB_Table_QAC_SG) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
-    else if (table == EDB_Table_QAC_SGS) fRangeManipEntry->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+    if (table == kDB_Table_Empty) fRangeManipEntry->SetLimitValues(0., 0.);
+    else if (table == kDB_Table_BaF2_HV) fRangeManipEntry->SetLimitValues(kDB_BaF2_HV_Min, kDB_BaF2_HV_Max);
+    else if (table == kDB_Table_BaF2_CFD) fRangeManipEntry->SetLimitValues(kDB_BaF2_CFD_Min, kDB_BaF2_CFD_Max);
+    else if (table == kDB_Table_BaF2_LED1) fRangeManipEntry->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
+    else if (table == kDB_Table_BaF2_LED2) fRangeManipEntry->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
+    else if (table == kDB_Table_Veto_LED) fRangeManipEntry->SetLimitValues(kDB_Veto_LED_Min, kDB_Veto_LED_Max);
+    else if (table == kDB_Table_QAC_LG) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+    else if (table == kDB_Table_QAC_LGS) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+    else if (table == kDB_Table_QAC_SG) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+    else if (table == kDB_Table_QAC_SGS) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
     
     // Leave if the dummy entry in the combo was selected
-    if (table == EDB_Table_Empty) return;
+    if (table == kDB_Table_Empty) return;
 
     // try to open connection to MySQL server
     TSQLServer* tapsDB = TSQLServer::Connect(fDBURLEntry->GetText(), 
@@ -1529,7 +1529,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     // exit if connection to DB failed
     if (!tapsDB)
     {
-        fTableCombo->Select(EDB_Table_Empty, kTRUE);
+        fTableCombo->Select(kDB_Table_Empty, kTRUE);
         printf("ERROR: Could not connect to the database server. Please check your settings!\n");
         return;
     }
@@ -1544,7 +1544,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     fTableTitle->SetText(name);
     
     // read values
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {   
         sprintf(query, "SELECT %s FROM %s WHERE id=%d", columnName, fCurrentTable, i+1);
         TSQLResult* res = tapsDB->Query(query);
@@ -1571,15 +1571,15 @@ void TMHWConfigModule::ReadTable(Int_t table)
         fElementNewValue[i]->SetNumber(val);
         
         // set limits of new value entries
-        if (table == EDB_Table_BaF2_HV) fElementNewValue[i]->SetLimitValues(gDB_BaF2_HV_Min, gDB_BaF2_HV_Max);
-        else if (table == EDB_Table_BaF2_CFD) fElementNewValue[i]->SetLimitValues(gDB_BaF2_CFD_Min, gDB_BaF2_CFD_Max);
-        else if (table == EDB_Table_BaF2_LED1) fElementNewValue[i]->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
-        else if (table == EDB_Table_BaF2_LED2) fElementNewValue[i]->SetLimitValues(gDB_BaF2_LED_Min, gDB_BaF2_LED_Max);
-        else if (table == EDB_Table_Veto_LED) fElementNewValue[i]->SetLimitValues(gDB_Veto_LED_Min, gDB_Veto_LED_Max);
-        else if (table == EDB_Table_QAC_LG) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
-        else if (table == EDB_Table_QAC_LGS) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
-        else if (table == EDB_Table_QAC_SG) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
-        else if (table == EDB_Table_QAC_SGS) fElementNewValue[i]->SetLimitValues(gDB_QAC_Ped_Min, gDB_QAC_Ped_Max);
+        if (table == kDB_Table_BaF2_HV) fElementNewValue[i]->SetLimitValues(kDB_BaF2_HV_Min, kDB_BaF2_HV_Max);
+        else if (table == kDB_Table_BaF2_CFD) fElementNewValue[i]->SetLimitValues(kDB_BaF2_CFD_Min, kDB_BaF2_CFD_Max);
+        else if (table == kDB_Table_BaF2_LED1) fElementNewValue[i]->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
+        else if (table == kDB_Table_BaF2_LED2) fElementNewValue[i]->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
+        else if (table == kDB_Table_Veto_LED) fElementNewValue[i]->SetLimitValues(kDB_Veto_LED_Min, kDB_Veto_LED_Max);
+        else if (table == kDB_Table_QAC_LG) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+        else if (table == kDB_Table_QAC_LGS) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+        else if (table == kDB_Table_QAC_SG) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+        else if (table == kDB_Table_QAC_SGS) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
 
         delete res;
     }
@@ -1613,7 +1613,7 @@ void TMHWConfigModule::WriteTable()
     Int_t table = fTableCombo->GetSelected();
 
     // Leave if the dummy entry in the combo was selected
-    if (table == EDB_Table_Empty) return;
+    if (table == kDB_Table_Empty) return;
  
     // ask user for confirmation
     ModuleQuestion("Are you REALLY sure you want to write the new values to the DB?");
@@ -1639,7 +1639,7 @@ void TMHWConfigModule::WriteTable()
     printf("Updating values in table %s ...\n", fCurrentTable);
     
     // write values
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {   
         sprintf(query, "UPDATE %s SET %s=%f WHERE id=%d", fCurrentTable, columnName, 
                 fElementNewValue[i]->GetNumber(), i+1);
@@ -1661,7 +1661,7 @@ void TMHWConfigModule::WriteHVToHardware()
     // Write the current values to the hardware HV crate. 
     
     // check value range 0..2000 V
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         Double_t val = atof(fElementCurrentValue[i]->GetText()->Data());
         if (val < 0 || val > 2000) return;
@@ -1682,10 +1682,10 @@ void TMHWConfigModule::WriteHVToHardware()
     fProgressBar->ShowPosition(kTRUE, kFALSE, "Uploading channel %.0f");
 
     // write all values
-    for (UInt_t i = 0; i < gMaxSize; i++)
+    for (UInt_t i = 0; i < kMaxSize; i++)
     {
         Int_t val = atoi(fElementCurrentValue[i]->GetText()->Data());
-        Set_BAF2_HV((char*)gTAPS_Server, i+1, val);
+        Set_BAF2_HV((char*)kTAPS_Server, i+1, val);
 
         fProgressBar->SetPosition(i+1); 
         gSystem->ProcessEvents();
@@ -1697,7 +1697,7 @@ void TMHWConfigModule::WriteHVToHardware()
     // OLD CODE:
     // NOT USED AT THE MOMENT BECAUSE OF BAD STATUS MONITORING
     // call BaF2 init method
-    //Init_BAF2_HV((char*)gTAPS_Server);
+    //Init_BAF2_HV((char*)kTAPS_Server);
     //ModuleInfo("The command for the initialization of the BaF2 HV was sent to the\n"
     //           "TAPS hardware server. Please wait until all 544 elements were\n"
     //           "initialized. This could take some time!");
