@@ -10,6 +10,9 @@
 #####################################################################
 
 
+0.2.0 : Feb 4 2011
+* added TDC gain calibration module
+
 0.1.7 : Dec 16 2010
 * code refactoring
 

@@ -17,7 +17,7 @@
 
 
 // TAPSMaintain version
-const Char_t kTAPSMaintainVersion[] = "0.1.7";
+const Char_t kTAPSMaintainVersion[] = "0.2.0";
 
 // default TAPS database settings
 const Char_t kTAPS_DB_URL[] = "mysql://localhost/taps";
@@ -41,6 +41,12 @@ const Double_t kTAPS_MIP_Loss_Veto  = 5;      // ?
 
 // BaF2 HV calibration gain slope
 const Double_t kBaF2_Gain_Slope = 153;
+
+// TDC cable delay measurements
+const Double_t kTDC_Cable_Delay[] = {0.0, 9.900, 15.050, 25.200,
+                                   35.450, 45.600, 55.500};
+const Double_t kTDC_Cable_Delay_Error[] = {0.0001, 0.054, 0.054, 0.102,
+                                         0.102, 0.151, 0.201};
 
 // TAPS DB limits
 const Double_t kDB_BaF2_HV_Min = 0.;

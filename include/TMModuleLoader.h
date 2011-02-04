@@ -22,6 +22,7 @@
 #include "TMHWConfigModule.h"
 #include "TMCalibCosmics.h"
 #include "TMCalibLED.h"
+#include "TMCalibTDC.h"
 
 
 class TMModuleLoader : public TObject

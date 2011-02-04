@@ -45,6 +45,10 @@ extern const Double_t kTAPS_MIP_Loss_Veto;
 // BaF2 HV calibration gain slope
 extern const Double_t kBaF2_Gain_Slope;
 
+// TDC cable delay measurements
+extern const Double_t kTDC_Cable_Delay[];
+extern const Double_t kTDC_Cable_Delay_Error[];
+
 // TAPS DB limits
 extern const Double_t kDB_BaF2_HV_Min;
 extern const Double_t kDB_BaF2_HV_Max;

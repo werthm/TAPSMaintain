@@ -37,6 +37,7 @@
 #pragma link C++ class TMCalibCosmics+; 
 #pragma link C++ class TMCalibLED+; 
 #pragma link C++ class TMCheckSpectra+; 
+#pragma link C++ class TMCalibTDC+; 
 
 #endif
 

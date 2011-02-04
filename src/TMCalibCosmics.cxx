@@ -180,12 +180,7 @@ void TMCalibCosmics::Process(Int_t index)
     // load raw spectrum
     sprintf(name, fHName, index + 1);
     h1 = (TH1F*) fFile->Get(name);
-
-    // set title
-    sprintf(name, "%s (Ring %d, Block %c)", 
-            h1->GetName(), TMUtils::GetRingNumber(index), TMUtils::GetBlock(index));
-    h1->SetTitle(name);
-
+    
     // check if spectra could be loaded
     if (!h1)
     {
@@ -195,7 +190,12 @@ void TMCalibCosmics::Process(Int_t index)
         return;
     }
     
+    // set title
+    sprintf(name, "%s (Ring %d, Block %c)", 
+            h1->GetName(), TMUtils::GetRingNumber(index), TMUtils::GetBlock(index));
+    h1->SetTitle(name);
     
+
     // ----------------------------- pedestal fitting -----------------------------
     // fit pedestal
     Double_t pedPos = h1->GetXaxis()->GetBinCenter(h1->GetMaximumBin());
