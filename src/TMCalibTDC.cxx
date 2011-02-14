@@ -221,12 +221,13 @@ void TMCalibTDC::Process(Int_t index)
     {
         // fit pulser
         Double_t pos = h[i]->GetXaxis()->GetBinCenter(h[i]->GetMaximumBin());
-        fPeakFunc[i]->SetParameters(h[i]->GetMaximum(), pos, 0.1);
-        fPeakFunc[i]->SetParLimits(2, 0.5, 1.5);
-        fPeakFunc[i]->SetRange(pos - 5, pos + 5);
+        fPeakFunc[i]->SetParameters(h[i]->GetMaximum(), pos, 0.55);
+        fPeakFunc[i]->SetParLimits(2, 0.5, 5);
+        fPeakFunc[i]->SetRange(pos - 20, pos + 20);
         h[i]->Fit(fPeakFunc[i], "RB0Q");
         pos = fPeakFunc[i]->GetParameter(1);
         Double_t pos_e = fPeakFunc[i]->GetParError(1);
+        Double_t sigma = fPeakFunc[i]->GetParameter(2);
         if (i == 0) 
         {
             pos0 = pos;
@@ -237,7 +238,7 @@ void TMCalibTDC::Process(Int_t index)
         fCanvas->cd(i+1);
         h[i]->Draw();
         fPeakFunc[i]->Draw("same");
-        h[i]->GetXaxis()->SetRangeUser(pos - 7, pos + 7);
+        h[i]->GetXaxis()->SetRangeUser(pos - 5*sigma, pos + 5*sigma);
         h[i]->GetXaxis()->SetTitle("TDC Channel");
         h[i]->GetYaxis()->SetTitle("Counts");
     
