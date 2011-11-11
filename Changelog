@@ -10,6 +10,9 @@
 #####################################################################
 
 
+0.2.2 : Nov 11 2011
+* support for veto QAC pedestal database setting
+
 0.2.1 : Feb 14 2011
 * improved fitting in TDC gain calibration module
 

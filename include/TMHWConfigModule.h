@@ -59,7 +59,8 @@ enum EDB_TAPS_Table {
     kDB_Table_QAC_LG,
     kDB_Table_QAC_LGS,
     kDB_Table_QAC_SG,
-    kDB_Table_QAC_SGS
+    kDB_Table_QAC_SGS,
+    kDB_Table_QAC_VETO
 };
 
 

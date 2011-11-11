@@ -81,6 +81,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableCombo->AddEntry("QAC Pedestal LGS", kDB_Table_QAC_LGS);
     fTableCombo->AddEntry("QAC Pedestal SG", kDB_Table_QAC_SG);
     fTableCombo->AddEntry("QAC Pedestal SGS", kDB_Table_QAC_SGS);
+    fTableCombo->AddEntry("QAC Pedestal Veto", kDB_Table_QAC_VETO);
     fControlFrame->AddFrame(fTableCombo, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     fTableCombo->Select(kDB_Table_Empty, kFALSE);
 
@@ -1387,6 +1388,11 @@ Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
             if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
             else return kFALSE;
         }
+        case kDB_Table_QAC_VETO:
+        {
+            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
+            else return kFALSE;
+        }
         case kDB_Table_Empty:
         {
             return kFALSE;
@@ -1461,6 +1467,12 @@ Bool_t TMHWConfigModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableNam
             strcpy(columnName, "th");
             return kTRUE;
         }
+        case kDB_Table_QAC_VETO:
+        {
+            strcpy(tableName, "vqac_par");
+            strcpy(columnName, "th");
+            return kTRUE;
+        }
         default:
         {
             return kFALSE;
@@ -1517,6 +1529,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     else if (table == kDB_Table_QAC_LGS) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
     else if (table == kDB_Table_QAC_SG) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
     else if (table == kDB_Table_QAC_SGS) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+    else if (table == kDB_Table_QAC_VETO) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
     
     // Leave if the dummy entry in the combo was selected
     if (table == kDB_Table_Empty) return;
@@ -1580,6 +1593,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
         else if (table == kDB_Table_QAC_LGS) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
         else if (table == kDB_Table_QAC_SG) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
         else if (table == kDB_Table_QAC_SGS) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+        else if (table == kDB_Table_QAC_VETO) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
 
         delete res;
     }

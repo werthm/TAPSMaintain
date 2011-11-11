@@ -17,7 +17,7 @@
 
 
 // TAPSMaintain version
-const Char_t kTAPSMaintainVersion[] = "0.2.1";
+const Char_t kTAPSMaintainVersion[] = "0.2.2";
 
 // default TAPS database settings
 const Char_t kTAPS_DB_URL[] = "mysql://localhost/taps";
