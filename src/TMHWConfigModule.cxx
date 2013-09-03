@@ -1699,7 +1699,7 @@ void TMHWConfigModule::WriteHVToHardware()
     for (UInt_t i = 0; i < kMaxSize; i++)
     {
         Int_t val = atoi(fElementCurrentValue[i]->GetText()->Data());
-        Set_BAF2_HV((char*)kTAPS_Server, i+1, val);
+        //Set_BAF2_HV((char*)kTAPS_Server, i+1, val);
 
         fProgressBar->SetPosition(i+1); 
         gSystem->ProcessEvents();

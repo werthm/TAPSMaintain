@@ -40,15 +40,6 @@
 #include "TMUtils.h"
 
 
-// C method provided by libtcpip to set the BaF2 high voltage
-// in the hardware crate.
-extern "C"
-{
-    void Set_BAF2_HV(char* server, int det, int value); 
-    void Init_BAF2_HV(char* server); 
-}
-
-
 enum EDB_TAPS_Table {
     kDB_Table_Empty, 
     kDB_Table_BaF2_HV, 

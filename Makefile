@@ -20,7 +20,6 @@ I             = include
 O             = obj
 L             = lib
 B             = bin
-LTCPIP        = libtcpip
 
 SRC           = $(wildcard $(S)/TM*.cxx) $(S)/Dict.cxx
 INCD          = $(wildcard $(I)/TM*.h)
@@ -45,17 +44,12 @@ vpath %.o  $(O)
 ifeq ($(OSTYPE),Darwin)
 	LIB_TM = $(L)/libTAPSMaintain.dylib
 	SOFLAGS_TM = -dynamiclib -single_module -undefined dynamic_lookup -install_name $(CURDIR)/$(LIB_TM)
-	LIB_TCPIP = $(L)/libtcpip.dylib
-	SOFLAGS_TCPIP = -dynamiclib -single_module -undefined dynamic_lookup -install_name $(CURDIR)/$(LIB_TCPIP) \
-                        -DOSF1 -DLINUX -DLIBC6 -DWARPFILL
 	POST_LIB_BUILD = @ln $(L)/libTAPSMaintain.dylib $(L)/libTAPSMaintain.so
 endif
 
 ifeq ($(OSTYPE),Linux)
 	LIB_TM = $(L)/libTAPSMaintain.so
 	SOFLAGS_TM = -shared
-	LIB_TCPIP = $(L)/libtcpip.so
-	SOFLAGS_TCPIP = -fPIC -shared -DOSF1 -DLINUX -DLIBC6 -DWARPFILL
 	POST_LIB_BUILD = 
 endif
 
@@ -80,11 +74,11 @@ end:
 	@echo "-> Finished!"
 	@echo
 
-$(B)/TAPSMaintain: $(LIB_TM) $(LIB_TCPIP) $(S)/MainTAPSMaintain.cxx
+$(B)/TAPSMaintain: $(LIB_TM) $(S)/MainTAPSMaintain.cxx
 	@echo
 	@echo "Building TAPSMaintain application ..."
 	@mkdir -p $(B)
-	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIB_TM) $(CURDIR)/$(LIB_TCPIP) -o $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
+	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIB_TM) -o $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
 
 $(LIB_TM): $(OBJ)
 	@echo
@@ -93,14 +87,6 @@ $(LIB_TM): $(OBJ)
 	@rm -f $(L)/libTAPSMaintain.*
 	@$(CCCOMP) $(LDFLAGS) $(ROOTGLIBS) $(SOFLAGS_TM) $(OBJD) -o $(LIB_TM)
 	@$(POST_LIB_BUILD)
-
-$(LIB_TCPIP): $(LTCPIP)/hw_write.c $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c
-	@echo
-	@echo "Building TAPS Slowcontrol libtcpip ..."
-	@mkdir -p $(L)
-	@$(CCOMP) $(LDFLAGS) $(SOFLAGS_TCPIP) \
-                  $(LTCPIP)/hw_write.c $(LTCPIP)/tcpip.c $(LTCPIP)/checkopts.c \
-                  -o $(LIB_TCPIP)
 
 $(S)/Dict.cxx: $(INC) $(I)/LinkDef.h 
 	@echo
