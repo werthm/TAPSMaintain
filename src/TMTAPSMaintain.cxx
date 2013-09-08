@@ -30,6 +30,11 @@ TMTAPSMaintain::TMTAPSMaintain()
     fActiveModule = 0;
     fFile = 0;
     fCurrentDir[0] = '\0';
+
+    // load TAPSsc configuration file
+    Char_t cfg[256];
+    sprintf(cfg, "%s/config/config.rootrc", gSystem->Getenv("TAPSSC"));
+    gEnv->ReadFile(cfg, kEnvLocal);
 }
 
 //______________________________________________________________________________

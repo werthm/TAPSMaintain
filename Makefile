@@ -6,11 +6,10 @@
 ##               Universal TAPS maintenance software               ##
 ##                                                                 ##
 ##                                                                 ##
-##                           (C) 2008 by                           ##
+##                       (C) 2008-2013 by                          ##
 ##      Dominik Werthmueller <dominik.werthmueller@unibas.ch>      ##
 ##                                                                 ##
 #####################################################################
-
 
 
 # --------------------------- System and ROOT variables ---------------------------
@@ -27,38 +26,25 @@ INC           = $(notdir $(INCD))
 OBJD          = $(patsubst $(S)/%.cxx, $(O)/%.o, $(SRC))
 OBJ           = $(notdir $(OBJD))
 
-OSTYPE       := $(subst -,,$(shell uname))
+ROOTGLIBS     = $(shell root-config --glibs) -lASImage
+ROOTCFLAGS    = $(shell root-config --cflags)
+ROOTLDFLAGS   = $(shell root-config --ldflags)
 
-ROOTGLIBS    := $(shell root-config --glibs) -lASImage
-ROOTCFLAGS   := $(shell root-config --cflags)
-ROOTLDFLAGS  := $(shell root-config --ldflags)
+BIN_INST_DIR  = $(HOME)/$(B)
 
-BIN_INSTALL_DIR = $(HOME)/$(B)
+LIB_TM        = $(L)/libTAPSMaintain.so
+SOFLAGS_TM    = -shared
 
 vpath %.cxx $(S)
 vpath %.h  $(I)
 vpath %.o  $(O)
 
-# ------------------------ Architecture dependent settings ------------------------
-
-ifeq ($(OSTYPE),Darwin)
-	LIB_TM = $(L)/libTAPSMaintain.dylib
-	SOFLAGS_TM = -dynamiclib -single_module -undefined dynamic_lookup -install_name $(CURDIR)/$(LIB_TM)
-	POST_LIB_BUILD = @ln $(L)/libTAPSMaintain.dylib $(L)/libTAPSMaintain.so
-endif
-
-ifeq ($(OSTYPE),Linux)
-	LIB_TM = $(L)/libTAPSMaintain.so
-	SOFLAGS_TM = -shared
-	POST_LIB_BUILD = 
-endif
-
 # -------------------------------- Compile options --------------------------------
 
 CCCOMP      = g++
 CCOMP       = gcc
-CXXFLAGS    = -O3 -g -Wall -fPIC $(ROOTCFLAGS) -I./$(I)
-LDFLAGS     = -O3 -g $(ROOTLDFLAGS)
+CXXFLAGS    = -O3 -g -Wall -fPIC $(ROOTCFLAGS) -I./$(I) -I$(TAPSSC)/include
+LDFLAGS     = -O3 -g $(ROOTLDFLAGS) -L$(TAPSSC)/lib -lTAPSsc
 
 # ------------------------------------ targets ------------------------------------
 
@@ -66,7 +52,7 @@ all:	begin $(LIB_TM) $(B)/TAPSMaintain end
 
 begin:
 	@echo
-	@echo "-> Building TAPSMaintain on a $(OSTYPE) system"
+	@echo "-> Building TAPSMaintain"
 	@echo
 
 end:
@@ -86,12 +72,11 @@ $(LIB_TM): $(OBJ)
 	@mkdir -p $(L)
 	@rm -f $(L)/libTAPSMaintain.*
 	@$(CCCOMP) $(LDFLAGS) $(ROOTGLIBS) $(SOFLAGS_TM) $(OBJD) -o $(LIB_TM)
-	@$(POST_LIB_BUILD)
 
 $(S)/Dict.cxx: $(INC) $(I)/LinkDef.h 
 	@echo
 	@echo "Creating TAPSMaintain dictionary ..."
-	@rootcint -v -f $@ -c -I./$(I) -p $(INC) $(I)/LinkDef.h
+	@rootcint -v -f $@ -c -I./$(I) -I$(TAPSSC)/include -p $(INC) $(I)/LinkDef.h
 
 %.o: %.cxx
 	@echo "Compiling $(notdir $<) ..."
@@ -105,14 +90,14 @@ docs:
 	@echo "Done."
 
 install: $(B)/TAPSMaintain
-	@echo "Installing TAPSMaintain in $(BIN_INSTALL_DIR) ..."
-	@mkdir -p $(BIN_INSTALL_DIR)
-	@cp $(B)/TAPSMaintain $(BIN_INSTALL_DIR) 
+	@echo "Installing TAPSMaintain in $(BIN_INST_DIR) ..."
+	@mkdir -p $(BIN_INST_DIR)
+	@cp $(B)/TAPSMaintain $(BIN_INST_DIR) 
 	@echo "Done."
 
 uninstall:
 	@echo "Uninstalling TAPSMaintain ..."
-	@rm -f $(BIN_INSTALL_DIR)/TAPSMaintain
+	@rm -f $(BIN_INST_DIR)/TAPSMaintain
 	@echo "Done."
 	
 clean:

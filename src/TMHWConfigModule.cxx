@@ -38,52 +38,36 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     
     // ------------------------------ Control frame ------------------------------
     fControlFrame = new TGCompositeFrame(fFrame, 50, 50);
-    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 7, 2));
+    fControlFrame->SetLayoutManager(new TGTableLayout(fControlFrame, 4, 2));
     
-    // DB URL
-    TGLabel* l = new TGLabel(fControlFrame, "DB URL:");
-    l->SetTextJustify(kTextRight);
-    fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fDBURLEntry = new TGTextEntry(fControlFrame, kTAPS_DB_URL);
-    fControlFrame->AddFrame(fDBURLEntry, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
-    
-    // DB User
-    l = new TGLabel(fControlFrame, "DB User:");
-    l->SetTextJustify(kTextRight);
-    fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fDBUserEntry = new TGTextEntry(fControlFrame, kTAPS_DB_User);
-    fControlFrame->AddFrame(fDBUserEntry, new TGTableLayoutHints(1, 2, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
-
-    // DB password
-    l = new TGLabel(fControlFrame, "DB Password:");
-    l->SetTextJustify(kTextRight);
-    fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
-    fDBPasswdEntry = new TGTextEntry(fControlFrame, kTAPS_DB_Passwd);
-    fDBPasswdEntry->SetEchoMode(TGTextEntry::kPassword);
-    fControlFrame->AddFrame(fDBPasswdEntry, new TGTableLayoutHints(1, 2, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
-
     // DB table
-    l = new TGLabel(fControlFrame, "DB table:");
+    TGLabel* l = new TGLabel(fControlFrame, "DB table:");
     l->SetTextJustify(kTextRight);
-    fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 3, 4, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
+    fControlFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsLeft, 5, 5, 5, 5));
     
     // combo box
     fTableCombo = new TGComboBox(fControlFrame);
     fTableCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "ReadTable(Int_t)");
     fTableCombo->Resize(200, 22);
-    fTableCombo->AddEntry("Select TAPS table here", kDB_Table_Empty);
-    fTableCombo->AddEntry("BaF2 High Voltage", kDB_Table_BaF2_HV);
-    fTableCombo->AddEntry("BaF2 CFD Threshold", kDB_Table_BaF2_CFD);
-    fTableCombo->AddEntry("BaF2 LED1 Threshold", kDB_Table_BaF2_LED1);
-    fTableCombo->AddEntry("BaF2 LED2 Threshold", kDB_Table_BaF2_LED2);
-    fTableCombo->AddEntry("Veto LED Threshold", kDB_Table_Veto_LED);
-    fTableCombo->AddEntry("QAC Pedestal LG", kDB_Table_QAC_LG);
-    fTableCombo->AddEntry("QAC Pedestal LGS", kDB_Table_QAC_LGS);
-    fTableCombo->AddEntry("QAC Pedestal SG", kDB_Table_QAC_SG);
-    fTableCombo->AddEntry("QAC Pedestal SGS", kDB_Table_QAC_SGS);
-    fTableCombo->AddEntry("QAC Pedestal Veto", kDB_Table_QAC_VETO);
-    fControlFrame->AddFrame(fTableCombo, new TGTableLayoutHints(1, 2, 3, 4, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
-    fTableCombo->Select(kDB_Table_Empty, kFALSE);
+    
+    // create a list of all parameter data types and fill combo box
+    TList* lt = TTMySQLManager::GetManager()->GetDataTypes();
+    fParTypes = new TList();
+    Int_t npar = 0;
+    fParTypes->Add(new TTDataTypePar());
+    fTableCombo->AddEntry("Select TAPS table here", npar++);
+    for (Int_t i = 0; i < lt->GetSize(); i++)
+    {
+        TTDataType* d = (TTDataType*) lt->At(i);
+        if (d->GetType() == kParType)
+        {
+            TTDataTypePar* dp = (TTDataTypePar*) d;
+            fParTypes->Add(dp);
+            fTableCombo->AddEntry(dp->GetTitle(), npar++);
+        }
+    }
+    fControlFrame->AddFrame(fTableCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
+    fTableCombo->Select(0, kFALSE);
 
 
     // ------------------------------ Begin Tab ------------------------------
@@ -354,7 +338,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     
                        
     // ------------------------------ End Tab ------------------------------
-    fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 4, 5, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
     fSettingsTab->SetEnabled(3, kFALSE);
     fSettingsTab->SetEnabled(4, kFALSE);
 
@@ -392,17 +376,17 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
                             new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
 
     // add buttons frame to control frame
-    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 5, 6, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
 
 
-    //// Progress bar
+    // Progress bar
     fProgressBar = new TGHProgressBar(fControlFrame, TGProgressBar::kFancy, 10);
     fProgressBar->SetBarColor("green");
     fProgressBar->Resize(200, 25);
     fProgressBar->SetMin(0);
     fProgressBar->SetMax(kMaxSize);
     fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
-    fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 6, 7, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
+    fControlFrame->AddFrame(fProgressBar,  new TGTableLayoutHints(0, 2, 3, 4, kLHintsFillX | kLHintsFillY | kLHintsLeft, 5, 5, 35, 5));
 
     // add control frame to main frame
     fFrame->AddFrame(fControlFrame, new TGLayoutHints(kLHintsTop | kLHintsLeft | kLHintsFillX | kLHintsFillY, 10, 10, 10, 10));
@@ -416,12 +400,33 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableTitle = new TGLabel(fInputFrame, "Table: none");
     fTableTitle->SetTextJustify(kTextLeft);
     fTableTitle->SetTextFont("-adobe-helvetica-bold-r-*-*-18-*-*-*-*-*-iso8859-1");
-    fInputFrame->AddFrame(fTableTitle, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 0, 0, 0, 20));
-
+    fInputFrame->AddFrame(fTableTitle, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 0, 0, 0, 10));
+    
+    // add header
+    TGCompositeFrame* hdrFrame = new TGCompositeFrame(fInputFrame);
+    hdrFrame->SetLayoutManager(new TGTableLayout(hdrFrame, 1, 4));
+    
+    l = new TGLabel(hdrFrame, "Element");
+    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    hdrFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsExpandX, 10, 10, 10, 10));
+    
+    l = new TGLabel(hdrFrame, "Current Value");
+    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    hdrFrame->AddFrame(l, new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX, 10, 10, 10, 10));
+    
+    l = new TGLabel(hdrFrame, "New Value");
+    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    hdrFrame->AddFrame(l, new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX, 10, 10, 10, 10));
+    
+    l = new TGLabel(hdrFrame, "Change");
+    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
+    hdrFrame->AddFrame(l, new TGTableLayoutHints(3, 4, 0, 1, kLHintsExpandX, 10, 10, 10, 10));
+    fInputFrame->AddFrame(hdrFrame, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 0, 0, 0, 0));
+ 
     // table scroll canvas
     fTableCanvas = new TGCanvas(fInputFrame, 250, 500, kSunkenFrame, TGCanvas::GetWhitePixel());
     fTableFrame = new TGCompositeFrame(fTableCanvas->GetViewPort(), 250, 500, kVerticalFrame | kOwnBackground);
-    fTableFrame->SetLayoutManager(new TGTableLayout(fTableFrame, kMaxSize+1, 4));
+    fTableFrame->SetLayoutManager(new TGTableLayout(fTableFrame, kMaxSize, 1));
     
     // mouse wheel scrolling
     fTableFrame->Connect("ProcessedEvent(Event_t*)", "TMHWConfigModule", this, "HandleMouseWheel(Event_t*)");
@@ -431,55 +436,49 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
                           kButtonPressMask | kButtonReleaseMask | kPointerMotionMask, kNone, kNone);
 
     // create table 
+    fElementFrame = new TGCompositeFrame*[kMaxSize];
     fElementCurrentValue = new TGLabel*[kMaxSize];
     fElementNewValue = new TGNumberEntry*[kMaxSize];
     fElementValueChanged = new TGLabel*[kMaxSize];
-
-    // add header
-    l = new TGLabel(fTableFrame, "Element");
-    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
-    fTableFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX | kLHintsLeft, 10, 10, 10, 10));
-    
-    l = new TGLabel(fTableFrame, "Current Value");
-    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
-    fTableFrame->AddFrame(l, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 10, 10, 10, 10));
-    
-    l = new TGLabel(fTableFrame, "New Value");
-    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
-    fTableFrame->AddFrame(l, new TGTableLayoutHints(2, 3, 0, 1, kLHintsFillX | kLHintsLeft, 10, 10, 10, 10));
-    
-    l = new TGLabel(fTableFrame, "Change");
-    l->SetTextFont("-adobe-helvetica-bold-r-*-*-14-*-*-*-*-*-iso8859-1");
-    fTableFrame->AddFrame(l, new TGTableLayoutHints(3, 4, 0, 1, kLHintsFillX | kLHintsLeft, 10, 10, 10, 10));
-    
+   
     // add element rows
     for (UInt_t i = 0; i < kMaxSize; i++)
     {
-        sprintf(aName, "%d", i+1);
-
+        
+        // create element frame
+        fElementFrame[i] = new TGCompositeFrame(fTableFrame);
+        fElementFrame[i]->SetLayoutManager(new TGTableLayout(fElementFrame[i], 1, 4));
+ 
         // add element number
-        l = new TGLabel(fTableFrame, aName);
-        l->SetTextJustify(kTextRight);
-        fTableFrame->AddFrame(l, new TGTableLayoutHints(0, 1, i+1, i+2, kLHintsFillX | kLHintsLeft, 4, 4, 8, 4));
+        sprintf(aName, "   %3d   ", i+1);
+        l = new TGLabel(fElementFrame[i], aName);
+        l->SetTextJustify(kTextCenterX);
+        l->SetTextFont("-adobe-courier-*-r-*-*-*-*-*-*-*-70-*-*");
+        fElementFrame[i]->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsExpandX, 4, 4, 4, 4));
 
         // add old value display
-        fElementCurrentValue[i] = new TGLabel(fTableFrame, "0");
-        fElementCurrentValue[i]->SetTextJustify(kTextRight);
-        fTableFrame->AddFrame(fElementCurrentValue[i], 
-                              new TGTableLayoutHints(1, 2, i+1, i+2, kLHintsFillX | kLHintsLeft, 4, 4, 8, 4));
+        fElementCurrentValue[i] = new TGLabel(fElementFrame[i], "   0   ");
+        fElementCurrentValue[i]->SetTextJustify(kTextCenterX);
+        fElementCurrentValue[i]->SetTextFont("-adobe-courier-*-r-*-*-*-*-*-*-*-70-*-*");
+        fElementFrame[i]->AddFrame(fElementCurrentValue[i], 
+                                   new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX, 80, 30, 4, 4));
 
         // add new value entry
-        fElementNewValue[i] = new TGNumberEntry(fTableFrame, 0, 10);
+        fElementNewValue[i] = new TGNumberEntry(fElementFrame[i], 0, 10);
         fElementNewValue[i]->SetLimits(TGNumberFormat::kNELLimitMinMax);
         fElementNewValue[i]->Connect("ValueSet(Long_t)", "TMHWConfigModule", this, "MarkChanges()");
-        fTableFrame->AddFrame(fElementNewValue[i], 
-                              new TGTableLayoutHints(2, 3, i+1, i+2, kLHintsFillX | kLHintsLeft, 4, 4, 4, 4));
+        fElementFrame[i]->AddFrame(fElementNewValue[i], 
+                                   new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX, 60, 60, 4, 4));
         
         // add value change
-        fElementValueChanged[i] = new TGLabel(fTableFrame, "       ");
+        fElementValueChanged[i] = new TGLabel(fElementFrame[i], "          ");
         fElementValueChanged[i]->SetTextJustify(kTextCenterX);
-        fTableFrame->AddFrame(fElementValueChanged[i], 
-                              new TGTableLayoutHints(3, 4, i+1, i+2, kLHintsFillX | kLHintsLeft, 4, 4, 8, 4));
+        fElementFrame[i]->AddFrame(fElementValueChanged[i], 
+                                   new TGTableLayoutHints(3, 4, 0, 1, kLHintsExpandX, 0, 0, 4, 4));
+        
+        // add element fram to table frame
+        fTableFrame->AddFrame(fElementFrame[i], 
+                              new TGTableLayoutHints(0, 1, i, i+1, kLHintsExpandX, 10, 10, 10, 10));
     }
     
     // frame to canvas
@@ -780,9 +779,9 @@ void TMHWConfigModule::DoGainMatch()
             if (hv_new < 0) hv_new = hv_old;
 
             // check limits and set new HV value
-            if (hv_new < kDB_BaF2_HV_Min) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Min);
-            else if (hv_new > kDB_BaF2_HV_Max) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Max);
-            else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
+            //if (hv_new < kDB_BaF2_HV_Min) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Min);      // update
+            //else if (hv_new > kDB_BaF2_HV_Max) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Max); // update
+            //else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);                                        // update
         }
     }
 
@@ -1013,9 +1012,9 @@ void TMHWConfigModule::SetLEDThresholds()
         
         // check limits and set value 
         Int_t resValue = (Int_t)fLEDFitFunctions[id-1]->Eval(reqValue);
-        if (resValue < kDB_BaF2_LED_Min) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Min);
-        else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Max);
-        else fElementNewValue[id-1]->SetNumber(resValue);
+        //if (resValue < kDB_BaF2_LED_Min) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Min);         // update
+        //else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Max);    // update
+        //else fElementNewValue[id-1]->SetNumber(resValue);                                             // update
     }
     else if (selectedLEDRange == kRange_All_Elements)
     {
@@ -1023,9 +1022,9 @@ void TMHWConfigModule::SetLEDThresholds()
         for (UInt_t i = 0; i < kMaxSize; i++)
         {
             Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-            if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);
-            else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);
-            else fElementNewValue[i]->SetNumber(resValue);
+            //if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);        // update
+            //else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);   // update
+            //else fElementNewValue[i]->SetNumber(resValue);                                            // update
         }
     }
     else
@@ -1056,9 +1055,9 @@ void TMHWConfigModule::SetLEDThresholds()
             if (ring == TMUtils::GetRingNumber(i))
             {
                 Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-                if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);
-                else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);
-                else fElementNewValue[i]->SetNumber(resValue);
+                //if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);        // update
+                //else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);   // update
+                //else fElementNewValue[i]->SetNumber(resValue);                                            // update
             }
         }
     }
@@ -1340,7 +1339,8 @@ Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
 {
     // Check if the value 'value' lies within the limits of the accepted values
     // for the table 'table'.
-
+    
+    /*
     switch (table)
     {
         case kDB_Table_BaF2_HV:
@@ -1402,108 +1402,46 @@ Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
             return kFALSE;
         }
     }
-}
+    */
+    
+    // update
 
-//______________________________________________________________________________
-Bool_t TMHWConfigModule::SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName)
-{
-    // Set the table name of the TAPS table 'table' in tableName and the column
-    // name of the data column in columnName.
-    // Return kTRUE on success.
-  
-    switch (table)
-    {
-        case kDB_Table_BaF2_HV:
-        {
-            strcpy(tableName, "hvbaf_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_BaF2_CFD:
-        {
-            strcpy(tableName, "cfd_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_BaF2_LED1:
-        {
-            strcpy(tableName, "ledl_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_BaF2_LED2:
-        {
-            strcpy(tableName, "ledh_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_Veto_LED:
-        {
-            strcpy(tableName, "vled_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_QAC_LG:
-        {
-            strcpy(tableName, "qaclg_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_QAC_LGS:
-        {
-            strcpy(tableName, "qaclgs_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_QAC_SG:
-        {
-            strcpy(tableName, "qacsg_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_QAC_SGS:
-        {
-            strcpy(tableName, "qacsgs_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        case kDB_Table_QAC_VETO:
-        {
-            strcpy(tableName, "vqac_par");
-            strcpy(columnName, "th");
-            return kTRUE;
-        }
-        default:
-        {
-            return kFALSE;
-        }
-    }
+    return kTRUE;
 }
 
 //______________________________________________________________________________
 void TMHWConfigModule::ReadTable(Int_t table)
 {
     // Read table from database and display the content.
-
-    Char_t columnName[256];
-    Char_t query[256];
-    Char_t name[256];
-    Double_t val;
-    Int_t badEntries = 0;
-    Char_t badEntriesID[768];
-    badEntriesID[0] = '\0';
-
+    
     // Clear current displayed values
     ClearValues();
-    
+     
+    // set all to standard when first dummy entry was selected
+    if (table == 0) 
+    {
+        fRangeManipEntry->SetLimitValues(0., 0.);
+        fWriteHWButton->SetEnabled(kFALSE);
+        fSettingsTab->SetEnabled(3, kFALSE);
+        fSettingsTab->SetEnabled(4, kFALSE);
+        fSettingsTab->SetTab(0, kFALSE);
+        return;
+    }
+
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+
     // de-/activate GUI elements depending on the loaded table 
-    if (table == kDB_Table_BaF2_HV) 
+    if (!strcmp(dataType->GetName(), "Par.BaF2.HV") || 
+        !strcmp(dataType->GetName(), "Par.Veto.HV") || 
+        !strcmp(dataType->GetName(), "Par.PWO.HV"))
     {
         fWriteHWButton->SetEnabled(kTRUE);
         fSettingsTab->SetEnabled(3, kTRUE);
         fSettingsTab->SetEnabled(4, kFALSE);
     }
-    else if (table == kDB_Table_BaF2_LED1 || table == kDB_Table_BaF2_LED2)
+    else if (!strcmp(dataType->GetName(), "Par.BaF2.Thr.LED1") || 
+             !strcmp(dataType->GetName(), "Par.BaF2.Thr.LED2"))
     {
         fSettingsTab->SetEnabled(3, kFALSE);
         fSettingsTab->SetEnabled(4, kTRUE);
@@ -1519,102 +1457,50 @@ void TMHWConfigModule::ReadTable(Int_t table)
     fSettingsTab->SetTab(0, kFALSE);
     
     // set range manipulation number entry limits
-    if (table == kDB_Table_Empty) fRangeManipEntry->SetLimitValues(0., 0.);
-    else if (table == kDB_Table_BaF2_HV) fRangeManipEntry->SetLimitValues(kDB_BaF2_HV_Min, kDB_BaF2_HV_Max);
-    else if (table == kDB_Table_BaF2_CFD) fRangeManipEntry->SetLimitValues(kDB_BaF2_CFD_Min, kDB_BaF2_CFD_Max);
-    else if (table == kDB_Table_BaF2_LED1) fRangeManipEntry->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
-    else if (table == kDB_Table_BaF2_LED2) fRangeManipEntry->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
-    else if (table == kDB_Table_Veto_LED) fRangeManipEntry->SetLimitValues(kDB_Veto_LED_Min, kDB_Veto_LED_Max);
-    else if (table == kDB_Table_QAC_LG) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-    else if (table == kDB_Table_QAC_LGS) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-    else if (table == kDB_Table_QAC_SG) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-    else if (table == kDB_Table_QAC_SGS) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-    else if (table == kDB_Table_QAC_VETO) fRangeManipEntry->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
+    fRangeManipEntry->SetLimitValues(dataType->GetMin(), dataType->GetMax());
     
-    // Leave if the dummy entry in the combo was selected
-    if (table == kDB_Table_Empty) return;
-
-    // try to open connection to MySQL server
-    TSQLServer* tapsDB = TSQLServer::Connect(fDBURLEntry->GetText(), 
-                                             fDBUserEntry->GetText(), 
-                                             fDBPasswdEntry->GetText());
-    
-    // exit if connection to DB failed
-    if (!tapsDB)
+    // try to open connection to database server
+    if (!TTMySQLManager::GetManager())
     {
-        fTableCombo->Select(kDB_Table_Empty, kTRUE);
+        fTableCombo->Select(0, kTRUE);
         printf("ERROR: Could not connect to the database server. Please check your settings!\n");
         return;
     }
-    
-    // Choose table and set name of the column containing the
-    // data values
-    if (!SetTableSettings((EDB_TAPS_Table)table, fCurrentTable, columnName)) return;
-
-    // display table info
-    printf("Reading values from table %s ...\n", fCurrentTable);
-    sprintf(name, "Table: %s", fCurrentTable);
-    fTableTitle->SetText(name);
-    
-    // read values
-    for (UInt_t i = 0; i < kMaxSize; i++)
-    {   
-        sprintf(query, "SELECT %s FROM %s WHERE id=%d", columnName, fCurrentTable, i+1);
-        TSQLResult* res = tapsDB->Query(query);
-        
-        // check if multiple values were found
-        if (res->GetRowCount() > 1) 
-        {
-            Char_t tmp[4];
-
-            // increment counter and add bad ID to list
-            badEntries++;
-            if (badEntries == 1) sprintf(tmp, "%d", i+1);
-            else sprintf(tmp, ", %d", i+1);
-            strcat(badEntriesID, tmp);
-        }
   
-        // get the value
-        val = atof(res->Next()->GetField(0));
-
+    // try to read values
+    Int_t size = dataType->GetSize();
+    Double_t par[size];
+    if (!TTMySQLManager::GetManager()->ReadParameters(dataType->GetName(), size, par))
+    {
+        fTableCombo->Select(0, kTRUE);
+        printf("ERROR: Could not read value from the database server. Please check your settings!\n");
+        return;
+    }
+    
+    // display values
+    for (UInt_t i = 0; i < size; i++)
+    {   
+        // show element row
+        fElementFrame[i]->MapWindow();
+        
         // set current and new value
         Char_t value[128];
-        sprintf(value, "%.f", val);
+        sprintf(value, "%.f", par[i]);
         fElementCurrentValue[i]->SetText(value);
-        fElementNewValue[i]->SetNumber(val);
+        fElementNewValue[i]->SetNumber(par[i]);
         
         // set limits of new value entries
-        if (table == kDB_Table_BaF2_HV) fElementNewValue[i]->SetLimitValues(kDB_BaF2_HV_Min, kDB_BaF2_HV_Max);
-        else if (table == kDB_Table_BaF2_CFD) fElementNewValue[i]->SetLimitValues(kDB_BaF2_CFD_Min, kDB_BaF2_CFD_Max);
-        else if (table == kDB_Table_BaF2_LED1) fElementNewValue[i]->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
-        else if (table == kDB_Table_BaF2_LED2) fElementNewValue[i]->SetLimitValues(kDB_BaF2_LED_Min, kDB_BaF2_LED_Max);
-        else if (table == kDB_Table_Veto_LED) fElementNewValue[i]->SetLimitValues(kDB_Veto_LED_Min, kDB_Veto_LED_Max);
-        else if (table == kDB_Table_QAC_LG) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-        else if (table == kDB_Table_QAC_LGS) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-        else if (table == kDB_Table_QAC_SG) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-        else if (table == kDB_Table_QAC_SGS) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-        else if (table == kDB_Table_QAC_VETO) fElementNewValue[i]->SetLimitValues(kDB_QAC_Ped_Min, kDB_QAC_Ped_Max);
-
-        delete res;
+        fElementNewValue[i]->SetLimitValues(dataType->GetMin(), dataType->GetMax());
     }
-
-    // deconnect from server
-    delete tapsDB;
-
-    // mark changes in case values from DB are out of the limits
-    // of the number entries
-    MarkChanges();
-
-    // create SQL error if necessary
-    if (badEntries)
+    
+    // hide unused element rows
+    for (UInt_t i = size; i < kMaxSize; i++)
     {
-        printf("\nWARNING: Broken SQL table!\n"
-               "         For the following ID(s) more than 1 values were found in table '%s':\n"
-               "         -> %s\n"
-               "         Only the last value of every ID is read by TAPSMaintain!\n"
-               "         ATTENTION: THESE VALUE WILL NOT BE UPDATED BY TAPSMaintain!\n\n"
-               , fCurrentTable, badEntriesID);
+        fElementFrame[i]->UnmapWindow();
     }
+
+    // mark changes in case values from DB are out of the limits of the number entries
+    MarkChanges();
 }
 
 //______________________________________________________________________________
@@ -1633,6 +1519,7 @@ void TMHWConfigModule::WriteTable()
     ModuleQuestion("Are you REALLY sure you want to write the new values to the DB?");
     if (GetDialogReturnValue() == kMBNo) return;
 
+    /*
     // try to open connection to MySQL server
     TSQLServer* tapsDB = TSQLServer::Connect(fDBURLEntry->GetText(), 
                                              fDBUserEntry->GetText(), 
@@ -1664,6 +1551,7 @@ void TMHWConfigModule::WriteTable()
 
     // deconnect from server
     delete tapsDB;
+    */
 
     // read new table
     ReadTable(table);

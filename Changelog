@@ -10,6 +10,9 @@
 #####################################################################
 
 
+0.3.0 : 
+* removed support for old slowcontrol system via libtcpip
+
 0.2.2 : Nov 11 2011
 * support for veto QAC pedestal database setting
 

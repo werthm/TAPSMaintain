@@ -36,6 +36,8 @@
 #include "TAxis.h"
 #include "TText.h"
 
+#include "TTMySQLManager.h"
+
 #include "TMModule.h"
 #include "TMUtils.h"
 
@@ -71,10 +73,8 @@ class TMHWConfigModule : public TMModule
 
 private:
     TGCompositeFrame* fControlFrame;                        // frame for the control elements
-    TGTextEntry* fDBURLEntry;                               // DB URL entry
-    TGTextEntry* fDBUserEntry;                              // DB user entry
-    TGTextEntry* fDBPasswdEntry;                            // DB password entry
     TGComboBox* fTableCombo;                                // DB table selection combo box
+    TList* fParTypes;                                       // list of parameter data types
 
     TGTab* fSettingsTab;                                    // tab for different settings
 
@@ -119,6 +119,7 @@ private:
     TGLabel* fTableTitle;                                   // displays the currently loaded table
     TGCanvas* fTableCanvas;                                 // table scroll canvas
     TGCompositeFrame* fTableFrame;                          // frame for the table input elements
+    TGCompositeFrame** fElementFrame;                       // array of frames for the table rows
     TGLabel** fElementCurrentValue;                         // current value display array of all elements
     TGNumberEntry** fElementNewValue;                       // new value entry array of all elements
     TGLabel** fElementValueChanged;                         // value change status array of all elements
@@ -140,7 +141,6 @@ private:
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
     void CreateExternalCanvas(UInt_t n);
-    Bool_t SetTableSettings(EDB_TAPS_Table table, Char_t* tableName, Char_t* columnName);
     Bool_t CheckValueLimits(EDB_TAPS_Table table, Double_t value);    
 
 public:

@@ -19,14 +19,6 @@
 // TAPSMaintain version
 const Char_t kTAPSMaintainVersion[] = "0.3.0";
 
-// default TAPS database settings
-const Char_t kTAPS_DB_URL[] = "mysql://localhost/taps";
-const Char_t kTAPS_DB_User[] = "taps";
-const Char_t kTAPS_DB_Passwd[] = "taps2003";
-
-// default TAPS hardware server
-const Char_t kTAPS_Server[] = "localhost";
-
 // number of TAPS detector elements
 const UInt_t kMaxSize     = 384;
 const UInt_t kBaF2Size    = 384;
@@ -48,17 +40,4 @@ const Double_t kTDC_Cable_Delay[] = {0.0, 9.900, 15.050, 25.200,
 const Double_t kTDC_Cable_Delay_Error[] = {0.0001, 0.054, 0.054, 0.102,
                                          0.102, 0.151, 0.201};
 
-// TAPS DB limits
-const Double_t kDB_BaF2_HV_Min = 0.;
-const Double_t kDB_BaF2_HV_Max = 2000.;
-const Double_t kDB_BaF2_CFD_Min = 1.;
-const Double_t kDB_BaF2_CFD_Max = 10000.;
-const Double_t kDB_BaF2_LED_Min = -999.;
-const Double_t kDB_BaF2_LED_Max = -1.;
-const Double_t kDB_Veto_LED_Min = -999.;
-const Double_t kDB_Veto_LED_Max = -1.;
-const Double_t kDB_Veto_HV_Min = 0.;
-const Double_t kDB_Veto_HV_Max = 1000.;
-const Double_t kDB_QAC_Ped_Min = 1.;
-const Double_t kDB_QAC_Ped_Max = 10000.;
 
