@@ -1469,8 +1469,10 @@ void TMHWConfigModule::ReadTable(Int_t table)
   
     // try to read values
     Int_t size = dataType->GetSize();
+    Int_t elem[size];
     Double_t par[size];
-    if (!TTMySQLManager::GetManager()->ReadParameters(dataType->GetName(), size, par))
+    for (Int_t i = 0; i < size; i++) elem[i] = i;
+    if (!TTMySQLManager::GetManager()->ReadParameters(dataType->GetName(), size, elem, par))
     {
         fTableCombo->Select(0, kTRUE);
         printf("ERROR: Could not read value from the database server. Please check your settings!\n");
