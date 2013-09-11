@@ -400,7 +400,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableTitle = new TGLabel(fInputFrame, "Table: none");
     fTableTitle->SetTextJustify(kTextLeft);
     fTableTitle->SetTextFont("-adobe-helvetica-bold-r-*-*-18-*-*-*-*-*-iso8859-1");
-    fInputFrame->AddFrame(fTableTitle, new TGLayoutHints(kLHintsTop | kLHintsExpandX, 0, 0, 0, 10));
+    fInputFrame->AddFrame(fTableTitle, new TGLayoutHints(kLHintsTop | kLHintsExpandX , 0, 0, 0, 10));
     
     // add header
     TGCompositeFrame* hdrFrame = new TGCompositeFrame(fInputFrame);
@@ -454,27 +454,27 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
         l = new TGLabel(fElementFrame[i], aName);
         l->SetTextJustify(kTextCenterX);
         l->SetTextFont("-adobe-courier-*-r-*-*-*-*-*-*-*-70-*-*");
-        fElementFrame[i]->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsExpandX, 4, 4, 4, 4));
+        fElementFrame[i]->AddFrame(l, new TGTableLayoutHints(0, 1, 0, 1, kLHintsExpandX | kLHintsCenterY, 4, 4, 4, 4));
 
         // add old value display
         fElementCurrentValue[i] = new TGLabel(fElementFrame[i], "   0   ");
         fElementCurrentValue[i]->SetTextJustify(kTextCenterX);
         fElementCurrentValue[i]->SetTextFont("-adobe-courier-*-r-*-*-*-*-*-*-*-70-*-*");
         fElementFrame[i]->AddFrame(fElementCurrentValue[i], 
-                                   new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX, 80, 30, 4, 4));
+                                   new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX | kLHintsCenterY, 80, 30, 4, 4));
 
         // add new value entry
         fElementNewValue[i] = new TGNumberEntry(fElementFrame[i], 0, 10);
         fElementNewValue[i]->SetLimits(TGNumberFormat::kNELLimitMinMax);
         fElementNewValue[i]->Connect("ValueSet(Long_t)", "TMHWConfigModule", this, "MarkChanges()");
         fElementFrame[i]->AddFrame(fElementNewValue[i], 
-                                   new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX, 60, 60, 4, 4));
+                                   new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsCenterY, 60, 60, 4, 4));
         
         // add value change
         fElementValueChanged[i] = new TGLabel(fElementFrame[i], "          ");
         fElementValueChanged[i]->SetTextJustify(kTextCenterX);
         fElementFrame[i]->AddFrame(fElementValueChanged[i], 
-                                   new TGTableLayoutHints(3, 4, 0, 1, kLHintsExpandX, 0, 0, 4, 4));
+                                   new TGTableLayoutHints(3, 4, 0, 1, kLHintsExpandX | kLHintsCenterY, 0, 0, 4, 4));
         
         // add element fram to table frame
         fTableFrame->AddFrame(fElementFrame[i], 
@@ -1463,7 +1463,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     if (!TTMySQLManager::GetManager())
     {
         fTableCombo->Select(0, kTRUE);
-        printf("ERROR: Could not connect to the database server. Please check your settings!\n");
+        printf("ERROR: Could not connect to the database. Please check your settings!\n");
         return;
     }
   
@@ -1475,12 +1475,12 @@ void TMHWConfigModule::ReadTable(Int_t table)
     if (!TTMySQLManager::GetManager()->ReadParameters(dataType->GetName(), size, elem, par))
     {
         fTableCombo->Select(0, kTRUE);
-        printf("ERROR: Could not read value from the database server. Please check your settings!\n");
+        printf("ERROR: Could not read values from the database. Please check your settings!\n");
         return;
     }
     
     // display values
-    for (UInt_t i = 0; i < size; i++)
+    for (Int_t i = 0; i < size; i++)
     {   
         // show element row
         fElementFrame[i]->MapWindow();
@@ -1510,51 +1510,43 @@ void TMHWConfigModule::WriteTable()
 {
     // Write the values back to the table in the database. 
     
-    Char_t columnName[256];
-    Char_t query[256];
-    Int_t table = fTableCombo->GetSelected();
-
     // Leave if the dummy entry in the combo was selected
-    if (table == kDB_Table_Empty) return;
+    Int_t table = fTableCombo->GetSelected();
+    if (table == 0) return;
  
     // ask user for confirmation
     ModuleQuestion("Are you REALLY sure you want to write the new values to the DB?");
     if (GetDialogReturnValue() == kMBNo) return;
-
-    /*
-    // try to open connection to MySQL server
-    TSQLServer* tapsDB = TSQLServer::Connect(fDBURLEntry->GetText(), 
-                                             fDBUserEntry->GetText(), 
-                                             fDBPasswdEntry->GetText());
     
-    // exit if connection to DB failed
-    if (!tapsDB)
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+    
+    // try to open connection to database server
+    if (!TTMySQLManager::GetManager())
     {
-        printf("ERROR: Could not connect to the database server. Please check your settings!\n");
+        fTableCombo->Select(0, kTRUE);
+        printf("ERROR: Could not connect to the database. Please check your settings!\n");
         return;
     }
-    
-    // Choose table and set name of the column containing the
-    // data values
-    if (!SetTableSettings((EDB_TAPS_Table)table, fCurrentTable, columnName)) return;
-
-    // display table info
-    printf("Updating values in table %s ...\n", fCurrentTable);
-    
-    // write values
-    for (UInt_t i = 0; i < kMaxSize; i++)
-    {   
-        sprintf(query, "UPDATE %s SET %s=%f WHERE id=%d", fCurrentTable, columnName, 
-                fElementNewValue[i]->GetNumber(), i+1);
-        TSQLResult* res = tapsDB->Query(query);
-        
-        delete res;
+ 
+    // prepare arrays
+    Int_t size = dataType->GetSize();
+    Int_t elem[size];
+    Double_t par[size];
+    for (Int_t i = 0; i < size; i++) 
+    {
+        elem[i] = i;
+        par[i] = fElementNewValue[i]->GetNumber();
     }
-
-    // deconnect from server
-    delete tapsDB;
-    */
-
+    
+    // try to write values
+    if (!TTMySQLManager::GetManager()->WriteParameters(dataType->GetName(), size, elem, par))
+    {
+        fTableCombo->Select(0, kTRUE);
+        printf("ERROR: Could not write values to the database. Please check your settings!\n");
+        return;
+    }
+ 
     // read new table
     ReadTable(table);
 }
@@ -1564,6 +1556,23 @@ void TMHWConfigModule::WriteHVToHardware()
 {
     // Write the current values to the hardware HV crate. 
     
+    // Leave if the dummy entry in the combo was selected
+    Int_t table = fTableCombo->GetSelected();
+    if (table == 0) return;
+     
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+
+    // loop over elements
+    for (Int_t i = 0; i < dataType->GetSize(); i++) 
+    {
+        if (!TTServerManager::GetManager()->WriteHV(dataType, i))
+        {
+            Error("WriteHVToHardware", "Could not write high voltage of element %d!", i);
+        }
+    }
+    
+    /*
     // check value range 0..2000 V
     for (UInt_t i = 0; i < kMaxSize; i++)
     {
@@ -1610,5 +1619,6 @@ void TMHWConfigModule::WriteHVToHardware()
     fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
 
     ModuleInfo("Upload completed!");
+    */
 }
 

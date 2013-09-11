@@ -27,7 +27,7 @@ Char_t* TMUtils::fTmpCh = 0;
 //______________________________________________________________________________
 Int_t TMUtils::IndexOf(const Char_t* s1, const Char_t* s2)
 {
-    // Returns the position of the first occurence of the string s2
+    // Returns the position of the first occurrence of the string s2
     // in the string s1. Returns -1 if s2 was not found.
 
     const Char_t* pos = strstr(s1, s2);

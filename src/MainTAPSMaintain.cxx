@@ -15,6 +15,9 @@
 
 #include "TApplication.h"
 
+#include "TTMySQLManager.h"
+#include "TTServerManager.h"
+
 #include "TMTAPSMaintain.h"
 
 
@@ -23,8 +26,22 @@ int main(int argc, char* argv[])
 {
     // TAPSMaintain application main method
     
-    TApplication app("TAPSMaintain", 0, 0);
+    // try to load TAPSsc configuration file 
+    Char_t tmp[256];
+    sprintf(tmp, "%s/config/config.rootrc", gSystem->Getenv("TAPSSC"));
+    if (gEnv->ReadFile(tmp, kEnvLocal))
+    {
+        printf("ERROR: Could not find configuration file!\n");
+        printf("Check the TAPSSC environment variable!\n");
+        return -1;
+    }
+    
+    // init MySQL and network server managers
+    TTMySQLManager::GetManager();
+    TTServerManager::GetManager();
 
+    // init TAPSMaintain
+    TApplication app("TAPSMaintain", 0, 0);
     TMTAPSMaintain tm;
     
     // try to start TAPSMaintain

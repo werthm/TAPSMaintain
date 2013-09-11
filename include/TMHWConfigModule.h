@@ -37,6 +37,7 @@
 #include "TText.h"
 
 #include "TTMySQLManager.h"
+#include "TTServerManager.h"
 
 #include "TMModule.h"
 #include "TMUtils.h"
