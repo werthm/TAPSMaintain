@@ -43,21 +43,6 @@
 #include "TMUtils.h"
 
 
-enum EDB_TAPS_Table {
-    kDB_Table_Empty, 
-    kDB_Table_BaF2_HV, 
-    kDB_Table_BaF2_CFD,
-    kDB_Table_BaF2_LED1,
-    kDB_Table_BaF2_LED2,
-    kDB_Table_Veto_LED,
-    kDB_Table_QAC_LG,
-    kDB_Table_QAC_LGS,
-    kDB_Table_QAC_SG,
-    kDB_Table_QAC_SGS,
-    kDB_Table_QAC_VETO
-};
-
-
 // Hardcoded values used for QT signal connections
 enum EFILE_BROWSE_SELECT {
     kFILE_SELECT_IMPORT             = 1,
@@ -127,14 +112,14 @@ private:
 
     TGCompositeFrame* fButtonsFrame;                        // horizontal frame for the main buttons
     TGTextButton* fWriteDBButton;                           // will write the values to the DB
-    TGTextButton* fWriteHWButton;                           // will write the values to the DB
+    TGTextButton* fWriteHWButton;                           // will write the values to the hardware
+    TGTextButton* fReadHWButton;                            // will read the values from the hardware
     TGTextButton* fQuitButton;                              // quit module button
 
     TGHProgressBar* fProgressBar;                           // progress bar
     
     TCanvas* fExternalCanvas;                               // external canvas
 
-    Char_t fCurrentTable[256];                              // name of the current table
     TF1** fLEDFitFunctions;                                 // fit functions for the LED setting
     TGraph** fLEDGraphs;                                    // graph for the LED setting
     UInt_t fNLEDCalibSets;                                  // number of LED calibration values per channel
@@ -142,7 +127,7 @@ private:
     void SetBlockValues(UInt_t block, Double_t value);
     void SetRingValues(UInt_t ring, Double_t value);
     void CreateExternalCanvas(UInt_t n);
-    Bool_t CheckValueLimits(EDB_TAPS_Table table, Double_t value);    
+    Bool_t CheckValueLimits(Int_t tableIndex, Double_t value);    
 
 public:
     TMHWConfigModule() : TMModule() { }
@@ -155,6 +140,7 @@ public:
     void LEDRangeChanged(Int_t id);
     void WriteTable();
     void WriteHVToHardware();
+    void ReadHVFromHardware();
     void MarkChanges();
     void SelectFile(Int_t ftype);
     void ShowLEDCalibration();

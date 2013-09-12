@@ -27,7 +27,6 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     Char_t aName[256];
     
     // initialize members   
-    fCurrentTable[0] = '\0';
     fLEDFitFunctions = 0;
     fLEDGraphs = 0;
     fNLEDCalibSets = 0;
@@ -50,7 +49,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fTableCombo->Connect("Selected(Int_t)", "TMHWConfigModule", this, "ReadTable(Int_t)");
     fTableCombo->Resize(200, 22);
     
-    // create a list of all parameter data types and fill combo box
+    // create a list of all parameter data types and fill combo box (including first dummy entry)
     TList* lt = TTMySQLManager::GetManager()->GetDataTypes();
     fParTypes = new TList();
     Int_t npar = 0;
@@ -345,7 +344,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
 
     // ------------------------------ Main control buttons ------------------------------
     fButtonsFrame = new TGCompositeFrame(fControlFrame);
-    fButtonsFrame->SetLayoutManager(new TGTableLayout(fButtonsFrame, 1, 3));
+    fButtonsFrame->SetLayoutManager(new TGTableLayout(fButtonsFrame, 1, 4));
     
     fWriteDBButton = new TGTextButton(fButtonsFrame, "Write to DB");
     fWriteDBButton->SetTopMargin(15);
@@ -366,6 +365,16 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fButtonsFrame->AddFrame(fWriteHWButton,
                             new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
 
+    fReadHWButton = new TGTextButton(fButtonsFrame, "Read from HW");
+    fReadHWButton->SetEnabled(kFALSE);
+    fReadHWButton->SetTopMargin(15);
+    fReadHWButton->SetBottomMargin(15);
+    fReadHWButton->SetRightMargin(15);
+    fReadHWButton->SetLeftMargin(15);
+    fReadHWButton->Connect("Clicked()", "TMHWConfigModule", this, "ReadHVFromHardware()");
+    fButtonsFrame->AddFrame(fReadHWButton,
+                            new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
+
     fQuitButton = new TGTextButton(fButtonsFrame, "Quit Module");
     fQuitButton->SetTopMargin(15);
     fQuitButton->SetBottomMargin(15);
@@ -373,7 +382,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fQuitButton->SetLeftMargin(15);
     fQuitButton->Connect("Clicked()", "TMHWConfigModule", this, "Finished()");
     fButtonsFrame->AddFrame(fQuitButton,
-                            new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
+                            new TGTableLayoutHints(3, 4, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
 
     // add buttons frame to control frame
     fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
@@ -547,7 +556,7 @@ void TMHWConfigModule::Init()
     fSettingsTab->SetTab(0, kFALSE);
 
     // select default entry in combos
-    fTableCombo->Select(kDB_Table_Empty, kTRUE);
+    fTableCombo->Select(0, kTRUE);
     fRangeManipCombo->Select(kRange_All_Elements, kFALSE);
     fLEDRangeCombo->Select(kRange_Single_Element, kFALSE);
     
@@ -680,7 +689,7 @@ void TMHWConfigModule::ImportFile()
 {
     // Import values from the specified file.
     
-    Char_t line[256];
+    Char_t tmp[256];
 
     Int_t id;
     Float_t value;
@@ -688,30 +697,34 @@ void TMHWConfigModule::ImportFile()
     // get the selected file name
     const Char_t* filename = fImportFileEntry->GetText();
 
-    // get the selected table
+    // leave if the dummy entry in the combo was selected
     Int_t table = fTableCombo->GetSelected();
-    
+    if (table == 0) return;
+  
     // leave if import file entry is empty
     if (!strcmp(filename, "")) return;
 
-    // leave if no table is selected
-    if (table == kDB_Table_Empty) return;
-
-    // open the file
+    // try to open the file
     FILE* fin;
     fin = fopen(filename, "r");
- 
+    if (!fin)
+    {
+        sprintf(tmp, "Could not open the file '%s'!", filename);
+        ModuleError(tmp);
+        return;
+    }
+
     // read file and set values
     while (!feof(fin))
     {
-        if (!fgets(line, 256, fin) && !feof(fin)) Error("ImportFile", "File read error!");
+        if (!fgets(tmp, 256, fin) && !feof(fin)) Error("ImportFile", "File read error!");
 
         // check if line is a comment
-        if (TMUtils::IsComment(line)) continue;
+        if (TMUtils::IsComment(tmp)) continue;
 
-        if (sscanf(line, "%d%f", &id, &value) == 2)
+        if (sscanf(tmp, "%d%f", &id, &value) == 2)
         {
-            if (CheckValueLimits((EDB_TAPS_Table)table, value)) fElementNewValue[id-1]->SetNumber(value);
+            if (CheckValueLimits(table, value)) fElementNewValue[id-1]->SetNumber(value);
         }
     }
 
@@ -727,7 +740,7 @@ void TMHWConfigModule::DoGainMatch()
 {
     // Perform gain match: calculate the new HV values.
     
-    Char_t line[256];
+    Char_t tmp[256];
     
     Int_t id;
     Float_t ped, peak, cosm_gain;
@@ -740,25 +753,39 @@ void TMHWConfigModule::DoGainMatch()
 
     // leave if import file entry is empty
     if (!strcmp(filename, "")) return;
+    
+    // get selected data type
+    Int_t table = fTableCombo->GetSelected();
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+    
+    // get minimum and maximum values
+    Double_t min = dataType->GetMin();
+    Double_t max = dataType->GetMax();
 
     // read range/resolution
     range = fGMRangeEntry->GetNumber();
     res = fGMResEntry->GetNumber();
 
-    // open the file
+    // try to open the file
     FILE* fin;
     fin = fopen(filename, "r");
+    if (!fin)
+    {
+        sprintf(tmp, "Could not open the file '%s'!", filename);
+        ModuleError(tmp);
+        return;
+    }
  
     // read file and set values
     while (!feof(fin))
     {
-        if (!fgets(line, 256, fin) && !feof(fin)) Error("DoGainMatch", "File read error!");
+        if (!fgets(tmp, 256, fin) && !feof(fin)) Error("DoGainMatch", "File read error!");
 
         // check if line is a comment
-        if (TMUtils::IsComment(line)) continue;
+        if (TMUtils::IsComment(tmp)) continue;
         
         // read id, pedestal pos., cosmic peak pos. and gain
-        if (sscanf(line, "%d%f%f%f", &id, &ped, &peak, &cosm_gain) == 4)
+        if (sscanf(tmp, "%d%f%f%f", &id, &ped, &peak, &cosm_gain) == 4)
         {	
             // skip bad calibration
             if (ped == 0 && peak == 0) continue;
@@ -779,9 +806,9 @@ void TMHWConfigModule::DoGainMatch()
             if (hv_new < 0) hv_new = hv_old;
 
             // check limits and set new HV value
-            //if (hv_new < kDB_BaF2_HV_Min) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Min);      // update
-            //else if (hv_new > kDB_BaF2_HV_Max) fElementNewValue[id-1]->SetNumber((Int_t)kDB_BaF2_HV_Max); // update
-            //else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);                                        // update
+            if (hv_new < min) fElementNewValue[id-1]->SetNumber((Int_t)min);
+            else if (hv_new > max) fElementNewValue[id-1]->SetNumber((Int_t)max);
+            else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
         }
     }
 
@@ -797,28 +824,43 @@ void TMHWConfigModule::ExportFile()
 {
     // Export values into the specified file.
     
+    Char_t tmp[256];
+
+    // leave if the dummy entry in the combo was selected
+    Int_t table = fTableCombo->GetSelected();
+    if (table == 0) return;
+     
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+  
     // get the selected file name
     const Char_t* filename = fExportFileEntry->GetText();
 
     // leave if export file entry is empty
     if (!strcmp(filename, "")) return;
-
-    // open the file
+    
+    // try to open the file
     FILE* fout;
     fout = fopen(filename, "w");
-    
+    if (!fout)
+    {
+        sprintf(tmp, "Could not open the file '%s'!", filename);
+        ModuleError(tmp);
+        return;
+    }
+ 
     // write header
-    if (fExportColumn->IsOn()) fprintf(fout, "# TAPSMaintain value export\n");
+    if (fExportColumn->IsOn()) fprintf(fout, "# TAPSMaintain data export\n");
     else
     {
-        fprintf(fout, "# TAPSMaintain database table export\n");
-        fprintf(fout, "# Table: %s\n", fCurrentTable);
+        fprintf(fout, "# TAPSMaintain data export\n");
+        fprintf(fout, "# Data: %s\n", dataType->GetTitle());
     }
     fprintf(fout, "\n");
     fprintf(fout, "# ID    Value\n");
     
     // write current values to file
-    for (UInt_t i = 0; i < kMaxSize; i++)
+    for (Int_t i = 0; i < dataType->GetSize(); i++)
     {
         if (fExportColumn->IsOn()) fprintf(fout, "%3d    %d\n", i+1, (Int_t)fElementNewValue[i]->GetNumber());
         else fprintf(fout, "%3d    %s\n", i+1, fElementCurrentValue[i]->GetText()->Data());
@@ -830,7 +872,7 @@ void TMHWConfigModule::ExportFile()
     // show info message
     Char_t msg[256];
     if (fExportColumn->IsOn()) sprintf(msg, "New values were saved to '%s' .", filename);
-    else sprintf(msg, "Current values of table '%s' were saved to '%s' .", fCurrentTable, filename);
+    else sprintf(msg, "Current values of data '%s' were saved to '%s' .", dataType->GetTitle(), filename);
     ModuleInfo(msg);
 }
 
@@ -840,7 +882,7 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     // Add an additional file to the LED calibration. Regenerate and refit the
     // calibration graphs of every channel.
 
-    Char_t line[256];
+    Char_t tmp[256];
     Int_t id, voltageLED;
     Float_t thr;
     Double_t thresholds[kMaxSize];
@@ -867,19 +909,25 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         Int_t id;
         Float_t ped, peak, gain;
         
-        // open the energy calibration file
+        // try to open the energy calibration file
         fin = fopen(ecalfile, "r");
-    
+        if (!fin)
+        {
+            sprintf(tmp, "Could not open the energy calibration file '%s'!", ecalfile);
+            ModuleError(tmp);
+            return;
+        }
+ 
         // read voltages and threshold from file
         while (!feof(fin))
         {
-            if (!fgets(line, 256, fin) && !feof(fin)) Error("AddFileToLEDCalibration", "File read error!");
+            if (!fgets(tmp, 256, fin) && !feof(fin)) Error("AddFileToLEDCalibration", "File read error!");
 
             // check if line is a comment
-            if (TMUtils::IsComment(line)) continue;
+            if (TMUtils::IsComment(tmp)) continue;
         
             // read id, pedestal pos., cosmic peak pos. and gain
-            if (sscanf(line, "%d%f%f%f", &id, &ped, &peak, &gain) == 4)
+            if (sscanf(tmp, "%d%f%f%f", &id, &ped, &peak, &gain) == 4)
             {
                 energyCalibPed[id-1] = ped;
                 energyCalibGain[id-1] = gain;
@@ -887,9 +935,6 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         }
         fclose(fin);
     }
-    
-    // clear file input entry
-    fLEDCalibFileEntry->SetText("");
     
     // init arrays
     for (UInt_t i = 0; i < kMaxSize; i++)
@@ -900,17 +945,23 @@ void TMHWConfigModule::AddFileToLEDCalibration()
    
     // open the LED calibration file
     fin = fopen(filename, "r");
-    
+    if (!fin)
+    {
+        sprintf(tmp, "Could not open the LED calibration file '%s'!", filename);
+        ModuleError(tmp);
+        return;
+    }
+ 
     // read voltages and threshold from file
     while (!feof(fin))
     {
-        if (!fgets(line, 256, fin) && !feof(fin)) Error("AddFileToLEDCalibration", "File read error!");
+        if (!fgets(tmp, 256, fin) && !feof(fin)) Error("AddFileToLEDCalibration", "File read error!");
 
         // check if line is a comment
-        if (TMUtils::IsComment(line)) continue;
+        if (TMUtils::IsComment(tmp)) continue;
         
         // read id, LED threshold voltage and LED threshold channel
-        if (sscanf(line, "%d%d%f", &id, &voltageLED, &thr) == 3)
+        if (sscanf(tmp, "%d%d%f", &id, &voltageLED, &thr) == 3)
         {
             voltages[id-1] = (Double_t) voltageLED;
             thresholds[id-1] = (Double_t) thr;
@@ -918,6 +969,9 @@ void TMHWConfigModule::AddFileToLEDCalibration()
     }
     fclose(fin);
     
+    // clear file input entry
+    fLEDCalibFileEntry->SetText("");
+  
     // check if fit functions exist
     if (!fLEDFitFunctions)
     {
@@ -925,8 +979,8 @@ void TMHWConfigModule::AddFileToLEDCalibration()
         fLEDFitFunctions = new TF1*[kMaxSize];
         for (UInt_t i = 0; i < kMaxSize; i++)
         {
-            sprintf(line, "LED_fit_func_%i", i+1);
-            fLEDFitFunctions[i] = new TF1(line, "pol1", 0, 2000);
+            sprintf(tmp, "LED_fit_func_%i", i+1);
+            fLEDFitFunctions[i] = new TF1(tmp, "pol1", 0, 2000);
             fLEDFitFunctions[i]->SetLineColor(kRed);
         }
     }
@@ -981,8 +1035,8 @@ void TMHWConfigModule::AddFileToLEDCalibration()
             
             // fit new graph
             fLEDFitFunctions[i]->SetParameters(0, 0);
-            sprintf(line, "LED_fit_func_%d", i+1);
-            fLEDGraphs[i]->Fit(line, "Q");
+            sprintf(tmp, "LED_fit_func_%d", i+1);
+            fLEDGraphs[i]->Fit(tmp, "Q");
         }
         
         // increment LED data set counter
@@ -1004,6 +1058,14 @@ void TMHWConfigModule::SetLEDThresholds()
     
     // get requested value
     Double_t reqValue = fLEDThrEntry->GetNumber();
+    
+    // get selected data type
+    Int_t table = fTableCombo->GetSelected();
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+    
+    // get minimum and maximum values
+    Double_t min = dataType->GetMin();
+    Double_t max = dataType->GetMax();
 
     if (selectedLEDRange == kRange_Single_Element)
     {
@@ -1012,9 +1074,9 @@ void TMHWConfigModule::SetLEDThresholds()
         
         // check limits and set value 
         Int_t resValue = (Int_t)fLEDFitFunctions[id-1]->Eval(reqValue);
-        //if (resValue < kDB_BaF2_LED_Min) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Min);         // update
-        //else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[id-1]->SetNumber(kDB_BaF2_LED_Max);    // update
-        //else fElementNewValue[id-1]->SetNumber(resValue);                                             // update
+        if (resValue < min) fElementNewValue[id-1]->SetNumber(min);
+        else if (resValue > max) fElementNewValue[id-1]->SetNumber(max);
+        else fElementNewValue[id-1]->SetNumber(resValue);
     }
     else if (selectedLEDRange == kRange_All_Elements)
     {
@@ -1022,9 +1084,9 @@ void TMHWConfigModule::SetLEDThresholds()
         for (UInt_t i = 0; i < kMaxSize; i++)
         {
             Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-            //if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);        // update
-            //else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);   // update
-            //else fElementNewValue[i]->SetNumber(resValue);                                            // update
+            if (resValue < min) fElementNewValue[i]->SetNumber(min);
+            else if (resValue > max) fElementNewValue[i]->SetNumber(max);
+            else fElementNewValue[i]->SetNumber(resValue);
         }
     }
     else
@@ -1055,9 +1117,9 @@ void TMHWConfigModule::SetLEDThresholds()
             if (ring == TMUtils::GetRingNumber(i))
             {
                 Int_t resValue = (Int_t)fLEDFitFunctions[i]->Eval(reqValue);
-                //if (resValue < kDB_BaF2_LED_Min) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Min);        // update
-                //else if (resValue > kDB_BaF2_LED_Max) fElementNewValue[i]->SetNumber(kDB_BaF2_LED_Max);   // update
-                //else fElementNewValue[i]->SetNumber(resValue);                                            // update
+                if (resValue < min) fElementNewValue[i]->SetNumber(min);
+                else if (resValue > max) fElementNewValue[i]->SetNumber(max);
+                else fElementNewValue[i]->SetNumber(resValue);
             }
         }
     }
@@ -1217,7 +1279,7 @@ void TMHWConfigModule::SetBlockValues(UInt_t block, Double_t value)
     // Set values
     for (UInt_t i = blockRange[block-1][0]; i < blockRange[block-1][1]; i++) 
     {
-        if (CheckValueLimits((EDB_TAPS_Table)table, value)) fElementNewValue[i]->SetNumber(value);
+        if (CheckValueLimits(table, value)) fElementNewValue[i]->SetNumber(value);
     }
 }
 
@@ -1232,15 +1294,18 @@ void TMHWConfigModule::SetRingValues(UInt_t ring, Double_t value)
     
     // get the selected table
     Int_t table = fTableCombo->GetSelected();
- 
+    
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+  
     // loop over all elements and change value if element belongs to the
     // specified ring
-    for (UInt_t i = 0; i < kMaxSize; i++)
+    for (Int_t i = 0; i < dataType->GetSize(); i++)
     {
         // element belongs to specified ring -> change value
         if (ring == TMUtils::GetRingNumber(i))
         {
-            if (CheckValueLimits((EDB_TAPS_Table)table, value)) fElementNewValue[i]->SetNumber(value);
+            if (CheckValueLimits(table, value)) fElementNewValue[i]->SetNumber(value);
         }
     }
 }
@@ -1253,9 +1318,6 @@ void TMHWConfigModule::ClearValues()
     // clear title
     fTableTitle->SetText("Table: none");
     
-    // unset table name variable
-    fCurrentTable[0] = '\0';
-
     // clear values
     for (UInt_t i = 0; i < kMaxSize; i++)
     {   
@@ -1301,17 +1363,19 @@ void TMHWConfigModule::DoRangeManipulation()
     Int_t range = fRangeManipCombo->GetSelected();
     Double_t value = fRangeManipEntry->GetNumber();
     
-    // get the selected table
+    // leave if the dummy entry in the combo was selected
     Int_t table = fTableCombo->GetSelected();
- 
-    // leave if no table is selected
-    if (table == kDB_Table_Empty) return;
-
+    if (table == 0) return;
+    
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+  
+    // set values
     if (range == kRange_All_Elements) 
     {
         // check limits
-        if (CheckValueLimits((EDB_TAPS_Table)table, value)) 
-            for (UInt_t i = 0; i < kMaxSize; i++) fElementNewValue[i]->SetNumber(value);
+        if (CheckValueLimits(table, value)) 
+            for (Int_t i = 0; i < dataType->GetSize(); i++) fElementNewValue[i]->SetNumber(value);
     }
     else if (range == kRange_Block_A) SetBlockValues(1, value);
     else if (range == kRange_Block_B) SetBlockValues(2, value);
@@ -1335,78 +1399,17 @@ void TMHWConfigModule::DoRangeManipulation()
 }
 
 //______________________________________________________________________________
-Bool_t TMHWConfigModule::CheckValueLimits(EDB_TAPS_Table table, Double_t value)
+Bool_t TMHWConfigModule::CheckValueLimits(Int_t tableIndex, Double_t value)
 {
     // Check if the value 'value' lies within the limits of the accepted values
-    // for the table 'table'.
+    // for the table index 'tableIndex'.
     
-    /*
-    switch (table)
-    {
-        case kDB_Table_BaF2_HV:
-        {
-            if (value >= kDB_BaF2_HV_Min && value <= kDB_BaF2_HV_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_BaF2_CFD:
-        {
-            if (value >= kDB_BaF2_CFD_Min && value <= kDB_BaF2_CFD_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_BaF2_LED1:
-        {
-            if (value >= kDB_BaF2_LED_Min && value <= kDB_BaF2_LED_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_BaF2_LED2:
-        {
-            if (value >= kDB_BaF2_LED_Min && value <= kDB_BaF2_LED_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_Veto_LED:
-        {
-            if (value >= kDB_Veto_LED_Min && value <= kDB_Veto_LED_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_QAC_LG:
-        {
-            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_QAC_LGS:
-        {
-            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_QAC_SG:
-        {
-            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_QAC_SGS:
-        {
-            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_QAC_VETO:
-        {
-            if (value >= kDB_QAC_Ped_Min && value <= kDB_QAC_Ped_Max) return kTRUE;
-            else return kFALSE;
-        }
-        case kDB_Table_Empty:
-        {
-            return kFALSE;
-        }
-        default:
-        {
-            return kFALSE;
-        }
-    }
-    */
+    // get data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(tableIndex);
     
-    // update
-
-    return kTRUE;
+    // check value
+    if (value >= dataType->GetMin() && value <= dataType->GetMax()) return kTRUE;
+    else return kFALSE;
 }
 
 //______________________________________________________________________________
@@ -1422,6 +1425,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     {
         fRangeManipEntry->SetLimitValues(0., 0.);
         fWriteHWButton->SetEnabled(kFALSE);
+        fReadHWButton->SetEnabled(kFALSE);
         fSettingsTab->SetEnabled(3, kFALSE);
         fSettingsTab->SetEnabled(4, kFALSE);
         fSettingsTab->SetTab(0, kFALSE);
@@ -1437,6 +1441,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
         !strcmp(dataType->GetName(), "Par.PWO.HV"))
     {
         fWriteHWButton->SetEnabled(kTRUE);
+        fReadHWButton->SetEnabled(kTRUE);
         fSettingsTab->SetEnabled(3, kTRUE);
         fSettingsTab->SetEnabled(4, kFALSE);
     }
@@ -1449,6 +1454,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     else 
     {
         fWriteHWButton->SetEnabled(kFALSE);
+        fReadHWButton->SetEnabled(kFALSE);
         fSettingsTab->SetEnabled(3, kFALSE);
         fSettingsTab->SetEnabled(4, kFALSE);
     }
@@ -1463,7 +1469,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     if (!TTMySQLManager::GetManager())
     {
         fTableCombo->Select(0, kTRUE);
-        printf("ERROR: Could not connect to the database. Please check your settings!\n");
+        Error("ReadTable", "Could not connect to the database. Please check your settings!");
         return;
     }
   
@@ -1475,7 +1481,7 @@ void TMHWConfigModule::ReadTable(Int_t table)
     if (!TTMySQLManager::GetManager()->ReadParameters(dataType->GetName(), size, elem, par))
     {
         fTableCombo->Select(0, kTRUE);
-        printf("ERROR: Could not read values from the database. Please check your settings!\n");
+        Error("ReadTable", "Could not read values from the database. Please check your settings!");
         return;
     }
     
@@ -1510,7 +1516,7 @@ void TMHWConfigModule::WriteTable()
 {
     // Write the values back to the table in the database. 
     
-    // Leave if the dummy entry in the combo was selected
+    // leave if the dummy entry in the combo was selected
     Int_t table = fTableCombo->GetSelected();
     if (table == 0) return;
  
@@ -1525,7 +1531,7 @@ void TMHWConfigModule::WriteTable()
     if (!TTMySQLManager::GetManager())
     {
         fTableCombo->Select(0, kTRUE);
-        printf("ERROR: Could not connect to the database. Please check your settings!\n");
+        Error("WriteTable", "Could not connect to the database. Please check your settings!");
         return;
     }
  
@@ -1543,7 +1549,7 @@ void TMHWConfigModule::WriteTable()
     if (!TTMySQLManager::GetManager()->WriteParameters(dataType->GetName(), size, elem, par))
     {
         fTableCombo->Select(0, kTRUE);
-        printf("ERROR: Could not write values to the database. Please check your settings!\n");
+        Error("WriteTable", "Could not write values to the database. Please check your settings!");
         return;
     }
  
@@ -1554,35 +1560,22 @@ void TMHWConfigModule::WriteTable()
 //______________________________________________________________________________
 void TMHWConfigModule::WriteHVToHardware()
 {
-    // Write the current values to the hardware HV crate. 
+    // Write the current values to the hardware HV mainframe. 
     
-    // Leave if the dummy entry in the combo was selected
+    Char_t tmp[256];
+
+    // leave if the dummy entry in the combo was selected
     Int_t table = fTableCombo->GetSelected();
     if (table == 0) return;
      
-    // get selected data type
-    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
-
-    // loop over elements
-    for (Int_t i = 0; i < dataType->GetSize(); i++) 
+    // check HV connection
+    if (!TTServerManager::GetManager()->IsConnectedToHV())
     {
-        if (!TTServerManager::GetManager()->WriteHV(dataType, i))
-        {
-            Error("WriteHVToHardware", "Could not write high voltage of element %d!", i);
-        }
+        ModuleError("No connection to HV server!");
+        Error("WriteHVToHardware", "No connection to HV server!");
+        return;
     }
     
-    /*
-    // check value range 0..2000 V
-    for (UInt_t i = 0; i < kMaxSize; i++)
-    {
-        Double_t val = atof(fElementCurrentValue[i]->GetText()->Data());
-        if (val < 0 || val > 2000) return;
-    }
-
-    // ask user to start HVServer
-    ModuleInfo("Please check that '/taps/HVServer' is running on vme-9! Otherwise the values will not be uploaded!");
-
     // ask user for confirmation
     ModuleQuestion("Are you sure you want to write the current values\nsaved in the database to the hardware?");
     if (GetDialogReturnValue() == kMBNo) return;
@@ -1590,35 +1583,96 @@ void TMHWConfigModule::WriteHVToHardware()
     // ask user for confirmation a second time
     ModuleQuestion("Are you REALLY sure?");
     if (GetDialogReturnValue() == kMBNo) return;
+ 
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
     
     // format progress bar
-    fProgressBar->ShowPosition(kTRUE, kFALSE, "Uploading channel %.0f");
+    fProgressBar->SetMax(dataType->GetSize());
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing channel %.0f");
 
-    // write all values
-    for (UInt_t i = 0; i < kMaxSize; i++)
+    // loop over elements
+    for (Int_t i = 0; i < dataType->GetSize(); i++) 
     {
-        Int_t val = atoi(fElementCurrentValue[i]->GetText()->Data());
-        //Set_BAF2_HV((char*)kTAPS_Server, i+1, val);
-
+        // write HV to hardware
+        if (!TTServerManager::GetManager()->WriteHV(dataType, i))
+        {
+            sprintf(tmp, "Could not write high voltage of element %d!", i);
+            ModuleError(tmp);
+            Error("WriteHVToHardware", "%s", tmp);
+        }
+        
+        // update GUI
         fProgressBar->SetPosition(i+1); 
         gSystem->ProcessEvents();
     }
     
     // reset progress bar
     fProgressBar->Reset();
- 
-    // OLD CODE:
-    // NOT USED AT THE MOMENT BECAUSE OF BAD STATUS MONITORING
-    // call BaF2 init method
-    //Init_BAF2_HV((char*)kTAPS_Server);
-    //ModuleInfo("The command for the initialization of the BaF2 HV was sent to the\n"
-    //           "TAPS hardware server. Please wait until all 544 elements were\n"
-    //           "initialized. This could take some time!");
     
     // re-format progress bar
     fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
 
-    ModuleInfo("Upload completed!");
-    */
+    ModuleInfo("Writing completed!");
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::ReadHVFromHardware()
+{
+    // Read the HV values from the mainfram to the current values. 
+    
+    Char_t tmp[256];
+    Int_t val;
+
+    // leave if the dummy entry in the combo was selected
+    Int_t table = fTableCombo->GetSelected();
+    if (table == 0) return;
+     
+    // check HV connection
+    if (!TTServerManager::GetManager()->IsConnectedToHV())
+    {
+        ModuleError("No connection to HV server!");
+        Error("ReadHVFromHardware", "No connection to HV server!");
+        return;
+    }
+    
+    // ask user for confirmation
+    ModuleQuestion("Are you sure you want to overwrite the new values\nwith the values from the HV hardware?");
+    if (GetDialogReturnValue() == kMBNo) return;
+    
+    // get selected data type
+    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
+    
+    // format progress bar
+    fProgressBar->SetMax(dataType->GetSize());
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Reading channel %.0f");
+
+    // loop over elements
+    for (Int_t i = 0; i < dataType->GetSize(); i++) 
+    {
+        // read HV from hardware
+        if (!TTServerManager::GetManager()->ReadHV(dataType, i, &val))
+        {
+            sprintf(tmp, "Could not read high voltage of element %d!", i);
+            ModuleError(tmp);
+            Error("ReadHVFromHardware", "%s", tmp);
+        }
+
+        // set value
+        fElementNewValue[i]->SetNumber((Double_t)val);
+        
+        // update GUI
+        fProgressBar->SetPosition(i+1); 
+        MarkChanges();
+        gSystem->ProcessEvents();
+    }
+    
+    // reset progress bar
+    fProgressBar->Reset();
+    
+    // re-format progress bar
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
+
+    ModuleInfo("Reading completed!");
 }
 

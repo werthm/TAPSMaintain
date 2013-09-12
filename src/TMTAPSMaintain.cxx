@@ -50,18 +50,18 @@ Int_t TMTAPSMaintain::Start()
     // check for window server
     if (!gClient) return -1;
     
-    printf("\nStarting up TAPSMaintain Version %s ...\n\n", kTAPSMaintainVersion);
+    Info("Start", "Starting up TAPSMaintain Version %s", kTAPSMaintainVersion);
 
     // set current directory
     strcpy(fCurrentDir, ".");
     
     // Load the GUI
     if (!fMainWindow) fMainWindow = new TMMainFrame(gClient->GetRoot(), this);
-    printf("GUI loaded.\n");
+    Info("Start", "GUI loaded.");
     
     // Load the module loader
     if (!fModuleLoader) fModuleLoader = new TMModuleLoader(1000);
-    printf("ModuleLoader loaded.\n");
+    Info("Start", "ModuleLoader loaded.");
     
     // connect the modules to the GUI
     TList* modules = fModuleLoader->GetModules();
@@ -108,11 +108,11 @@ Int_t TMTAPSMaintain::Start()
             m->Connect("ConfigDialogCancel()", "TMTAPSMaintain", this, "AbortModuleConfig()");
         }
         
-        printf("Module '%s' (ID %d) loaded.\n", name, id);
+        Info("Start", "Module '%s' (ID %d) loaded.", name, id);
     }
     
     fMainWindow->Show();
-    printf("\nReady!\n");
+    Info("Start", "Ready!");
     
     return 0;
 }
@@ -148,7 +148,7 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
     // check if an other module is active
     if (fActiveModule)
     {
-         printf("ERROR: Could not start module '%s' because module '%s' is still running!\n", 
+         Error("StartModule", "Could not start module '%s' because module '%s' is still running!", 
                 mod->GetName(), fActiveModule->GetName());
     }
     // check if needed ROOT was opened
@@ -160,7 +160,7 @@ void TMTAPSMaintain::StartModule(TMModule* mod)
     }
     else
     {
-        printf("Starting module '%s'\n", mod->GetName());
+        Info("StartModule", "Starting module '%s'", mod->GetName());
         
         // set ROOT file if necessary
         if (mod->NeedsRootInputFile()) mod->SetRootInputFile(fFile);
@@ -228,7 +228,7 @@ void TMTAPSMaintain::AbortModuleConfig()
     fActiveModule->GetConfigDialog()->UnmapWindow();
     fActiveModule->GetConfigDialog()->ReparentWindow(0);
     
-    printf("Aborting module '%s'\n", fActiveModule->GetName());
+    Info("AbortModuleConfig", "Aborting module '%s'", fActiveModule->GetName());
     
     // unset active modules
     fActiveModule = 0;
@@ -242,7 +242,7 @@ void TMTAPSMaintain::StopModule(Bool_t forced)
     
     if (!fActiveModule)
     {
-         printf("ERROR: Cannot stop module because no module is loaded!\n");
+         Error("StopModule", "Cannot stop module because no module is loaded!");
     }
     else
     {
@@ -258,7 +258,7 @@ void TMTAPSMaintain::StopModule(Bool_t forced)
             if (retval == kMBNo) return;
         }
         
-        printf("Stopping module '%s'\n", fActiveModule->GetName());
+        Info("StopModule", "Stopping module '%s'", fActiveModule->GetName());
         
         // unload frame
         fMainWindow->UnloadModuleFrame(fActiveModule->GetFrame());
@@ -342,7 +342,7 @@ Bool_t TMTAPSMaintain::OpenInputFile(const char* inFile)
         fFile = fileTest;
         
         fMainWindow->SetStatusBar(inFile, 0);
-        printf("Opened ROOT file '%s'.\n", inFile);
+        Info("OpenInputFile", "Opened ROOT file '%s'", inFile);
         return kTRUE;
     }
 }
@@ -355,7 +355,7 @@ void TMTAPSMaintain::SelectAndOpenFile()
     // check if a module is active
     if (fActiveModule)
     {
-        printf("ERROR: Cannot open a new ROOT file while a module is still active!\n");
+        Error("SelectAndOpenFile", "Cannot open a new ROOT file while a module is still active!");
         return;
     }
     
@@ -371,7 +371,8 @@ void TMTAPSMaintain::SelectAndOpenFile()
     // open the file if the user selected one
     if (fileInfo.fFilename)
     {
-        if (!OpenInputFile(fileInfo.fFilename)) printf("ERROR: Could not open ROOT input file '%s'!\n", fileInfo.fFilename);
+        if (!OpenInputFile(fileInfo.fFilename)) 
+            Error("SelectAndOpenFile", "Could not open ROOT input file '%s'!", fileInfo.fFilename);
     }
 
     // save current directory

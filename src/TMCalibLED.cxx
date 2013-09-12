@@ -334,7 +334,7 @@ void TMCalibLED::SaveResults(const Char_t* filename)
     
     fclose(fout);
     
-    printf("Saved results of module '%s' to file '%s'.\n", GetName(), filename);
+    Info("SaveResults", "Saved results of module '%s' to file '%s'", GetName(), filename);
 }
  
 //______________________________________________________________________________

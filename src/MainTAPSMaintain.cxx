@@ -31,8 +31,7 @@ int main(int argc, char* argv[])
     sprintf(tmp, "%s/config/config.rootrc", gSystem->Getenv("TAPSSC"));
     if (gEnv->ReadFile(tmp, kEnvLocal))
     {
-        printf("ERROR: Could not find configuration file!\n");
-        printf("Check the TAPSSC environment variable!\n");
+        Error("main", "Could not find configuration file - check the TAPSSC environment variable!");
         return -1;
     }
     
@@ -50,7 +49,7 @@ int main(int argc, char* argv[])
     // open ROOT file if specified
     if (argc == 2)
     {
-        if (!tm.OpenInputFile(argv[1])) printf("ERROR: Could not open ROOT input file '%s'!\n", argv[1]);
+        if (!tm.OpenInputFile(argv[1])) Error("main", "Could not open ROOT input file '%s'!", argv[1]);
     }
     
     app.Run();

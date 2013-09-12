@@ -197,7 +197,7 @@ void TMCheckSpectra::DrawSingleHistogram()
     {
         sprintf(name, "Spectrum '%s' was not found in ROOT file!", hName);
         //ModuleError(name);
-        printf("%s\n", name);
+        Error("DrawSingleHistogram", "%s", name);
     }
 }
 
@@ -310,7 +310,7 @@ void TMCheckSpectra::DrawMultipleHistograms()
         {
             sprintf(name, "Spectrum '%s' was not found in ROOT file!", hName);
             //ModuleError(name);
-            printf("%s\n", name);
+            Error("DrawMultipleHistograms", "%s", name);
         }
     }
     
@@ -358,7 +358,7 @@ void TMCheckSpectra::DrawPatternHistogram(Int_t id)
     {
         sprintf(name, "Spectrum '%s' was not found in ROOT file!", hName);
         //ModuleError(name);
-        printf("%s\n", name);
+        Error("DrawPatternHistogram", "%s", name);
     }
 }
 
