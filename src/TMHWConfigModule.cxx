@@ -335,16 +335,86 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     l->SetTextJustify(kTextLeft);
     fLEDFrame->AddFrame(l, new TGTableLayoutHints(0, 4, 8, 9, kLHintsFillX | kLHintsLeft, 15, 15, 15, 5));
     
-                       
+    // ------------------------------ HV ctrl frame ------------------------------
+    fHVCtrlFrame = fSettingsTab->AddTab("HV");
+    fHVCtrlFrame->SetLayoutManager(new TGTableLayout(fHVCtrlFrame, 3, 3));
+    
+    fHVReadButton = new TGTextButton(fHVCtrlFrame, "Read HV status");
+    fHVReadButton->SetTopMargin(15);
+    fHVReadButton->SetBottomMargin(15);
+    fHVReadButton->SetRightMargin(15);
+    fHVReadButton->SetLeftMargin(15);
+    fHVReadButton->Connect("Clicked()", "TMHWConfigModule", this, "ReadHVStatus()");
+    fHVCtrlFrame->AddFrame(fHVReadButton, 
+                           new TGTableLayoutHints(0, 1, 0, 1, kLHintsFillX, 20, 5, 20, 5));
+    
+    fHVToggleButton[0] = new TGTextButton(fHVCtrlFrame, "Turn off M1");
+    fHVToggleButton[0]->SetTopMargin(15);
+    fHVToggleButton[0]->SetBottomMargin(15);
+    fHVToggleButton[0]->SetRightMargin(15);
+    fHVToggleButton[0]->SetLeftMargin(15);
+    fHVToggleButton[0]->SetText("Status unknown");
+    fHVToggleButton[0]->SetState(kButtonUp);
+    fHVToggleButton[0]->SetEnabled(kFALSE);
+    fHVToggleButton[0]->Connect("Clicked()", "TMHWConfigModule", this, "ChangeHVStatus(=0)");
+    fHVCtrlFrame->AddFrame(fHVToggleButton[0],  
+                           new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX | kLHintsFillY | kLHintsCenterX | kLHintsCenterY, 5, 5, 20, 5));
+
+    fHVToggleButton[1] = new TGTextButton(fHVCtrlFrame, "Turn off M2");
+    fHVToggleButton[1]->SetTopMargin(15);
+    fHVToggleButton[1]->SetBottomMargin(15);
+    fHVToggleButton[1]->SetRightMargin(15);
+    fHVToggleButton[1]->SetLeftMargin(15);
+    fHVToggleButton[1]->SetText("Status unknown");
+    fHVToggleButton[1]->SetState(kButtonUp);
+    fHVToggleButton[1]->SetEnabled(kFALSE);
+    fHVToggleButton[1]->Connect("Clicked()", "TMHWConfigModule", this, "ChangeHVStatus(=1)");
+    fHVCtrlFrame->AddFrame(fHVToggleButton[1], 
+                           new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsFillY | kLHintsCenterX | kLHintsCenterY, 5, 5, 20, 5));
+    
+    Pixel_t pixel;
+    gClient->GetColorByName("gray", pixel);
+    fHVToggleButton[0]->SetBackgroundColor(pixel);
+    fHVToggleButton[1]->SetBackgroundColor(pixel);
+
+    fWriteHWButton = new TGTextButton(fHVCtrlFrame, "Write to HW");
+    fWriteHWButton->SetTopMargin(15);
+    fWriteHWButton->SetBottomMargin(15);
+    fWriteHWButton->SetRightMargin(15);
+    fWriteHWButton->SetLeftMargin(15);
+    fWriteHWButton->Connect("Clicked()", "TMHWConfigModule", this, "WriteHVToHardware()");
+    fHVCtrlFrame->AddFrame(fWriteHWButton,
+                            new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX, 20, 5, 25, 5));
+
+    fReadHWButton = new TGTextButton(fHVCtrlFrame, "Read from HW");
+    fReadHWButton->SetTopMargin(15);
+    fReadHWButton->SetBottomMargin(15);
+    fReadHWButton->SetRightMargin(15);
+    fReadHWButton->SetLeftMargin(15);
+    fReadHWButton->Connect("Clicked()", "TMHWConfigModule", this, "ReadHVFromHardware()");
+    fHVCtrlFrame->AddFrame(fReadHWButton,
+                            new TGTableLayoutHints(0, 1, 2, 3, kLHintsFillX, 20, 5, 15, 5));
+
+
     // ------------------------------ End Tab ------------------------------
     fControlFrame->AddFrame(fSettingsTab,  new TGTableLayoutHints(0, 2, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
     fSettingsTab->SetEnabled(3, kFALSE);
     fSettingsTab->SetEnabled(4, kFALSE);
+    fSettingsTab->SetEnabled(5, kFALSE);
 
 
     // ------------------------------ Main control buttons ------------------------------
     fButtonsFrame = new TGCompositeFrame(fControlFrame);
-    fButtonsFrame->SetLayoutManager(new TGTableLayout(fButtonsFrame, 1, 4));
+    fButtonsFrame->SetLayoutManager(new TGHorizontalLayout(fButtonsFrame));
+    
+    fQuitButton = new TGTextButton(fButtonsFrame, "Quit Module");
+    fQuitButton->SetTopMargin(15);
+    fQuitButton->SetBottomMargin(15);
+    fQuitButton->SetRightMargin(15);
+    fQuitButton->SetLeftMargin(15);
+    fQuitButton->Connect("Clicked()", "TMHWConfigModule", this, "Finished()");
+    fButtonsFrame->AddFrame(fQuitButton,
+                            new TGLayoutHints(kLHintsRight, 5, 5, 5, 5));
     
     fWriteDBButton = new TGTextButton(fButtonsFrame, "Write to DB");
     fWriteDBButton->SetTopMargin(15);
@@ -353,39 +423,11 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fWriteDBButton->SetLeftMargin(15);
     fWriteDBButton->Connect("Clicked()", "TMHWConfigModule", this, "WriteTable()");
     fButtonsFrame->AddFrame(fWriteDBButton,
-                            new TGTableLayoutHints(0, 1, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
+                            new TGLayoutHints(kLHintsRight, 5, 0, 5, 5));
 
-    fWriteHWButton = new TGTextButton(fButtonsFrame, "Write to HW");
-    fWriteHWButton->SetEnabled(kFALSE);
-    fWriteHWButton->SetTopMargin(15);
-    fWriteHWButton->SetBottomMargin(15);
-    fWriteHWButton->SetRightMargin(15);
-    fWriteHWButton->SetLeftMargin(15);
-    fWriteHWButton->Connect("Clicked()", "TMHWConfigModule", this, "WriteHVToHardware()");
-    fButtonsFrame->AddFrame(fWriteHWButton,
-                            new TGTableLayoutHints(1, 2, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
-
-    fReadHWButton = new TGTextButton(fButtonsFrame, "Read from HW");
-    fReadHWButton->SetEnabled(kFALSE);
-    fReadHWButton->SetTopMargin(15);
-    fReadHWButton->SetBottomMargin(15);
-    fReadHWButton->SetRightMargin(15);
-    fReadHWButton->SetLeftMargin(15);
-    fReadHWButton->Connect("Clicked()", "TMHWConfigModule", this, "ReadHVFromHardware()");
-    fButtonsFrame->AddFrame(fReadHWButton,
-                            new TGTableLayoutHints(2, 3, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
-
-    fQuitButton = new TGTextButton(fButtonsFrame, "Quit Module");
-    fQuitButton->SetTopMargin(15);
-    fQuitButton->SetBottomMargin(15);
-    fQuitButton->SetRightMargin(15);
-    fQuitButton->SetLeftMargin(15);
-    fQuitButton->Connect("Clicked()", "TMHWConfigModule", this, "Finished()");
-    fButtonsFrame->AddFrame(fQuitButton,
-                            new TGTableLayoutHints(3, 4, 0, 1, kLHintsExpandX | kLHintsCenterX, 5, 5, 5, 5));
 
     // add buttons frame to control frame
-    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 2, 3, kLHintsFillX | kLHintsLeft, 5, 5, 15, 5));
+    fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 15, 5));
 
 
     // Progress bar
@@ -1424,10 +1466,9 @@ void TMHWConfigModule::ReadTable(Int_t table)
     if (table == 0) 
     {
         fRangeManipEntry->SetLimitValues(0., 0.);
-        fWriteHWButton->SetEnabled(kFALSE);
-        fReadHWButton->SetEnabled(kFALSE);
         fSettingsTab->SetEnabled(3, kFALSE);
         fSettingsTab->SetEnabled(4, kFALSE);
+        fSettingsTab->SetEnabled(5, kFALSE);
         fSettingsTab->SetTab(0, kFALSE);
         return;
     }
@@ -1440,10 +1481,9 @@ void TMHWConfigModule::ReadTable(Int_t table)
         !strcmp(dataType->GetName(), "Par.Veto.HV") || 
         !strcmp(dataType->GetName(), "Par.PWO.HV"))
     {
-        fWriteHWButton->SetEnabled(kTRUE);
-        fReadHWButton->SetEnabled(kTRUE);
         fSettingsTab->SetEnabled(3, kTRUE);
         fSettingsTab->SetEnabled(4, kFALSE);
+        fSettingsTab->SetEnabled(5, kTRUE);
     }
     else if (!strcmp(dataType->GetName(), "Par.BaF2.Thr.LED1") || 
              !strcmp(dataType->GetName(), "Par.BaF2.Thr.LED2"))
@@ -1453,10 +1493,9 @@ void TMHWConfigModule::ReadTable(Int_t table)
     }
     else 
     {
-        fWriteHWButton->SetEnabled(kFALSE);
-        fReadHWButton->SetEnabled(kFALSE);
         fSettingsTab->SetEnabled(3, kFALSE);
         fSettingsTab->SetEnabled(4, kFALSE);
+        fSettingsTab->SetEnabled(5, kFALSE);
     }
 
     // set standard tab
@@ -1577,19 +1616,15 @@ void TMHWConfigModule::WriteHVToHardware()
     }
     
     // ask user for confirmation
-    ModuleQuestion("Are you sure you want to write the current values\nsaved in the database to the hardware?");
+    ModuleQuestion("Are you REALLY sure you want to write the current values\nsaved in the database to the hardware?");
     if (GetDialogReturnValue() == kMBNo) return;
     
-    // ask user for confirmation a second time
-    ModuleQuestion("Are you REALLY sure?");
-    if (GetDialogReturnValue() == kMBNo) return;
- 
     // get selected data type
     TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
     
     // format progress bar
     fProgressBar->SetMax(dataType->GetSize());
-    fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing channel %.0f");
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Writing element %.0f");
 
     // loop over elements
     for (Int_t i = 0; i < dataType->GetSize(); i++) 
@@ -1619,7 +1654,7 @@ void TMHWConfigModule::WriteHVToHardware()
 //______________________________________________________________________________
 void TMHWConfigModule::ReadHVFromHardware()
 {
-    // Read the HV values from the mainfram to the current values. 
+    // Read the HV values from the mainframe to the current values. 
     
     Char_t tmp[256];
     Int_t val;
@@ -1637,7 +1672,7 @@ void TMHWConfigModule::ReadHVFromHardware()
     }
     
     // ask user for confirmation
-    ModuleQuestion("Are you sure you want to overwrite the new values\nwith the values from the HV hardware?");
+    ModuleQuestion("Are you REALLY sure you want to overwrite the new values\nwith the values from the HV hardware?");
     if (GetDialogReturnValue() == kMBNo) return;
     
     // get selected data type
@@ -1645,7 +1680,7 @@ void TMHWConfigModule::ReadHVFromHardware()
     
     // format progress bar
     fProgressBar->SetMax(dataType->GetSize());
-    fProgressBar->ShowPosition(kTRUE, kFALSE, "Reading channel %.0f");
+    fProgressBar->ShowPosition(kTRUE, kFALSE, "Reading element %.0f");
 
     // loop over elements
     for (Int_t i = 0; i < dataType->GetSize(); i++) 
@@ -1674,5 +1709,155 @@ void TMHWConfigModule::ReadHVFromHardware()
     fProgressBar->ShowPosition(kTRUE, kFALSE, "Nothing to do");
 
     ModuleInfo("Reading completed!");
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::ReadHVStatus()
+{
+    // Read the status of the HV mainframes. 
+    
+    Char_t tmp[256];
+    
+    // check HV connection
+    if (!TTServerManager::GetManager()->IsConnectedToHV())
+    {
+        ModuleError("No connection to HV server!");
+        Error("ReadHVStatus", "No connection to HV server!");
+        return;
+    }
+    
+    // lock read button
+    fHVReadButton->SetText("Reading...");
+    fHVReadButton->SetEnabled(kFALSE);
+    gSystem->ProcessEvents();
+    
+    // get colors
+    Pixel_t pixel_gray;
+    Pixel_t pixel_red;
+    Pixel_t pixel_green;
+    gClient->GetColorByName("gray", pixel_gray);
+    gClient->GetColorByName("red", pixel_red);
+    gClient->GetColorByName("green", pixel_green);
+     
+    // read HV status of mainframes
+    Bool_t status;
+    for (Int_t i = 0; i < 2; i++)
+    {
+        // try to read status and set-up GUI
+        if (!TTServerManager::GetManager()->GetStatusHV(i+1, &status))
+        {
+            fHVToggleButton[i]->SetText("Status unknown");
+            fHVToggleButton[i]->SetBackgroundColor(pixel_gray);
+            fHVToggleButton[i]->SetEnabled(kFALSE);
+            sprintf(tmp, "Could not read high voltage status of mainframe %d!", i+1);
+            ModuleError(tmp);
+            Error("ReadHVStatus", "%s", tmp);
+        }
+        else
+        {
+            if (status)
+            {
+                sprintf(tmp, "Turn off M%d", i+1);
+                fHVToggleButton[i]->SetText(tmp);
+                fHVToggleButton[i]->SetBackgroundColor(pixel_green);
+                fHVToggleButton[i]->SetEnabled(kTRUE);
+            }
+            else
+            {
+                sprintf(tmp, "Turn on M%d", i+1);
+                fHVToggleButton[i]->SetText(tmp);
+                fHVToggleButton[i]->SetBackgroundColor(pixel_red);
+                fHVToggleButton[i]->SetEnabled(kTRUE);
+            }
+        }
+
+        // update GUI
+        gSystem->ProcessEvents();
+    }
+
+    // release read button
+    fHVReadButton->SetText("Read HV status");
+    fHVReadButton->SetEnabled(kTRUE);
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::ChangeHVStatus(Int_t id)
+{
+    // Change the status of the HV mainframes. 
+    
+    Char_t tmp[256];
+    
+    // check HV connection
+    if (!TTServerManager::GetManager()->IsConnectedToHV())
+    {
+        ModuleError("No connection to HV server!");
+        Error("ChangeHVStatus", "No connection to HV server!");
+        return;
+    }
+    
+    // ask user for confirmation
+    ModuleQuestion("Are you REALLY sure you want to change the status of the\nhigh voltage mainframe?");
+    if (GetDialogReturnValue() == kMBNo) return;
+  
+    // lock read button
+    fHVToggleButton[id]->SetText("Changing...");
+    fHVToggleButton[id]->SetEnabled(kFALSE);
+    gSystem->ProcessEvents();
+    
+    // get colors
+    Pixel_t pixel_gray;
+    Pixel_t pixel_red;
+    Pixel_t pixel_green;
+    gClient->GetColorByName("gray", pixel_gray);
+    gClient->GetColorByName("red", pixel_red);
+    gClient->GetColorByName("green", pixel_green);
+     
+    // try to read HV status of mainframes
+    Bool_t status;
+    if (!TTServerManager::GetManager()->GetStatusHV(id+1, &status))
+    {
+        fHVToggleButton[id]->SetText("Status unknown");
+        fHVToggleButton[id]->SetBackgroundColor(pixel_gray);
+        fHVToggleButton[id]->SetEnabled(kFALSE);
+        sprintf(tmp, "Could not read high voltage status of mainframe %d!", id+1);
+        ModuleError(tmp);
+        Error("ChangeHVStatus", "%s", tmp);
+        return;
+    }
+    
+    // update GUI
+    gSystem->ProcessEvents();
+ 
+    // try to change HV status of mainframes
+    status = !status;
+    if (!TTServerManager::GetManager()->SetStatusHV(id+1, status))
+    {
+        fHVToggleButton[id]->SetText("Status unknown");
+        fHVToggleButton[id]->SetBackgroundColor(pixel_gray);
+        fHVToggleButton[id]->SetEnabled(kFALSE);
+        sprintf(tmp, "Could not set high voltage status of mainframe %d!", id+1);
+        ModuleError(tmp);
+        Error("ChangeHVStatus", "%s", tmp);
+        return;
+    }
+
+    // format GUI
+    if (status)
+    {
+        sprintf(tmp, "Turn off M%d", id+1);
+        fHVToggleButton[id]->SetText(tmp);
+        fHVToggleButton[id]->SetBackgroundColor(pixel_green);
+        fHVToggleButton[id]->SetEnabled(kTRUE);
+    }
+    else
+    {
+        sprintf(tmp, "Turn on M%d", id+1);
+        fHVToggleButton[id]->SetText(tmp);
+        fHVToggleButton[id]->SetBackgroundColor(pixel_red);
+        fHVToggleButton[id]->SetEnabled(kTRUE);
+    }
+
+    // update GUI
+    gSystem->ProcessEvents();
 }
 

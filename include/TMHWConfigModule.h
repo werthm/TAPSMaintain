@@ -112,10 +112,14 @@ private:
 
     TGCompositeFrame* fButtonsFrame;                        // horizontal frame for the main buttons
     TGTextButton* fWriteDBButton;                           // will write the values to the DB
-    TGTextButton* fWriteHWButton;                           // will write the values to the hardware
-    TGTextButton* fReadHWButton;                            // will read the values from the hardware
     TGTextButton* fQuitButton;                              // quit module button
 
+    TGCompositeFrame* fHVCtrlFrame;                         // frame for the HV control buttons
+    TGTextButton* fHVReadButton;                            // will read status of HV mainframes
+    TGTextButton* fHVToggleButton[2];                       // will change status of HV mainframe 1/2
+    TGTextButton* fWriteHWButton;                           // will write the values to the hardware
+    TGTextButton* fReadHWButton;                            // will read the values from the hardware
+     
     TGHProgressBar* fProgressBar;                           // progress bar
     
     TCanvas* fExternalCanvas;                               // external canvas
@@ -139,6 +143,8 @@ public:
     void ReadTable(Int_t table);
     void LEDRangeChanged(Int_t id);
     void WriteTable();
+    void ReadHVStatus();
+    void ChangeHVStatus(Int_t id);
     void WriteHVToHardware();
     void ReadHVFromHardware();
     void MarkChanges();
