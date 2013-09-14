@@ -425,6 +425,14 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
     fButtonsFrame->AddFrame(fWriteDBButton,
                             new TGLayoutHints(kLHintsRight, 5, 0, 5, 5));
 
+    fWriteADButton = new TGTextButton(fButtonsFrame, "Write AcquDAQ");
+    fWriteADButton->SetTopMargin(15);
+    fWriteADButton->SetBottomMargin(15);
+    fWriteADButton->SetRightMargin(15);
+    fWriteADButton->SetLeftMargin(15);
+    fWriteADButton->Connect("Clicked()", "TMHWConfigModule", this, "WriteADConfigs()");
+    fButtonsFrame->AddFrame(fWriteADButton,
+                            new TGLayoutHints(kLHintsRight, 5, 110, 5, 5));
 
     // add buttons frame to control frame
     fControlFrame->AddFrame(fButtonsFrame,  new TGTableLayoutHints(0, 2, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 15, 5));
@@ -1951,5 +1959,30 @@ void TMHWConfigModule::ChangeHVStatus(Int_t id)
 
     // update GUI
     gSystem->ProcessEvents();
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::WriteADConfigs()
+{
+    // Write the AcquDAQ configuration files.
+    
+    // lock button
+    fWriteADButton->SetText("Writing...");
+    fWriteADButton->SetEnabled(kFALSE);
+    gSystem->ProcessEvents();
+  
+    // write BaF2 config files
+    Bool_t ret = TTServerManager::GetManager()->WriteADConfigBaF2();
+
+    // release button
+    fWriteADButton->SetText("Write AcquDAQ");
+    fWriteADButton->SetEnabled(kTRUE);
+    
+    // inform user
+    if (ret)
+        ModuleInfo("BaF2 configuration files were successfully written!");
+    else 
+        ModuleError("An error occurred during the BaF2 configuration file writing!");
+
 }
 

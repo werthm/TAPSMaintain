@@ -112,6 +112,7 @@ private:
 
     TGCompositeFrame* fButtonsFrame;                        // horizontal frame for the main buttons
     TGTextButton* fWriteDBButton;                           // will write the values to the DB
+    TGTextButton* fWriteADButton;                           // will write AcquDAQ configuration files
     TGTextButton* fQuitButton;                              // quit module button
 
     TGCompositeFrame* fHVCtrlFrame;                         // frame for the HV control buttons
@@ -159,6 +160,7 @@ public:
     void AddFileToLEDCalibration();
     void HandleMouseWheel(Event_t* event);
     void ToggleHexFormat();
+    void WriteADConfigs();
     void DestroyExternalCanvas();
 
     virtual void Init();
