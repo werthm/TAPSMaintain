@@ -132,6 +132,9 @@ private:
     void SetRingValues(UInt_t ring, Double_t value);
     void CreateExternalCanvas(UInt_t n);
     Bool_t CheckValueLimits(Int_t tableIndex, Double_t value);    
+    void ClearValues();
+    void GainMatchBaF2(const Char_t* filename, Double_t min, Double_t max);
+    void GainMatchPWO(const Char_t* filename, Double_t min, Double_t max);
 
 public:
     TMHWConfigModule() : TMModule() { }
@@ -139,7 +142,6 @@ public:
     virtual ~TMHWConfigModule();
     
     void DoRangeManipulation();
-    void ClearValues();
     void ReadTable(Int_t table);
     void LEDRangeChanged(Int_t id);
     void WriteTable();

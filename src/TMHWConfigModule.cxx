@@ -187,7 +187,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
 
     
     // ------------------------------ Gain match frame ------------------------------
-    fGMFrame = fSettingsTab->AddTab("BaF2 gain match");
+    fGMFrame = fSettingsTab->AddTab("Gain match");
     fGMFrame->SetLayoutManager(new TGTableLayout(fGMFrame, 6, 4));
     
     l = new TGLabel(fGMFrame, "Calibration file:");
@@ -529,7 +529,7 @@ TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)
         
         // add element fram to table frame
         fTableFrame->AddFrame(fElementFrame[i], 
-                              new TGTableLayoutHints(0, 1, i, i+1, kLHintsExpandX, 10, 10, 10, 10));
+                              new TGTableLayoutHints(0, 1, i, i+1, kLHintsExpandX, 10, 10, 0, 0));
     }
     
     // frame to canvas
@@ -778,32 +778,17 @@ void TMHWConfigModule::ImportFile()
 }
 
 //______________________________________________________________________________
-void TMHWConfigModule::DoGainMatch()
+void TMHWConfigModule::GainMatchBaF2(const Char_t* filename, Double_t min, Double_t max)
 {
-    // Perform gain match: calculate the new HV values.
+    // Gain match method for BaF2 detectors.
     
     Char_t tmp[256];
-    
     Int_t id;
     Float_t ped, peak, cosm_gain;
     Double_t range, res;
     Double_t nom_gain, gain_bias;
     Double_t hv_old, hv_new;
    
-    // get the selected file name
-    const Char_t* filename = fGMCalibFileEntry->GetText();
-
-    // leave if import file entry is empty
-    if (!strcmp(filename, "")) return;
-    
-    // get selected data type
-    Int_t table = fTableCombo->GetSelected();
-    TTDataTypePar* dataType = (TTDataTypePar*) fParTypes->At(table);
-    
-    // get minimum and maximum values
-    Double_t min = dataType->GetMin();
-    Double_t max = dataType->GetMax();
-
     // read range/resolution
     range = fGMRangeEntry->GetNumber();
     res = fGMResEntry->GetNumber();
@@ -821,7 +806,7 @@ void TMHWConfigModule::DoGainMatch()
     // read file and set values
     while (!feof(fin))
     {
-        if (!fgets(tmp, 256, fin) && !feof(fin)) Error("DoGainMatch", "File read error!");
+        if (!fgets(tmp, 256, fin) && !feof(fin)) Error("GainMatchBaF2", "File read error!");
 
         // check if line is a comment
         if (TMUtils::IsComment(tmp)) continue;
@@ -859,6 +844,113 @@ void TMHWConfigModule::DoGainMatch()
 
     // check changes
     MarkChanges();
+}
+
+//______________________________________________________________________________
+void TMHWConfigModule::GainMatchPWO(const Char_t* filename, Double_t min, Double_t max)
+{
+    // Gain match method for PWO detectors.
+    // Author: Tigran Rostomyan, 2012
+    
+    Char_t line[256];
+    Int_t id;
+    Float_t ped, peak, cosm_gain;
+    Double_t hv_old, hv_new;
+    Double_t p0 = 5.21153;
+    Double_t p1 = 0.00396537;
+    Double_t p2 = TMath::Exp(p0);               // if ADC is at its correct position then Delta_HV=0
+    
+    // Broken PbWO4 crystals
+    const Int_t nBad = 6;
+    const Int_t bad[nBad] = { 9, 17, 18, 23, 33, 72 };
+   
+    // open the file
+    FILE* fin;
+    fin = fopen(filename, "r");
+ 
+    // read file and set values
+    while (!feof(fin))
+    {
+        if (!fgets(line, 256, fin) && !feof(fin)) Error("GainMatchPWO", "File read error!");
+
+        // check if line is a comment
+        if (TMUtils::IsComment(line)) continue;
+        
+        // read id, pedestal pos., cosmic peak pos. and gain
+        if (sscanf(line, "%d%f%f%f", &id, &ped, &peak, &cosm_gain) == 4)
+        {	
+            // skip bad values
+            if (ped == 0 && peak == 0) continue;
+            if (cosm_gain < 0) continue;
+            
+            // This happens when crystals 57-62 are missing, first correct by hand ped for 20 and 22
+            if (ped < 0) continue;
+            
+            // skip bad PbWO4 channels
+            Bool_t isBad = kFALSE;
+            for (Int_t i = 0; i < nBad; i++)
+            {
+                if (bad[i] == id) 
+                {
+                    isBad = kTRUE;
+                    break;
+                }
+            }
+            if (isBad) continue;
+
+            // read old HV value
+            hv_old = atof(fElementCurrentValue[id-1]->GetText()->Data());
+
+            // calculate new HV value
+            if (hv_old != 0)
+                hv_new = hv_old + (TMath::Log((kTAPS_MIP_Loss_PbWO4 / 0.25 - (peak - ped)) + p2) - p0) / p1;
+            else
+                hv_new = 0;
+      
+            // check limits and set new HV value
+            if (hv_new < min) fElementNewValue[id-1]->SetNumber((Int_t)min);
+            else if (hv_new > max) fElementNewValue[id-1]->SetNumber((Int_t)max);
+            else fElementNewValue[id-1]->SetNumber((Int_t)hv_new);
+        }
+    }
+
+    // close the file
+    fclose(fin); 
+
+    // check changes
+    MarkChanges();
+}
+ 
+//______________________________________________________________________________
+void TMHWConfigModule::DoGainMatch()
+{
+    // Gain match GUI handler method.
+    
+    // leave if the dummy entry in the combo was selected
+    Int_t table = fTableCombo->GetSelected();
+    if (table == 0) return;
+   
+    // get the selected file name
+    const Char_t* filename = fGMCalibFileEntry->GetText();
+
+    // leave if import file entry is empty
+    if (!strcmp(filename, "")) return;
+    
+    // get selected data type
+    TTDataTypePar* d = (TTDataTypePar*) fParTypes->At(table);
+   
+    // select gain match method
+    if (!strcmp(d->GetName(), "Par.BaF2.HV")) 
+        GainMatchBaF2(filename, d->GetMin(), d->GetMax());
+    else if (!strcmp(d->GetName(), "Par.PWO.HV")) 
+        GainMatchPWO(filename, d->GetMin(), d->GetMax());
+    else 
+    {
+        Char_t tmp[256];
+        sprintf(tmp, "Gain match method is not available for\nthe data type '%s'!", d->GetName());
+        ModuleError(tmp);
+        return;
+    }
 }
 
 //______________________________________________________________________________
