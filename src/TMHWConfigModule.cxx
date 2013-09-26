@@ -1972,17 +1972,21 @@ void TMHWConfigModule::WriteADConfigs()
     gSystem->ProcessEvents();
   
     // write BaF2 config files
-    Bool_t ret = TTServerManager::GetManager()->WriteADConfigBaF2();
+    Bool_t ret_baf2 = TTServerManager::GetManager()->WriteADConfigBaF2();
+
+    // write Veto config files
+    Bool_t ret_veto = TTServerManager::GetManager()->WriteADConfigVeto();
 
     // release button
     fWriteADButton->SetText("Write AcquDAQ");
     fWriteADButton->SetEnabled(kTRUE);
     
-    // inform user
-    if (ret)
-        ModuleInfo("BaF2 configuration files were successfully written!");
-    else 
-        ModuleError("An error occurred during the BaF2 configuration file writing!");
+    // inform user about BaF2
+    if (ret_baf2) ModuleInfo("BaF2 configuration files were successfully written!");
+    else ModuleError("An error occurred during the BaF2 configuration file writing!");
 
+    // inform user about Veto
+    if (ret_veto) ModuleInfo("Veto configuration files were successfully written!");
+    else ModuleError("An error occurred during the Veto configuration file writing!");
 }
 
