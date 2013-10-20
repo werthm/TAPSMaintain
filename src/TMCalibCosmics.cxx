@@ -50,7 +50,9 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fTypeCombo->Connect("Selected(Int_t)", "TMCalibCosmics", this, "UpdateDetectorType(Int_t)");
     fTypeCombo->Resize(200, 22);
     fTypeCombo->AddEntry("BaF2 LG", kCosmics_Calib_Type_BAF2_LG);
+    fTypeCombo->AddEntry("BaF2 LGS", kCosmics_Calib_Type_BAF2_LGS);
     fTypeCombo->AddEntry("BaF2 SG", kCosmics_Calib_Type_BAF2_SG);
+    fTypeCombo->AddEntry("BaF2 SGS", kCosmics_Calib_Type_BAF2_SGS);
     fTypeCombo->AddEntry("PbWO4 LG", kCosmics_Calib_Type_PBWO4_LG);
     fTypeCombo->AddEntry("Veto", kCosmics_Calib_Type_VETO);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
@@ -348,19 +350,33 @@ void TMCalibCosmics::UpdateDetectorType(Int_t id)
     
     if (id == kCosmics_Calib_Type_BAF2_LG)
     {
-        fHNameEntry->SetText("LG/baf2-LG-%03d");
+        fHNameEntry->SetText("BaF2_LG_%03d");
+        fCEndEntry->SetText("1000");
     }
-    if (id == kCosmics_Calib_Type_BAF2_SG)
+    else if (id == kCosmics_Calib_Type_BAF2_LGS)
     {
-        fHNameEntry->SetText("SG/baf2-SG-%03d");
+        fHNameEntry->SetText("BaF2_LGS_%03d");
+        fCEndEntry->SetText("2000");
     }
-    if (id == kCosmics_Calib_Type_PBWO4_LG)
+    else if (id == kCosmics_Calib_Type_BAF2_SG)
     {
-        fHNameEntry->SetText("PWO-LG/pwo-LG-%03d");
+        fHNameEntry->SetText("BaF2_SG_%03d");
+        fCEndEntry->SetText("500");
     }
-    if (id == kCosmics_Calib_Type_VETO)
+    else if (id == kCosmics_Calib_Type_BAF2_SGS)
     {
-        fHNameEntry->SetText("Veto-Q/veto-Q-%03d");
+        fHNameEntry->SetText("BaF2_SGS_%03d");
+        fCEndEntry->SetText("1000");
+    }
+    else if (id == kCosmics_Calib_Type_PBWO4_LG)
+    {
+        fHNameEntry->SetText("PWO_LG_%03d");
+        fCEndEntry->SetText("1000");
+    }
+    else if (id == kCosmics_Calib_Type_VETO)
+    {
+        fHNameEntry->SetText("Veto_%03d");
+        fCEndEntry->SetText("800");
     }
 }
 
@@ -372,7 +388,9 @@ void TMCalibCosmics::ReadConfig()
     // set detector id
     Int_t type = fTypeCombo->GetSelected();
     if (type == kCosmics_Calib_Type_BAF2_LG)       fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_BAF2_LGS) fDetID = kBaF2_Detector;
     else if (type == kCosmics_Calib_Type_BAF2_SG)  fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_BAF2_SGS) fDetID = kBaF2_Detector;
     else if (type == kCosmics_Calib_Type_PBWO4_LG) fDetID = kPbWO4_Detector;
     else if (type == kCosmics_Calib_Type_VETO)     fDetID = kVeto_Detector;
     

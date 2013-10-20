@@ -487,7 +487,8 @@ void TMCheckSpectra::Init()
         if (TMUtils::IndexOf(cname.Data(), "TH1") == 0 ||
             TMUtils::IndexOf(cname.Data(), "TH2") == 0)
         {
-            fSpList->AddEntry(StrDup(name), id++);
+            if (name.Contains("Pat"))
+                fSpList->AddEntry(StrDup(name), id++);
         }
     }
 

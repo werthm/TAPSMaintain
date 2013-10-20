@@ -43,8 +43,8 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fTypeCombo->Resize(200, 22);
     fTypeCombo->AddEntry("BaF2 LG LED 1", kLED_Calib_Type_LG_LED1);
     fTypeCombo->AddEntry("BaF2 LG LED 2", kLED_Calib_Type_LG_LED2);
-    fTypeCombo->AddEntry("BaF2 LG LED 1 (AcquRoot)", kLED_Calib_Type_LG_LED1_AR);
-    fTypeCombo->AddEntry("BaF2 LG LED 2 (AcquRoot)", kLED_Calib_Type_LG_LED2_AR);
+    fTypeCombo->AddEntry("BaF2 LGS LED 1", kLED_Calib_Type_LGS_LED1);
+    fTypeCombo->AddEntry("BaF2 LGS LED 2", kLED_Calib_Type_LGS_LED2);
     fTypeCombo->AddEntry("Manual", kLED_Calib_Type_MANUAL);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
     
@@ -386,29 +386,29 @@ void TMCalibLED::UpdateLEDType(Int_t id)
     
     if (id == kLED_Calib_Type_LG_LED1)
     {
-        fUncut->SetText("LG/baf2-LG-%03d");
-        fCut->SetText("LG_LED1/baf2-LG_LED1-%03d");
+        fUncut->SetText("BaF2_LG_%03d");
+        fCut->SetText("BaF2_LG_LED1_%03d");
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
     else if (id == kLED_Calib_Type_LG_LED2)
     {
-        fUncut->SetText("LG/baf2-LG-%03d");
-        fCut->SetText("LG_LED2/baf2-LG_LED2-%03d");
+        fUncut->SetText("BaF2_LG_%03d");
+        fCut->SetText("BaF2_LG_LED2_%03d");
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
-    else if (id == kLED_Calib_Type_LG_LED1_AR)
+    else if (id == kLED_Calib_Type_LGS_LED1)
     {
-        fUncut->SetText("Calib.TAPS.LG_%d");
-        fCut->SetText("Calib.TAPS.LG_LED1_%d");
+        fUncut->SetText("BaF2_LGS_%03d");
+        fCut->SetText("BaF2_LGS_LED1_%03d");
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
-    else if (id == kLED_Calib_Type_LG_LED2_AR)
+    else if (id == kLED_Calib_Type_LGS_LED2)
     {
-        fUncut->SetText("Calib.TAPS.LG_%d");
-        fCut->SetText("Calib.TAPS.LG_LED2_%d");
+        fUncut->SetText("BaF2_LGS_%03d");
+        fCut->SetText("BaF2_LGS_LED2_%03d");
         fUncut->SetEnabled(kFALSE);
         fCut->SetEnabled(kFALSE);
     }
@@ -430,8 +430,8 @@ void TMCalibLED::ReadConfig()
     Int_t type = fTypeCombo->GetSelected();
     if (type == kLED_Calib_Type_LG_LED1)         fDetID = kBaF2_Detector;
     else if (type == kLED_Calib_Type_LG_LED2)    fDetID = kBaF2_Detector;
-    else if (type == kLED_Calib_Type_LG_LED1_AR) fDetID = kBaF2_Detector;
-    else if (type == kLED_Calib_Type_LG_LED2_AR) fDetID = kBaF2_Detector;
+    else if (type == kLED_Calib_Type_LGS_LED1)   fDetID = kBaF2_Detector;
+    else if (type == kLED_Calib_Type_LGS_LED2)   fDetID = kBaF2_Detector;
     else if (type == kLED_Calib_Type_MANUAL)     fDetID = kBaF2_Detector;
     
     // copy histogram names
