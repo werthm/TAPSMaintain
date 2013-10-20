@@ -33,56 +33,32 @@
 enum {
     kSpec_Empty,
     kSpec_BaF2_LG,
+    kSpec_BaF2_LG_CFD,
     kSpec_BaF2_LG_LED1,
     kSpec_BaF2_LG_LED2,
-    kSpec_BaF2_LGbed,
-    kSpec_BaF2_LGnoP,
     kSpec_BaF2_LGS,
+    kSpec_BaF2_LGS_CFD,
+    kSpec_BaF2_LGS_LED1,
+    kSpec_BaF2_LGS_LED2,
     kSpec_BaF2_SG,
     kSpec_BaF2_SGS,  
-    kSpec_BaF2_TIME, 
-    kSpec_BaF2_T,
-    kSpec_BaF2_TDIFF,
-    kSpec_Veto_Q,
-    kSpec_Veto_QLED,
-    kSpec_Veto_T,
-    kSpec_T_DIFF_BAFVETO_single,
-    kSpec_PWO_LG,
-    kSpec_PWO_LG_TIME,
-    kSpec_PWO_LGS,
-    kSpec_PWO_TIME,
-    kSpec_PWO_TIME_MULT,
-    kSpec_PWO_VETO_LG,
-    kSpec_PWO_VETO_LGS,
-    kSpec_PWO_VETO_TIME
+    kSpec_Veto
 };
 
 
-static const Char_t specNames[24][64] = {
+static const Char_t specNames[12][64] = {
      {"nothing"},
-     {"LG/baf2-LG-%03d"},
-     {"LG_LED1/baf2-LG_LED1-%03d"},
-     {"LG_LED2/baf2-LG_LED2-%03d"},
-     {"LGbed/baf2-LGbed-%03d"},
-     {"LGnoP/baf2-LGnoP-%03d"},
-     {"LGS/baf2-LGS-%03d"},
-     {"SG/baf2-SG-%03d"},
-     {"SGS/baf2-SGS-%03d"},
-     {"TIME/baf2-TIME-%03d"},
-     {"T/baf2-T-%03d"},
-     {"TDIFF/baf2-TDIFF-%03d"},
-     {"Veto-Q/veto-Q-%03d"},
-     {"Veto-QLED/veto-QV-%03d"},
-     {"Veto-T/veto-T-%03d"},
-     {"T_DIFF_BAFVETO_single/t_DIFF_BAFVETO_single-%03d"},
-     {"PWO-LG/pwo-LG-%03d"},
-     {"PWO-LG-TIME/pwo-LG-TIME-%03d"},
-     {"PWO-LGS/pwo-LGS-%03d"},
-     {"PWO-TIME/pwo-TIME-%03d"},
-     {"PWO-TIME/pwo-TIME-MULT-%03d"},
-     {"PWO-VETO-LG/pwo-veto-LG-%03d"},
-     {"PWO-VETO-LGS/pwo-veto-LGS-%03d"},
-     {"PWO-VETO-TIME/pwo-veto-TIME-%03d"}
+     {"BaF2_LG_%03d"},
+     {"BaF2_LG_CFD_%03d"},
+     {"BaF2_LG_LED1_%03d"},
+     {"BaF2_LG_LED2_%03d"},
+     {"BaF2_LGS_%03d"},
+     {"BaF2_LGS_CFD_%03d"},
+     {"BaF2_LGS_LED1_%03d"},
+     {"BaF2_LGS_LED2_%03d"},
+     {"BaF2_SG_%03d"},
+     {"BaF2_SGS_%03d"},  
+     {"Veto_%03d"}
 };
 
 
