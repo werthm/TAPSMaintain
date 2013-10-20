@@ -7,12 +7,16 @@
 ##                                                                 ##
 ##                            Changelog                            ##
 ##                                                                 ##
+##                       (C) 2008-2013 by                          ##
+##      Dominik Werthmueller <dominik.werthmueller@unibas.ch>      ##
+##                                                                 ##
 #####################################################################
 
 
 0.3.0 : 
 * removed support for old slowcontrol system via libtcpip
-
+* added support for new AcquDAQ-based acquisition and TAPSsc
+  slowcontrol
 0.2.2 : Nov 11 2011
 * support for veto QAC pedestal database setting
 

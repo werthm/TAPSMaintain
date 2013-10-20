@@ -63,7 +63,9 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo->AddEntry("BaF2 LGS LED2", kSpec_BaF2_LGS_LED2);
     fSpectraCombo->AddEntry("BaF2 SG",       kSpec_BaF2_SG);
     fSpectraCombo->AddEntry("BaF2 SGS",      kSpec_BaF2_SGS);  
+    fSpectraCombo->AddEntry("BaF2 Time",     kSpec_BaF2_Time);  
     fSpectraCombo->AddEntry("Veto",          kSpec_Veto);
+    fSpectraCombo->AddEntry("Veto_Time",     kSpec_Veto_Time);
     fControlFrame->AddFrame(fSpectraCombo, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
     
     // add element selection type combo box
