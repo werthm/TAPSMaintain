@@ -43,8 +43,8 @@ vpath %.o  $(O)
 
 CCCOMP      = g++
 CCOMP       = gcc
-CXXFLAGS    = -O3 -g -Wall -fPIC $(ROOTCFLAGS) -I./$(I) -I$(TAPSSC)/include
-LDFLAGS     = -O3 -g $(ROOTLDFLAGS) -L$(TAPSSC)/lib -lTAPSsc
+CXXFLAGS    = -g -O3  -Wall -fPIC $(ROOTCFLAGS) -I./$(I) -I$(TAPSSC)/include
+LDFLAGS     = -g -O3  $(ROOTLDFLAGS)
 
 # ------------------------------------ targets ------------------------------------
 
@@ -64,7 +64,8 @@ $(B)/TAPSMaintain: $(LIB_TM) $(S)/MainTAPSMaintain.cxx
 	@echo
 	@echo "Building TAPSMaintain application ..."
 	@mkdir -p $(B)
-	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIB_TM) -o $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
+	@$(CCCOMP) $(CXXFLAGS) $(ROOTGLIBS) $(CURDIR)/$(LIB_TM) -L$(TAPSSC)/lib -lTAPSsc -o \
+        $(B)/TAPSMaintain $(S)/MainTAPSMaintain.cxx
 
 $(LIB_TM): $(OBJ)
 	@echo
