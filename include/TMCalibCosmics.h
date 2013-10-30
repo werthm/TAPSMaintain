@@ -33,8 +33,11 @@ enum {
     kCosmics_Calib_Type_BAF2_LGS,
     kCosmics_Calib_Type_BAF2_SG,
     kCosmics_Calib_Type_BAF2_SGS,
-    kCosmics_Calib_Type_PBWO4_LG,
-    kCosmics_Calib_Type_VETO
+    kCosmics_Calib_Type_VETO,
+    kCosmics_Calib_Type_PWO,
+    kCosmics_Calib_Type_PWO_S,
+    kCosmics_Calib_Type_PWO_VETO,
+    kCosmics_Calib_Type_PWO_VETO_S
 };
 
 

@@ -49,14 +49,16 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
     fTypeCombo = new TGComboBox(fConfigFrame);
     fTypeCombo->Connect("Selected(Int_t)", "TMCalibCosmics", this, "UpdateDetectorType(Int_t)");
     fTypeCombo->Resize(200, 22);
-    fTypeCombo->AddEntry("BaF2 LG", kCosmics_Calib_Type_BAF2_LG);
-    fTypeCombo->AddEntry("BaF2 LGS", kCosmics_Calib_Type_BAF2_LGS);
-    fTypeCombo->AddEntry("BaF2 SG", kCosmics_Calib_Type_BAF2_SG);
-    fTypeCombo->AddEntry("BaF2 SGS", kCosmics_Calib_Type_BAF2_SGS);
-    fTypeCombo->AddEntry("PbWO4 LG", kCosmics_Calib_Type_PBWO4_LG);
-    fTypeCombo->AddEntry("Veto", kCosmics_Calib_Type_VETO);
+    fTypeCombo->AddEntry("BaF2 LG",    kCosmics_Calib_Type_BAF2_LG);
+    fTypeCombo->AddEntry("BaF2 LGS",   kCosmics_Calib_Type_BAF2_LGS);
+    fTypeCombo->AddEntry("BaF2 SG",    kCosmics_Calib_Type_BAF2_SG);
+    fTypeCombo->AddEntry("BaF2 SGS",   kCosmics_Calib_Type_BAF2_SGS);
+    fTypeCombo->AddEntry("Veto",       kCosmics_Calib_Type_VETO);
+    fTypeCombo->AddEntry("PWO",        kCosmics_Calib_Type_PWO);
+    fTypeCombo->AddEntry("PWO S",      kCosmics_Calib_Type_PWO_S);
+    fTypeCombo->AddEntry("PWO Veto",   kCosmics_Calib_Type_PWO_VETO);
+    fTypeCombo->AddEntry("PWO Veto S", kCosmics_Calib_Type_PWO_VETO_S);
     fConfigFrame->AddFrame(fTypeCombo, new TGTableLayoutHints(1, 2, 0, 1, kLHintsFillX | kLHintsLeft, 5, 5, 2, 2));
-    
 
     // ADC histogram name
     l = new TGLabel(fConfigFrame, "Histogram name:");
@@ -156,9 +158,10 @@ void TMCalibCosmics::Redo()
     Double_t energyLoss = 0;
     
     // check detector type
-    if (fDetID == kBaF2_Detector)       energyLoss = kTAPS_MIP_Loss_BaF2;
-    else if (fDetID == kPbWO4_Detector) energyLoss = kTAPS_MIP_Loss_PbWO4;
-    else if (fDetID == kVeto_Detector)  energyLoss = kTAPS_MIP_Loss_Veto;
+    if (fDetID == kBaF2_Detector)            energyLoss = kTAPS_MIP_Loss_BaF2;
+    else if (fDetID == kVeto_Detector)       energyLoss = kTAPS_MIP_Loss_Veto;
+    else if (fDetID == kPbWO4_Detector)      energyLoss = kTAPS_MIP_Loss_PbWO4;
+    else if (fDetID == kPbWO4_Veto_Detector) energyLoss = kTAPS_MIP_Loss_Veto;
     
     Double_t gain = energyLoss / (peakPos - pedPos); 
     
@@ -282,9 +285,10 @@ void TMCalibCosmics::Process(Int_t index)
     Double_t energyLoss = 0;
     
     // check detector type
-    if (fDetID == kBaF2_Detector)       energyLoss = kTAPS_MIP_Loss_BaF2;
-    else if (fDetID == kPbWO4_Detector) energyLoss = kTAPS_MIP_Loss_PbWO4;
-    else if (fDetID == kVeto_Detector)  energyLoss = kTAPS_MIP_Loss_Veto;
+    if (fDetID == kBaF2_Detector)            energyLoss = kTAPS_MIP_Loss_BaF2;
+    else if (fDetID == kVeto_Detector)       energyLoss = kTAPS_MIP_Loss_Veto;
+    else if (fDetID == kPbWO4_Detector)      energyLoss = kTAPS_MIP_Loss_PbWO4;
+    else if (fDetID == kPbWO4_Veto_Detector) energyLoss = kTAPS_MIP_Loss_Veto;
     
     Double_t gain = energyLoss / (peakPos - pedPos); 
     
@@ -368,14 +372,29 @@ void TMCalibCosmics::UpdateDetectorType(Int_t id)
         fHNameEntry->SetText("BaF2_SGS_%03d");
         fCEndEntry->SetText("1000");
     }
-    else if (id == kCosmics_Calib_Type_PBWO4_LG)
-    {
-        fHNameEntry->SetText("PWO_LG_%03d");
-        fCEndEntry->SetText("1000");
-    }
     else if (id == kCosmics_Calib_Type_VETO)
     {
         fHNameEntry->SetText("Veto_%03d");
+        fCEndEntry->SetText("800");
+    }
+    else if (id == kCosmics_Calib_Type_PWO)
+    {
+        fHNameEntry->SetText("PWO_%03d");
+        fCEndEntry->SetText("1000");
+    }
+    else if (id == kCosmics_Calib_Type_PWO_S)
+    {
+        fHNameEntry->SetText("PWO_S_%03d");
+        fCEndEntry->SetText("1000");
+    }
+    else if (id == kCosmics_Calib_Type_PWO_VETO)
+    {
+        fHNameEntry->SetText("PWO_Veto_%03d");
+        fCEndEntry->SetText("800");
+    }
+    else if (id == kCosmics_Calib_Type_PWO_VETO_S)
+    {
+        fHNameEntry->SetText("PWO_Veto_S_%03d");
         fCEndEntry->SetText("800");
     }
 }
@@ -387,12 +406,15 @@ void TMCalibCosmics::ReadConfig()
     
     // set detector id
     Int_t type = fTypeCombo->GetSelected();
-    if (type == kCosmics_Calib_Type_BAF2_LG)       fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_BAF2_LGS) fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_BAF2_SG)  fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_BAF2_SGS) fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_PBWO4_LG) fDetID = kPbWO4_Detector;
-    else if (type == kCosmics_Calib_Type_VETO)     fDetID = kVeto_Detector;
+    if (type == kCosmics_Calib_Type_BAF2_LG)         fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_BAF2_LGS)   fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_BAF2_SG)    fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_BAF2_SGS)   fDetID = kBaF2_Detector;
+    else if (type == kCosmics_Calib_Type_VETO)       fDetID = kVeto_Detector;
+    else if (type == kCosmics_Calib_Type_PWO)        fDetID = kPbWO4_Detector;
+    else if (type == kCosmics_Calib_Type_PWO_S)      fDetID = kPbWO4_Detector;
+    else if (type == kCosmics_Calib_Type_PWO_VETO)   fDetID = kPbWO4_Veto_Detector;
+    else if (type == kCosmics_Calib_Type_PWO_VETO_S) fDetID = kPbWO4_Veto_Detector;
     
     // copy histogram name
     strcpy(fHName, fHNameEntry->GetText());

@@ -65,7 +65,13 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo->AddEntry("BaF2 SGS",      kSpec_BaF2_SGS);  
     fSpectraCombo->AddEntry("BaF2 Time",     kSpec_BaF2_Time);  
     fSpectraCombo->AddEntry("Veto",          kSpec_Veto);
-    fSpectraCombo->AddEntry("Veto_Time",     kSpec_Veto_Time);
+    fSpectraCombo->AddEntry("Veto Time",     kSpec_Veto_Time);
+    fSpectraCombo->AddEntry("PWO",           kSpec_PWO);
+    fSpectraCombo->AddEntry("PWO S",         kSpec_PWO_S);
+    fSpectraCombo->AddEntry("PWO Time",      kSpec_PWO_Time);
+    fSpectraCombo->AddEntry("PWO Veto",      kSpec_PWO_Veto);
+    fSpectraCombo->AddEntry("PWO Veto S",    kSpec_PWO_Veto_S);
+    fSpectraCombo->AddEntry("PWO Veto Time", kSpec_PWO_Veto_Time);
     fControlFrame->AddFrame(fSpectraCombo, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
     
     // add element selection type combo box
@@ -387,40 +393,34 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
     }
 
     // Set detector number entry limits
-    //if (id == kSpec_PWO_LG      ||
-    //    id == kSpec_PWO_LG_TIME ||
-    //    id == kSpec_PWO_LGS     ||
-    //    id == kSpec_PWO_TIME    ||
-    //    id == kSpec_PWO_TIME_MULT) 
-    //{
-    //    // limit element numbers
-    //    fElementNumberEntry->SetLimitValues(1, kPbWO4Size);
-    //    
-    //    // recreate element combo box
-    //    fElementCombo->RemoveAll();
-    //    fElementCombo->AddEntry("Single element", kRange_Single_Element);
-    //    fElementCombo->AddEntry("All elements", kRange_All_PWO_Elements);
-    //    fElementCombo->GetListBox()->Resize(150, 40);
-    //    fElementCombo->Select(kRange_Single_Element, kFALSE);
-    //    fElementNumberEntry->SetState(kTRUE);
-    //}
-    //else if (id == kSpec_PWO_VETO_LG  ||
-    //         id == kSpec_PWO_VETO_LGS ||
-    //         id == kSpec_PWO_VETO_TIME)
-    //{
-    //    // limit element numbers
-    //    fElementNumberEntry->SetLimitValues(1, kPWOVetoSize);
-    //    
-    //    // recreate element combo box
-    //    fElementCombo->RemoveAll();
-    //    fElementCombo->AddEntry("Single element", kRange_Single_Element);
-    //    fElementCombo->AddEntry("All elements", kRange_All_PWO_VETO_Elements);
-    //    fElementCombo->GetListBox()->Resize(150, 40);
-    //    fElementCombo->Select(kRange_Single_Element, kFALSE);
-    //    fElementNumberEntry->SetState(kTRUE);
-    //}
-    //else 
-    //{
+    if (id == kSpec_PWO || id == kSpec_PWO_S || id == kSpec_PWO_Time)
+    {
+        // limit element numbers
+        fElementNumberEntry->SetLimitValues(1, kPbWO4Size);
+        
+        // recreate element combo box
+        fElementCombo->RemoveAll();
+        fElementCombo->AddEntry("Single element", kRange_Single_Element);
+        fElementCombo->AddEntry("All elements", kRange_All_PWO_Elements);
+        fElementCombo->GetListBox()->Resize(150, 40);
+        fElementCombo->Select(kRange_Single_Element, kFALSE);
+        fElementNumberEntry->SetState(kTRUE);
+    }
+    else if (id == kSpec_PWO_Veto || id == kSpec_PWO_Veto_S || id == kSpec_PWO_Veto_Time)
+    {
+        // limit element numbers
+        fElementNumberEntry->SetLimitValues(1, kPWOVetoSize);
+        
+        // recreate element combo box
+        fElementCombo->RemoveAll();
+        fElementCombo->AddEntry("Single element", kRange_Single_Element);
+        fElementCombo->AddEntry("All elements", kRange_All_PWO_VETO_Elements);
+        fElementCombo->GetListBox()->Resize(150, 40);
+        fElementCombo->Select(kRange_Single_Element, kFALSE);
+        fElementNumberEntry->SetState(kTRUE);
+    }
+    else 
+    {
         // limit element numbers
         fElementNumberEntry->SetLimitValues(1, kBaF2Size);
     
@@ -436,7 +436,7 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
         fElementCombo->GetListBox()->Resize(150, 120);
         fElementCombo->Select(kRange_Single_Element, kFALSE);
         fElementNumberEntry->SetState(kTRUE);
-    //}
+    }
 
     DrawHistogram();
 }

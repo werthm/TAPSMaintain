@@ -47,7 +47,8 @@ enum ETAPSDetector
     kNo_Detector,
     kBaF2_Detector,
     kPbWO4_Detector,
-    kVeto_Detector    
+    kVeto_Detector,
+    kPbWO4_Veto_Detector    
 };
 typedef ETAPSDetector TAPSDetector_t;
 
