@@ -1,14 +1,17 @@
 TAPSMaintain
 ============
 
+TAPS maintenance software
+
 Installation
 ------------
 
 ### Dependencies
 * ROOT 5.34
+* TAPSsc
 
 ### Installation
-`make clean ; make; make install`
+* Compile and install the software using `make clean ; make; make install`
 
 Changelog
 ---------
