@@ -1,5 +1,3 @@
-// SVN Info: $Id: TMCalibCosmics.cxx 706 2010-12-16 22:29:49Z werthm $
-
 /*************************************************************************
  * Author: Dominik Werthmueller, 2011-2013
  *************************************************************************/
@@ -324,11 +322,11 @@ void TMCalibTDC::UpdateDetectorType(Int_t id)
     
     if (id == kTDC_Calib_Type_BAF2)
     {
-        fHNameEntry->SetText("TIME/baf2-TIME-%03d");
+        fHNameEntry->SetText("BaF2_Time_%03d");
     }
     if (id == kTDC_Calib_Type_VETO)
     {
-        fHNameEntry->SetText("Veto-T/veto-T-%03d");
+        fHNameEntry->SetText("Veto_Time_%03d");
     }
 }
 

@@ -1,5 +1,3 @@
-# SVN Info: $Id$
-
 #####################################################################
 ##                           TAPSMaintain                          ##
 ##                                                                 ##
@@ -20,7 +18,7 @@ O             = obj
 L             = lib
 B             = bin
 
-SRC           = $(wildcard $(S)/TM*.cxx) $(S)/Dict.cxx
+SRC           = $(wildcard $(S)/TM*.cxx) $(S)/G__TAPSMaintain.cxx
 INCD          = $(wildcard $(I)/TM*.h)
 INC           = $(notdir $(INCD))
 OBJD          = $(patsubst $(S)/%.cxx, $(O)/%.o, $(SRC))
@@ -74,7 +72,7 @@ $(LIB_TM): $(OBJ)
 	@rm -f $(L)/libTAPSMaintain.*
 	@$(CCCOMP) $(LDFLAGS) $(ROOTGLIBS) $(SOFLAGS_TM) $(OBJD) -o $(LIB_TM)
 
-$(S)/Dict.cxx: $(INC) $(I)/LinkDef.h 
+$(S)/G__TAPSMaintain.cxx: $(INC) $(I)/LinkDef.h 
 	@echo
 	@echo "Creating TAPSMaintain dictionary ..."
 	@rootcint -v -f $@ -c -I./$(I) -I$(TAPSSC)/include -p $(INC) $(I)/LinkDef.h
@@ -103,7 +101,7 @@ uninstall:
 	
 clean:
 	@echo "Cleaning TAPSMaintain distribution ..."
-	@rm -f $(S)/Dict.*
+	@rm -f $(S)/G__*
 	@rm -r -f $(L)
 	@rm -f -r $(O)
 	@rm -r -f $(B)
