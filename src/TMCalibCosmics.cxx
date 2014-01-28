@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2013
+ * Author: Dominik Werthmueller, 2008-2014
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -22,6 +22,14 @@ TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)
 {
     // Constructor.
     
+    // init members
+    fCStart = 0;
+    fCEnd = 0;
+    fPeakRange = 0;
+    fPeakLimMin = 0;
+    fPeakLimMax = 0;
+    fPeakWidthFac = 0;
+
     // set module result header
     SetResultHeader("# Results of the Cosmics Calibration module\n"
                     "# Format: element id, pedestal position, cosmic peak position, gain\n");
@@ -239,25 +247,26 @@ void TMCalibCosmics::Process(Int_t index)
     Double_t peakHeight = fHClone->GetBinContent(fHClone->GetMaximumBin());
     fHClone->GetXaxis()->SetRangeUser(pedPos, fCEnd);
     
-    fPeakFunc->SetRange(peakPos - 200, peakPos + 200);
+    fPeakFunc->SetRange(peakPos - fPeakRange, peakPos + fPeakRange);
     fPeakFunc->SetParameters(peakHeight, peakPos, 10);
     fHClone->Fit("PeakFunc", "RB0Q");
     
     // fit both
     if (fDetID == kPbWO4_Detector) 
     {
-        fTotalFunc->SetParameters(peakHeight, peakPos, 25, 8, -1.3e-2);
-        fTotalFunc->SetParLimits(0, 10, peakHeight);
-        fTotalFunc->SetParLimits(1, 100, 300);
-        fTotalFunc->SetParLimits(2, 10, 40);
+        if (peakPos < fPeakLimMin) peakPos = fPeakLimMin*1.1;
+        fTotalFunc->SetParameters(peakHeight, peakPos, 2.5*fPeakWidthFac, 8, -1.3e-2);
+        fTotalFunc->SetParLimits(0, 0.01, peakHeight*1.1);
+        fTotalFunc->SetParLimits(1, fPeakLimMin, fPeakLimMax);
+        fTotalFunc->SetParLimits(2, fPeakWidthFac, 4*fPeakWidthFac);
     }
     else 
     {
         fTotalFunc->SetParameters(fPeakFunc->GetParameter(0), fPeakFunc->GetParameter(1), fPeakFunc->GetParameter(2),
                               fBgFunc->GetParameter(0), fBgFunc->GetParameter(1));
         fTotalFunc->SetParLimits(0, 10, peakHeight);
-        fTotalFunc->SetParLimits(1, 100, 500);
-        fTotalFunc->SetParLimits(2, 10, 60);
+        fTotalFunc->SetParLimits(1, fPeakLimMin, fPeakLimMax);
+        fTotalFunc->SetParLimits(2, fPeakWidthFac, 6*fPeakWidthFac);
     }
     
     fTotalFunc->SetRange(pedPos + fCStart, fCEnd);
@@ -363,7 +372,7 @@ void TMCalibCosmics::UpdateDetectorType(Int_t id)
     else if (id == kCosmics_Calib_Type_BAF2_SG)
     {
         fHNameEntry->SetText("BaF2_SG_%03d");
-        fCEndEntry->SetText("500");
+        fCEndEntry->SetText("1000");
     }
     else if (id == kCosmics_Calib_Type_BAF2_SGS)
     {
@@ -383,7 +392,7 @@ void TMCalibCosmics::UpdateDetectorType(Int_t id)
     else if (id == kCosmics_Calib_Type_PWO_S)
     {
         fHNameEntry->SetText("PWO_S_%03d");
-        fCEndEntry->SetText("1000");
+        fCEndEntry->SetText("3500");
     }
     else if (id == kCosmics_Calib_Type_PWO_VETO)
     {
@@ -393,7 +402,7 @@ void TMCalibCosmics::UpdateDetectorType(Int_t id)
     else if (id == kCosmics_Calib_Type_PWO_VETO_S)
     {
         fHNameEntry->SetText("PWO_Veto_S_%03d");
-        fCEndEntry->SetText("800");
+        fCEndEntry->SetText("1500");
     }
 }
 
@@ -402,18 +411,81 @@ void TMCalibCosmics::ReadConfig()
 {
     // Read the configuration made by the user in the config dialog.
     
-    // set detector id
+    // configure fitting
     Int_t type = fTypeCombo->GetSelected();
-    if (type == kCosmics_Calib_Type_BAF2_LG)         fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_BAF2_LGS)   fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_BAF2_SG)    fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_BAF2_SGS)   fDetID = kBaF2_Detector;
-    else if (type == kCosmics_Calib_Type_VETO)       fDetID = kVeto_Detector;
-    else if (type == kCosmics_Calib_Type_PWO)        fDetID = kPbWO4_Detector;
-    else if (type == kCosmics_Calib_Type_PWO_S)      fDetID = kPbWO4_Detector;
-    else if (type == kCosmics_Calib_Type_PWO_VETO)   fDetID = kPbWO4_Veto_Detector;
-    else if (type == kCosmics_Calib_Type_PWO_VETO_S) fDetID = kPbWO4_Veto_Detector;
-    
+    if (type == kCosmics_Calib_Type_BAF2_LG)
+    {
+        fDetID = kBaF2_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 500;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_BAF2_LGS)
+    {
+        fDetID = kBaF2_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 500;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_BAF2_SG)
+    {
+        fDetID = kBaF2_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 500;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_BAF2_SGS)
+    {
+        fDetID = kBaF2_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 500;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_VETO)
+    {
+        fDetID = kVeto_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 500;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_PWO)
+    {
+        fDetID = kPbWO4_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 300;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_PWO_S)
+    {
+        fDetID = kPbWO4_Detector;
+        fPeakRange = 700;
+        fPeakLimMin = 1200;
+        fPeakLimMax = 1900;
+        fPeakWidthFac = 100;
+    }
+    else if (type == kCosmics_Calib_Type_PWO_VETO)
+    {
+        fDetID = kPbWO4_Veto_Detector;
+        fPeakRange = 200;
+        fPeakLimMin = 100;
+        fPeakLimMax = 300;
+        fPeakWidthFac = 10;
+    }
+    else if (type == kCosmics_Calib_Type_PWO_VETO_S)
+    {
+        fDetID = kPbWO4_Veto_Detector;
+        fPeakRange = 700;
+        fPeakLimMin = 500;
+        fPeakLimMax = 1300;
+        fPeakWidthFac = 80;
+    }
+
     // copy histogram name
     strcpy(fHName, fHNameEntry->GetText());
     

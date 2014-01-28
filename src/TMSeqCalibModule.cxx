@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2013
+ * Author: Dominik Werthmueller, 2008-2014
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -109,6 +109,7 @@ Int_t TMSeqCalibModule::GetCurrentDetectorSize() const
 
     if (fDetID == kBaF2_Detector) return kBaF2Size;
     else if (fDetID == kPbWO4_Detector) return kPbWO4Size;
+    else if (fDetID == kPbWO4_Veto_Detector) return kPWOVetoSize;
     else if (fDetID == kVeto_Detector) return kVetoSize;
     else return 0;
 }

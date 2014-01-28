@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2013
+ * Author: Dominik Werthmueller, 2008-2014
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,11 @@ private:
     Char_t fHName[256];                         // name of the ADC spectra
     Double_t fCStart;                           // Cosmic peak fit start
     Double_t fCEnd;                             // Cosmic peak fit end
-    
+    Double_t fPeakRange;                        // +/- range of peak fitting
+    Double_t fPeakLimMin;                       // peak position minimum limit
+    Double_t fPeakLimMax;                       // peak position maximum limit
+    Double_t fPeakWidthFac;                     // peak width maximum factor
+
     TH1F* fHClone;                              // histogram pointer used for cloning
     TF1* fPedFunc;                              // function used for pedestal fitting
     TF1* fPeakFunc;                             // function used for cosmic peak fitting
