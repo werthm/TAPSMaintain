@@ -12,4 +12,4 @@ G__*.cxx
 G__*.h
 
 # binaries
-bin/*
+/bin/*
