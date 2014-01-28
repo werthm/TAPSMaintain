@@ -301,7 +301,7 @@ void TMTAPSMaintain::HandleMenu(Int_t id)
                "Version %s\n"
                "Compiled on %s\n"
                "Linked to TAPSsc %s and ROOT %s\n\n"
-               "(C) 2008-2013 by Dominik Werthmueller, University of Basel\n",
+               "(C) 2008-2014 by Dominik Werthmueller, University of Basel\n",
                kTAPSMaintainVersion, __DATE__, TTConfig::kTAPSscVersion, ROOT_RELEASE);
         
         new TGMsgBox(gClient->GetRoot(), fMainWindow, "About TAPSMaintain", cAbout, 
