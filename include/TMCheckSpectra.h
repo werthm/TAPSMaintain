@@ -48,15 +48,17 @@ enum {
     kSpec_PWO_S,
     kSpec_PWO_S_CFD,
     kSpec_PWO_Time,
+    kSpec_PWO_S_Time,
     kSpec_PWO_Veto,
     kSpec_PWO_Veto_CFD,
     kSpec_PWO_Veto_S,
     kSpec_PWO_Veto_S_CFD,
-    kSpec_PWO_Veto_Time
+    kSpec_PWO_Veto_Time,
+    kSpec_PWO_Veto_S_Time
 };
 
 
-static const Char_t specNames[24][64] = {
+static const Char_t specNames[26][64] = {
      {"nothing"},
      {"BaF2_LG_%03d"},
      {"BaF2_LG_CFD_%03d"},
@@ -76,11 +78,13 @@ static const Char_t specNames[24][64] = {
      {"PWO_S_%03d"},
      {"PWO_S_CFD_%03d"},
      {"PWO_Time_%03d"},
+     {"PWO_S_Time_%03d"},
      {"PWO_Veto_%03d"},
      {"PWO_Veto_CFD_%03d"},
      {"PWO_Veto_S_%03d"},
      {"PWO_Veto_S_CFD_%03d"},
-     {"PWO_Veto_Time_%03d"}
+     {"PWO_Veto_Time_%03d"},
+     {"PWO_Veto_S_Time_%03d"}
 };
 
 

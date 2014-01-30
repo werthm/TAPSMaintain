@@ -50,30 +50,32 @@ TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)
     fSpectraCombo = new TGComboBox(fControlFrame);
     fSpectraCombo->Resize(150, 22);
     fSpectraCombo->Connect("Selected(Int_t)", "TMCheckSpectra", this, "SpectraClassChanged(Int_t)");
-    fSpectraCombo->AddEntry("Select class",   kSpec_Empty);           
-    fSpectraCombo->AddEntry("BaF2 LG",        kSpec_BaF2_LG);
-    fSpectraCombo->AddEntry("BaF2 LG CFD",    kSpec_BaF2_LG_CFD);
-    fSpectraCombo->AddEntry("BaF2 LG LED1",   kSpec_BaF2_LG_LED1);
-    fSpectraCombo->AddEntry("BaF2 LG LED2",   kSpec_BaF2_LG_LED2);
-    fSpectraCombo->AddEntry("BaF2 LGS",       kSpec_BaF2_LGS);
-    fSpectraCombo->AddEntry("BaF2 LGS CFD",   kSpec_BaF2_LGS_CFD);
-    fSpectraCombo->AddEntry("BaF2 LGS LED1",  kSpec_BaF2_LGS_LED1);
-    fSpectraCombo->AddEntry("BaF2 LGS LED2",  kSpec_BaF2_LGS_LED2);
-    fSpectraCombo->AddEntry("BaF2 SG",        kSpec_BaF2_SG);
-    fSpectraCombo->AddEntry("BaF2 SGS",       kSpec_BaF2_SGS);  
-    fSpectraCombo->AddEntry("BaF2 Time",      kSpec_BaF2_Time);  
-    fSpectraCombo->AddEntry("Veto",           kSpec_Veto);
-    fSpectraCombo->AddEntry("Veto Time",      kSpec_Veto_Time);
-    fSpectraCombo->AddEntry("PWO",            kSpec_PWO);
-    fSpectraCombo->AddEntry("PWO CFD",        kSpec_PWO_CFD);
-    fSpectraCombo->AddEntry("PWO S",          kSpec_PWO_S);
-    fSpectraCombo->AddEntry("PWO S CFD",      kSpec_PWO_S_CFD);
-    fSpectraCombo->AddEntry("PWO Time",       kSpec_PWO_Time);
-    fSpectraCombo->AddEntry("PWO Veto",       kSpec_PWO_Veto);
-    fSpectraCombo->AddEntry("PWO Veto CFD",   kSpec_PWO_Veto_CFD);
-    fSpectraCombo->AddEntry("PWO Veto S",     kSpec_PWO_Veto_S);
-    fSpectraCombo->AddEntry("PWO Veto S CFD", kSpec_PWO_Veto_S_CFD);
-    fSpectraCombo->AddEntry("PWO Veto Time",  kSpec_PWO_Veto_Time);
+    fSpectraCombo->AddEntry("Select class",    kSpec_Empty);           
+    fSpectraCombo->AddEntry("BaF2 LG",         kSpec_BaF2_LG);
+    fSpectraCombo->AddEntry("BaF2 LG CFD",     kSpec_BaF2_LG_CFD);
+    fSpectraCombo->AddEntry("BaF2 LG LED1",    kSpec_BaF2_LG_LED1);
+    fSpectraCombo->AddEntry("BaF2 LG LED2",    kSpec_BaF2_LG_LED2);
+    fSpectraCombo->AddEntry("BaF2 LGS",        kSpec_BaF2_LGS);
+    fSpectraCombo->AddEntry("BaF2 LGS CFD",    kSpec_BaF2_LGS_CFD);
+    fSpectraCombo->AddEntry("BaF2 LGS LED1",   kSpec_BaF2_LGS_LED1);
+    fSpectraCombo->AddEntry("BaF2 LGS LED2",   kSpec_BaF2_LGS_LED2);
+    fSpectraCombo->AddEntry("BaF2 SG",         kSpec_BaF2_SG);
+    fSpectraCombo->AddEntry("BaF2 SGS",        kSpec_BaF2_SGS);  
+    fSpectraCombo->AddEntry("BaF2 Time",       kSpec_BaF2_Time);  
+    fSpectraCombo->AddEntry("Veto",            kSpec_Veto);
+    fSpectraCombo->AddEntry("Veto Time",       kSpec_Veto_Time);
+    fSpectraCombo->AddEntry("PWO",             kSpec_PWO);
+    fSpectraCombo->AddEntry("PWO CFD",         kSpec_PWO_CFD);
+    fSpectraCombo->AddEntry("PWO S",           kSpec_PWO_S);
+    fSpectraCombo->AddEntry("PWO S CFD",       kSpec_PWO_S_CFD);
+    fSpectraCombo->AddEntry("PWO Time",        kSpec_PWO_Time);
+    fSpectraCombo->AddEntry("PWO S Time",      kSpec_PWO_S_Time);
+    fSpectraCombo->AddEntry("PWO Veto",        kSpec_PWO_Veto);
+    fSpectraCombo->AddEntry("PWO Veto CFD",    kSpec_PWO_Veto_CFD);
+    fSpectraCombo->AddEntry("PWO Veto S",      kSpec_PWO_Veto_S);
+    fSpectraCombo->AddEntry("PWO Veto S CFD",  kSpec_PWO_Veto_S_CFD);
+    fSpectraCombo->AddEntry("PWO Veto Time",   kSpec_PWO_Veto_Time);
+    fSpectraCombo->AddEntry("PWO Veto S Time", kSpec_PWO_Veto_S_Time);
     fControlFrame->AddFrame(fSpectraCombo, new TGTableLayoutHints(0, 1, 1, 2, kLHintsFillX | kLHintsLeft, 5, 5, 5, 5));
     
     // add element selection type combo box
@@ -395,7 +397,7 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
     }
 
     // Set detector number entry limits
-    if (id == kSpec_PWO || id == kSpec_PWO_S || id == kSpec_PWO_Time ||
+    if (id == kSpec_PWO || id == kSpec_PWO_S || id == kSpec_PWO_Time || id == kSpec_PWO_S_Time ||
         id == kSpec_PWO_CFD || id == kSpec_PWO_S_CFD)
     {
         // limit element numbers
@@ -409,7 +411,7 @@ void TMCheckSpectra::SpectraClassChanged(Int_t id)
         fElementCombo->Select(kRange_Single_Element, kFALSE);
         fElementNumberEntry->SetState(kTRUE);
     }
-    else if (id == kSpec_PWO_Veto || id == kSpec_PWO_Veto_S || id == kSpec_PWO_Veto_Time || 
+    else if (id == kSpec_PWO_Veto || id == kSpec_PWO_Veto_S || id == kSpec_PWO_Veto_Time || id == kSpec_PWO_Veto_S_Time ||
              id == kSpec_PWO_Veto_CFD || id == kSpec_PWO_Veto_S_CFD)
     {
         // limit element numbers
