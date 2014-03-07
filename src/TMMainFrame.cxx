@@ -36,7 +36,7 @@ TMMainFrame::TMMainFrame()
 }
 
 //______________________________________________________________________________
-TMMainFrame::TMMainFrame(const TGWindow* p = 0, void* menuHandler = 0)
+TMMainFrame::TMMainFrame(const TGWindow* p, void* menuHandler)
     : TGMainFrame(p, 0, 0)
 {
     // Constructor.

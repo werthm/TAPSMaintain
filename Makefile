@@ -40,7 +40,6 @@ vpath %.o  $(O)
 # -------------------------------- Compile options --------------------------------
 
 CCCOMP      = g++
-CCOMP       = gcc
 CXXFLAGS    = -g -O3  -Wall -fPIC $(ROOTCFLAGS) -I./$(I) -I$(TAPSSC)/include
 LDFLAGS     = -g -O3  $(ROOTLDFLAGS)
 
