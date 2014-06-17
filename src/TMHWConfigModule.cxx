@@ -867,8 +867,8 @@ void TMHWConfigModule::GainMatchPWO(const Char_t* filename, Double_t min, Double
     Double_t p2 = TMath::Exp(p0);               // if ADC is at its correct position then Delta_HV=0
     
     // Broken PbWO4 crystals
-    const Int_t nBad = 6;
-    const Int_t bad[nBad] = { 9, 17, 18, 23, 33, 72 };
+    //const Int_t nBad = 6;
+    //const Int_t bad[nBad] = { 9, 17, 18, 23, 33, 72 };
    
     // open the file
     FILE* fin;
@@ -893,16 +893,16 @@ void TMHWConfigModule::GainMatchPWO(const Char_t* filename, Double_t min, Double
             if (ped < 0) continue;
             
             // skip bad PbWO4 channels
-            Bool_t isBad = kFALSE;
-            for (Int_t i = 0; i < nBad; i++)
-            {
-                if (bad[i] == id) 
-                {
-                    isBad = kTRUE;
-                    break;
-                }
-            }
-            if (isBad) continue;
+            //Bool_t isBad = kFALSE;
+            //for (Int_t i = 0; i < nBad; i++)
+            //{
+            //    if (bad[i] == id) 
+            //    {
+            //        isBad = kTRUE;
+            //        break;
+            //    }
+            //}
+            //if (isBad) continue;
 
             // read old HV value
             hv_old = atof(fElementCurrentValue[id-1]->GetText()->Data());
