@@ -15,18 +15,16 @@
 #define TAPSMaintain_TMCheckSpectra
 
 #include "RQ_OBJECT.h"
-#include "TH1.h"
-#include "TKey.h"
-#include "TGTableLayout.h"
+#include "TGListBox.h"
 #include "TGComboBox.h"
-#include "TGNumberEntry.h"
-#include "TRootEmbeddedCanvas.h"
-#include "TCanvas.h"
-#include "TStyle.h"
 
 #include "TMModule.h"
 #include "TMUtils.h"
 
+class TGNumberEntry;
+class TGListBox;
+class TCanvas;
+class TRootEmbeddedCanvas;
 
 enum {
     kSpec_Empty,
@@ -57,7 +55,6 @@ enum {
     kSpec_PWO_Veto_S_Time
 };
 
-
 static const Char_t specNames[26][64] = {
      {"nothing"},
      {"BaF2_LG_%03d"},
@@ -86,7 +83,6 @@ static const Char_t specNames[26][64] = {
      {"PWO_Veto_Time_%03d"},
      {"PWO_Veto_S_Time_%03d"}
 };
-
 
 class TMCheckSpectra : public TMModule
 {

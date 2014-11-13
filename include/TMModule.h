@@ -69,16 +69,14 @@
 #define TAPSMaintain_TMModule
 
 #include "TNamed.h"
-#include "TGFrame.h"
-#include "TGLabel.h"
-#include "TGWidget.h"
-#include "TFile.h"
+#include "TQObject.h"
 #include "TGFileDialog.h"
-#include "TGMsgBox.h"
-#include "TGButton.h"
 
-#include "TMConfig.h"
-
+class TFile;
+class TGCompositeFrame;
+class TGTransientFrame;
+class TGTextButton;
+class TGWindow;
 
 class TMModule : public TNamed, public TQObject
 {

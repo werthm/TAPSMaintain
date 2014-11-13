@@ -14,12 +14,7 @@
 #ifndef TAPSMaintain_TMUtils
 #define TAPSMaintain_TMUtils
 
-#ifndef ROOT_Rtypes
 #include "Rtypes.h"
-#endif
-
-#include <cstring>
-
 
 enum EElement_Selection {
     kRange_Single_Element,
@@ -44,7 +39,6 @@ enum EElement_Selection {
     kRange_Ring_10,
     kRange_Ring_11,
 };
-
 
 namespace TMUtils
 {

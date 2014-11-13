@@ -16,14 +16,13 @@
 #define TAPSMaintain_TMTAPSMaintain
 
 #include "RQ_OBJECT.h"
-#include "TApplication.h"
-#include "TGClient.h"
-#include "TFile.h"
-#include "TGFileDialog.h"
+#include "TObject.h"
+#include "TGMsgBox.h"
 
-#include "TMModuleLoader.h"
-#include "TMMainFrame.h"
-
+class TFile;
+class TMModuleLoader;
+class TMMainFrame;
+class TMModule;
 
 class TMTAPSMaintain : public TObject
 {

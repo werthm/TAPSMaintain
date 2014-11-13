@@ -12,12 +12,14 @@
 
 
 #include "TApplication.h"
+#include "TSystem.h"
+#include "TEnv.h"
+#include "TGFileDialog.h"
 
 #include "TTMySQLManager.h"
 #include "TTServerManager.h"
 
 #include "TMTAPSMaintain.h"
-
 
 //______________________________________________________________________________
 int main(int argc, char* argv[])

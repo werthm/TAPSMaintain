@@ -13,7 +13,6 @@
 
 #include "TMTAPSLogo.h"
 
-
 const UInt_t kTAPSLogo_width = 280;
 const UInt_t kTAPSLogo_height = 252;
 const Char_t* kTAPSLogo_data =

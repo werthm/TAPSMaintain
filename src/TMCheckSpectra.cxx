@@ -11,10 +11,20 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TStyle.h"
+#include "TGTableLayout.h"
+#include "TGNumberEntry.h"
+#include "TGLabel.h"
+#include "TRootEmbeddedCanvas.h"
+#include "TCanvas.h"
+#include "TFile.h"
+#include "TH1.h"
+#include "TKey.h"
+
 #include "TMCheckSpectra.h"
+#include "TMConfig.h"
 
 ClassImp(TMCheckSpectra)
-
 
 //______________________________________________________________________________
 TMCheckSpectra::TMCheckSpectra(const Char_t* name, UInt_t id)

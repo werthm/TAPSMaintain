@@ -17,10 +17,8 @@
 NamespaceImp(TMUtils)
 #endif
 
-
 // Declare namespace member
 Char_t* TMUtils::fTmpCh = 0;
-
 
 //______________________________________________________________________________
 Int_t TMUtils::IndexOf(const Char_t* s1, const Char_t* s2)

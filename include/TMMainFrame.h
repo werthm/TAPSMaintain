@@ -14,20 +14,15 @@
 #ifndef TAPSMaintain_TMMainFrame
 #define TAPSMaintain_TMMainFrame
 
-#include "TGToolBar.h"
-#include "TGMenu.h"
-#include "TGMsgBox.h"
-#include "TG3DLine.h"
 #include "TGFrame.h"
-#include "TASImage.h"
-#include "TGIcon.h"
-#include "TColor.h"
-#include "TGLabel.h"
 #include "TGStatusBar.h"
 
-#include "TMTAPSLogo.h"
-#include "TMConfig.h"
-
+class TGToolBar;
+class TGMenuBar;
+class TASImage;
+class TGIcon;
+class TGPopupMenu;
+class TGStatusBar;
 
 enum TMMainFrameActionEvents {
     kACTION_OPEN_ROOT_FILE,
@@ -35,7 +30,6 @@ enum TMMainFrameActionEvents {
     kACTION_MODULE_STOP,
     kACTION_HELP_ABOUT
 };
-
 
 class TMMainFrame : public TGMainFrame
 {

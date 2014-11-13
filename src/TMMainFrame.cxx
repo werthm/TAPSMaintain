@@ -11,10 +11,19 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TASImage.h"
+#include "TGMenu.h"
+#include "TGToolBar.h"
+#include "TG3DLine.h"
+#include "TColor.h"
+#include "TGLabel.h"
+#include "TGIcon.h"
+
 #include "TMMainFrame.h"
+#include "TMTAPSLogo.h"
+#include "TMConfig.h"
 
 ClassImp(TMMainFrame)
-
 
 //______________________________________________________________________________
 TMMainFrame::TMMainFrame()

@@ -27,7 +27,6 @@
 
 #ifndef __CINT__
 
-
 extern const UInt_t kTAPSLogo_width;
 extern const UInt_t kTAPSLogo_height;
 extern const Char_t* kTAPSLogo_data; 

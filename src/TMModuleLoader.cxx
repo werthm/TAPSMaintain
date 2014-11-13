@@ -11,10 +11,16 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TList.h"
+
 #include "TMModuleLoader.h"
+#include "TMCheckSpectra.h"
+#include "TMHWConfigModule.h"
+#include "TMCalibLED.h"
+#include "TMCalibTDC.h"
+#include "TMCalibCosmics.h"
 
 ClassImp(TMModuleLoader)
-
 
 //______________________________________________________________________________
 TMModuleLoader::TMModuleLoader()

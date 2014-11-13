@@ -16,7 +16,6 @@
 
 #include "Rtypes.h"
 
-
 // TAPSMaintain version
 extern const Char_t kTAPSMaintainVersion[];
 

@@ -12,10 +12,20 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TFile.h"
+#include "TGFileDialog.h"
+#include "TGMenu.h"
+#include "TApplication.h"
+
+#include "TTConfig.h"
+
 #include "TMTAPSMaintain.h"
+#include "TMMainFrame.h"
+#include "TMModuleLoader.h"
+#include "TMModule.h"
+#include "TMConfig.h"
 
 ClassImp(TMTAPSMaintain)
-
 
 //______________________________________________________________________________
 TMTAPSMaintain::TMTAPSMaintain()

@@ -21,10 +21,14 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TStyle.h"
+#include "TRootEmbeddedCanvas.h"
+#include "TGButton.h"
+#include "TGLabel.h"
+
 #include "TMSeqCalibModule.h"
 
 ClassImp(TMSeqCalibModule)
-
 
 //______________________________________________________________________________
 TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresults, Bool_t needsROOTInputFile, 

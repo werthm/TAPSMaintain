@@ -14,14 +14,9 @@
 #ifndef TAPSMaintain_TMModuleLoader
 #define TAPSMaintain_TMModuleLoader
 
-#include "TList.h"
+#include "TObject.h"
 
-#include "TMCheckSpectra.h"
-#include "TMHWConfigModule.h"
-#include "TMCalibCosmics.h"
-#include "TMCalibLED.h"
-#include "TMCalibTDC.h"
-
+class TMModule;
 
 class TMModuleLoader : public TObject
 {

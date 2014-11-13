@@ -14,18 +14,9 @@
 #ifndef TAPSMaintain_TMCalibLED
 #define TAPSMaintain_TMCalibLED
 
-#include <cstdlib>
-#include "TH1.h"
-#include "TText.h"
-#include "TLine.h"
-#include "TGTableLayout.h"
-#include "TGComboBox.h"
-#include "TGTextEntry.h"
-#include "TGNumberEntry.h"
-
 #include "TMSeqCalibModule.h"
-#include "TMUtils.h"
 
+class TGNumberEntry;
 
 enum {
     kLED_Calib_Type_LG_LED1,
@@ -34,7 +25,6 @@ enum {
     kLED_Calib_Type_LGS_LED2,
     kLED_Calib_Type_MANUAL
 };
-
 
 class TMCalibLED : public TMSeqCalibModule
 {

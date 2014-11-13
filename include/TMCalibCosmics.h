@@ -14,17 +14,10 @@
 #ifndef TAPSMaintain_TMCalibCosmics
 #define TAPSMaintain_TMCalibCosmics
 
-#include <cstdlib>
-#include "TH1.h"
-#include "TF1.h"
-#include "TGTableLayout.h"
-#include "TGComboBox.h"
-#include "TGTextEntry.h"
-#include "TLine.h"
-
 #include "TMSeqCalibModule.h"
-#include "TMUtils.h"
 
+class TF1;
+class TLine;
 
 enum {
     kCosmics_Calib_Type_BAF2_LG,
@@ -37,7 +30,6 @@ enum {
     kCosmics_Calib_Type_PWO_VETO,
     kCosmics_Calib_Type_PWO_VETO_S
 };
-
 
 class TMCalibCosmics : public TMSeqCalibModule
 {

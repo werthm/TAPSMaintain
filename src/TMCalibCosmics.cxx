@@ -11,10 +11,21 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include <cstdlib>
+
+#include "TF1.h"
+#include "TH1.h"
+#include "TGTableLayout.h"
+#include "TGLabel.h"
+#include "TGComboBox.h"
+#include "TGTextEntry.h"
+#include "TLine.h"
+#include "TFile.h"
+
 #include "TMCalibCosmics.h"
+#include "TMUtils.h"
 
 ClassImp(TMCalibCosmics)
-
 
 //______________________________________________________________________________
 TMCalibCosmics::TMCalibCosmics(const Char_t* name, UInt_t id)

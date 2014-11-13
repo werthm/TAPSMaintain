@@ -11,10 +11,21 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include "TF1.h"
+#include "TH1.h"
+#include "TLine.h"
+#include "TGraphErrors.h"
+#include "TGTableLayout.h"
+#include "TGComboBox.h"
+#include "TGTextEntry.h"
+#include "TGLabel.h"
+#include "TSystem.h"
+#include "TFile.h"
+#include "TMath.h"
+
 #include "TMCalibTDC.h"
 
 ClassImp(TMCalibTDC)
-
 
 //______________________________________________________________________________
 TMCalibTDC::TMCalibTDC(const Char_t* name, UInt_t id)

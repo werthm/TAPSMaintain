@@ -11,10 +11,22 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include <cstdlib>
+
+#include "TGTableLayout.h"
+#include "TGLabel.h"
+#include "TGComboBox.h"
+#include "TGTextEntry.h"
+#include "TGNumberEntry.h"
+#include "TH1.h"
+#include "TFile.h"
+#include "TText.h"
+#include "TLine.h"
+
 #include "TMCalibLED.h"
+#include "TMUtils.h"
 
 ClassImp(TMCalibLED)
-
 
 //______________________________________________________________________________
 TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)

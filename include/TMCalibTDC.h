@@ -14,26 +14,16 @@
 #ifndef TAPSMaintain_TMCalibTDC
 #define TAPSMaintain_TMCalibTDC
 
-#include <cstdlib>
-#include "TH1.h"
-#include "TMath.h"
-#include "TF1.h"
-#include "TGTableLayout.h"
-#include "TSystem.h"
-#include "TGComboBox.h"
-#include "TGTextEntry.h"
-#include "TLine.h"
-#include "TGraphErrors.h"
-
 #include "TMSeqCalibModule.h"
-#include "TMUtils.h"
 
+class TF1;
+class TLine;
+class TGraphErrors;
 
 enum {
     kTDC_Calib_Type_BAF2,
     kTDC_Calib_Type_VETO
 };
-
 
 class TMCalibTDC : public TMSeqCalibModule
 {

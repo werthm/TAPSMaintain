@@ -25,13 +25,13 @@
 #define TAPSMaintain_TMSeqCalibModule
 
 #include "RQ_OBJECT.h"
-#include "TRootEmbeddedCanvas.h"
 #include "TCanvas.h"
-#include "TGButton.h"
-#include "TStyle.h"
 
 #include "TMModule.h"
+#include "TMConfig.h"
 
+class TRootEmbeddedCanvas;
+class TGLabel; 
 
 class TMSeqCalibModule : public TMModule
 {

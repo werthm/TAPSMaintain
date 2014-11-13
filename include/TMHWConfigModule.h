@@ -15,31 +15,17 @@
 #define TAPSMaintain_TMHWConfigModule
 
 #include "RQ_OBJECT.h"
-#include "TMath.h"
-#include "TGComboBox.h"
-#include "TGFileDialog.h"
-#include "TGNumberEntry.h"
-#include "TGTableLayout.h"
-#include "TG3DLine.h"
-#include "TGTab.h"
-#include "TGProgressBar.h"
-#include "TColor.h"
-#include "TSQLServer.h"
-#include "TSQLResult.h"
-#include "TSQLRow.h"
-#include "TSystem.h"
-#include "TF1.h"
-#include "TGraph.h"
-#include "TCanvas.h"
-#include "TAxis.h"
-#include "TText.h"
-
-#include "TTMySQLManager.h"
-#include "TTServerManager.h"
 
 #include "TMModule.h"
-#include "TMUtils.h"
 
+class TGTab;
+class TGNumberEntry;
+class TGLabel;
+class TGCanvas;
+class TGHProgressBar;
+class TCanvas;
+class TF1;
+class TGraph;
 
 // Hardcoded values used for QT signal connections
 enum EFILE_BROWSE_SELECT {
@@ -49,7 +35,6 @@ enum EFILE_BROWSE_SELECT {
     kFILE_SELECT_LED_ENERGY_CALIB   = 4,
     kFILE_SELECT_LED_CALIB          = 5
 };
-
 
 class TMHWConfigModule : public TMModule
 {

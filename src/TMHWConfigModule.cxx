@@ -11,10 +11,35 @@
 //////////////////////////////////////////////////////////////////////////
 
 
+#include <cstdlib>
+
+#include "TGTableLayout.h"
+#include "TGLabel.h"
+#include "TGComboBox.h"
+#include "THashList.h"
+#include "TGTab.h"
+#include "TGNumberEntry.h"
+#include "TG3DLine.h"
+#include "TGProgressBar.h"
+#include "TF1.h"
+#include "TGraph.h"
+#include "TSystem.h"
+#include "TMath.h"
+#include "TText.h"
+#include "TAxis.h"
+#include "TCanvas.h"
+#include "TColor.h"
+#include "TGMsgBox.h"
+
+#include "TTMySQLManager.h"
+#include "TTDataTypePar.h"
+#include "TTServerManager.h"
+
 #include "TMHWConfigModule.h"
+#include "TMUtils.h"
+#include "TMConfig.h"
 
 ClassImp(TMHWConfigModule)
-
 
 //______________________________________________________________________________
 TMHWConfigModule::TMHWConfigModule(const Char_t* name, UInt_t id)

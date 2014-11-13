@@ -13,7 +13,6 @@
 
 #include "TMConfig.h"
 
-
 // TAPSMaintain version
 const Char_t kTAPSMaintainVersion[] = "0.3.0";
 
