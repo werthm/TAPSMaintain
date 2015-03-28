@@ -32,9 +32,9 @@ const Double_t kTAPS_MIP_Loss_Veto  = 5;      // ?
 const Double_t kBaF2_Gain_Slope = 153;
 
 // TDC cable delay measurements
-const Double_t kTDC_Cable_Delay[] = {0.0, 9.900, 15.050, 25.200,
-                                   35.450, 45.600, 55.500};
-const Double_t kTDC_Cable_Delay_Error[] = {0.0001, 0.054, 0.054, 0.102,
-                                         0.102, 0.151, 0.201};
+const Double_t kTDC_Cable_Delay[] = {0.0, 4.895, 10.060, 20.355,
+                                   30.915, 41.205, 50.910};
+const Double_t kTDC_Cable_Delay_Error[] = {0.001, 0.005, 0.03, 0.005,
+                                         0.005, 0.005, 0.01};
 
 
