@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2013
+ * Author: Dominik Werthmueller, 2008-2016
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -15,6 +15,8 @@
 #define TAPSMaintain_TMUtils
 
 #include "Rtypes.h"
+
+class TH1;
 
 enum EElement_Selection {
     kRange_Single_Element,
@@ -47,9 +49,12 @@ namespace TMUtils
     Int_t IndexOf(const Char_t* s1, const Char_t* s2);
     Char_t* Trim(const Char_t* s);
     Bool_t IsComment(const Char_t* s);
-    
+
     UInt_t GetRingNumber(Int_t element);
     Char_t GetBlock(Int_t element);
+
+    TH1* DeriveHistogram(TH1* inH);
+    void ZeroBins(TH1* inH, Double_t th = 0);
 }
 
 #endif
