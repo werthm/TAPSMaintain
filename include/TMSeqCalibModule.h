@@ -64,17 +64,17 @@ public:
 
     void ProcessPreviousElement();
     void ProcessNextElement();
-    void ProcessElement(Int_t index)
+    void ProcessElement(Int_t index, Bool_t redo = kFALSE)
     {
         fCanvas->cd();
         fPreviousElement = fCurrentElement;
         fCurrentElement = index;
-        Process(index);
+        Process(index, redo);
         fCanvas->Update();
     }
 
-    virtual void Redo() { Process(fCurrentElement); }
-    virtual void Process(Int_t index) = 0;          // Process the element 'index'
+    virtual void Redo() { Process(fCurrentElement, kTRUE); }
+    virtual void Process(Int_t index, Bool_t redo) = 0;  // Process the element 'index'
     virtual void Quit() = 0;                        // Save results and quit
 
     ClassDef(TMSeqCalibModule, 0) // Sequential element calibration base module
