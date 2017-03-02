@@ -73,7 +73,7 @@ public:
 
     virtual void Init();
     virtual void ReadConfig();
-    virtual void Process(Int_t index);
+    virtual void Process(Int_t index, Bool_t redo);
     virtual void Redo();
     virtual void Quit();
     virtual void SaveResults(const Char_t* filename);

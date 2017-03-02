@@ -234,10 +234,11 @@ void TMCalibLED::Redo()
     // Read the threshold value from the line.
 
     SetResult(fCurrentElement, 0, fLine->GetX1());
+    Info("Redo", "Corrected threshold of element %d to %f", fCurrentElement+1, fLine->GetX1());
 }
 
 //______________________________________________________________________________
-void TMCalibLED::Process(Int_t index)
+void TMCalibLED::Process(Int_t index, Bool_t redo)
 {
     // Fit LED spectrum of the element 'index'.
 
@@ -246,12 +247,12 @@ void TMCalibLED::Process(Int_t index)
     TH1F* h2;
 
     // check if previous element was corrected
-    if (index)
+    if (!redo && fPreviousElement != -1)
     {
         if (fLine->GetX1() != fThreshold)
         {
-            SetResult(index-1, 0, fLine->GetX1());
-            Info("Process", "Corrected threshold of element %d to %f", index-1+1, fLine->GetX1());
+            SetResult(fPreviousElement, 0, fLine->GetX1());
+            Info("Process", "Corrected threshold of element %d to %f", fPreviousElement+1, fLine->GetX1());
         }
     }
 
