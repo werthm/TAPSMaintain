@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2014
+ * Author: Dominik Werthmueller, 2008-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@
 #include "TMConfig.h"
 
 class TRootEmbeddedCanvas;
-class TGLabel; 
+class TGLabel;
 
 class TMSeqCalibModule : public TMModule
 {
@@ -39,19 +39,20 @@ class TMSeqCalibModule : public TMModule
 
 protected:
     Int_t fCurrentElement;                          // index of the current element
+    Int_t fPreviousElement;                         // index of the previous element
     TAPSDetector_t fDetID;                          // TAPS detector ID
-    
+
     TRootEmbeddedCanvas* fEmbCanvas;                // the embedded canvas
     TCanvas* fCanvas;                               // the canvas
     TGHorizontalFrame* fControlFrame;               // Control frame
-    
+
     TGTextButton* fPrev;                            // "Previous" button
     TGTextButton* fNext;                            // "Next" button
     TGTextButton* fRedo;                            // "Redo" button
     TGTextButton* fQuit;                            // "Quit" button
-    
+
     TGLabel* fInfo;                                 // Info label
-    
+
     Int_t GetCurrentDetectorSize() const;
 
 public:
@@ -60,17 +61,18 @@ public:
     virtual ~TMSeqCalibModule();
 
     void ShowCanvasInfo(Int_t event, Int_t px, Int_t py, TObject *selected);
-    
+
     void ProcessPreviousElement();
     void ProcessNextElement();
     void ProcessElement(Int_t index)
     {
         fCanvas->cd();
+        fPreviousElement = fCurrentElement;
         fCurrentElement = index;
         Process(index);
         fCanvas->Update();
     }
-    
+
     virtual void Redo() { Process(fCurrentElement); }
     virtual void Process(Int_t index) = 0;          // Process the element 'index'
     virtual void Quit() = 0;                        // Save results and quit
