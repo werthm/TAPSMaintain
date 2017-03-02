@@ -16,6 +16,12 @@ Installation
 Changelog
 ---------
 
+### 0.4.0
+March 2017
+* cosmics calibration: improved fitting, extended manual correction
+* LED calibration: use histogram derivative, improved manual correction,
+  rebin support
+
 ### 0.3.0
 December 4, 2013
 * removed support for old slowcontrol system via libtcpip
