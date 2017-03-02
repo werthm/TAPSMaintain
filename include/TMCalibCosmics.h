@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2014
+ * Author: Dominik Werthmueller, 2008-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -46,9 +46,9 @@ private:
 
     TH1F* fHClone;                              // histogram pointer used for cloning
     TF1* fPedFunc;                              // function used for pedestal fitting
-    TF1* fPeakFunc;                             // function used for cosmic peak fitting
     TF1* fBgFunc;                               // cosmics peak background function
     TF1* fTotalFunc;                            // total cosmic peak function
+    TLine* fPedLine;                            // line indicating the pedestal position
     TLine* fPeakLine;                           // line indicating the peak position
 
     // Config dialog elements
@@ -58,20 +58,21 @@ private:
     TGTextEntry* fCStartEntry;                  // start value of fit range
     TGTextEntry* fCEndEntry;                    // end value of fit range
     TGCheckButton* fBatchMode;                  // batch mode check box
-    
+
+    Double_t CalculateGain(Double_t ped, Double_t peak);
+
 public:
     TMCalibCosmics() : TMSeqCalibModule() { }
     TMCalibCosmics(const Char_t* name, UInt_t id);
     virtual ~TMCalibCosmics();
-    
+
     virtual void Init();
     virtual void ReadConfig();
     virtual void Cleanup();
-    virtual void Process(Int_t index);
-    virtual void Redo();
+    virtual void Process(Int_t index, Bool_t redo);
     virtual void Quit();
     virtual void SaveResults(const Char_t* filename);
-    
+
     void UpdateDetectorType(Int_t id);
 
     ClassDef(TMCalibCosmics, 0) // Cosmics calibration module
