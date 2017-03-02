@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2013
+ * Author: Dominik Werthmueller, 2008-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@
 #include "TMConfig.h"
 
 // TAPSMaintain version
-const Char_t kTAPSMaintainVersion[] = "0.3.0";
+const Char_t kTAPSMaintainVersion[] = "0.4.0";
 
 // number of TAPS detector elements
 const UInt_t kMaxSize     = 384;

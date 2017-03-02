@@ -1,5 +1,5 @@
 /*************************************************************************
- * Author: Dominik Werthmueller, 2008-2013
+ * Author: Dominik Werthmueller, 2008-2017
  *************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,13 +39,13 @@ extern const Double_t kTDC_Cable_Delay[];
 extern const Double_t kTDC_Cable_Delay_Error[];
 
 // define TAPS detectors
-enum ETAPSDetector 
+enum ETAPSDetector
 {
     kNo_Detector,
     kBaF2_Detector,
     kPbWO4_Detector,
     kVeto_Detector,
-    kPbWO4_Veto_Detector    
+    kPbWO4_Veto_Detector
 };
 typedef ETAPSDetector TAPSDetector_t;
 
