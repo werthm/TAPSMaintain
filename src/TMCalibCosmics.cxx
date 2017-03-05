@@ -350,14 +350,6 @@ void TMCalibCosmics::Quit()
 {
     // Save cosmics calibration results and quit module.
 
-    // save gain distribution to ROOT file
-    TFile f("Cosmics_Calibration_Results.root", "recreate");
-    TH1F h("Gain distribution", "Gain distribution", 250, 0, 0.5);
-    Double_t** results = GetResults();
-    for (Int_t i = 0; i < GetCurrentDetectorSize(); i++) h.Fill(results[i][2]);
-    h.Write(h.GetName());
-    f.Close();
-
     // save results
     Save();
 
