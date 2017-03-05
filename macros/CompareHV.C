@@ -48,13 +48,13 @@ Char_t FormatDiff(Double_t diff)
 {
     // Format the difference value (%) using terminal colors.
 
-    // foreground color
+    // standard foreground color
     Int_t fg = 32;
 
-    // check if the element number is standard
+    // check if the difference is larger than 1%
     if (TMath::Abs(diff) > 1) fg = 31;
 
-    // format element
+    // format difference
     sprintf(gTmp, "%c[%d;%dm%4.1f%%%c[%dm", 0x1b, 0, fg, diff, 0x1b, 0);
 
     return gTmp;
