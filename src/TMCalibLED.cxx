@@ -41,15 +41,17 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
 
     fThreshold = 0;
     fHClone = 0;
+    fHDeriv = 0;
+    fFunc = 0;
 
     // marker line
     fLine = new TLine();
     fLine->SetLineStyle(1);
     fLine->SetLineWidth(2);
-    fLine->SetLineColor(kRed);
+    fLine->SetLineColor(kBlue);
 
     // create configuration dialog
-    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 17, 2));
+    fConfigFrame->SetLayoutManager(new TGTableLayout(fConfigFrame, 7, 2));
 
     // LED type
     TGLabel* l = new TGLabel(fConfigFrame, "LED Type:");
@@ -83,89 +85,17 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fCut = new TGTextEntry(fConfigFrame);
     fConfigFrame->AddFrame(fCut, new TGTableLayoutHints(1, 2, 2, 3, kLHintsFillX | kLHintsRight, 5, 5, 2, 2));
 
-    // threshold voltage number entries
-    // ring 1
-    l = new TGLabel(fConfigFrame, "Ring 1 Threshold [mV]:");
+    // threshold voltage number entry
+    l = new TGLabel(fConfigFrame, "Threshold [mV]:");
     l->SetTextJustify(kTextRight);
     fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 3, 4, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing1Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing1Voltage, new TGTableLayoutHints(1, 2, 3, 4, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 2
-    l = new TGLabel(fConfigFrame, "Ring 2 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 4, 5, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing2Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing2Voltage, new TGTableLayoutHints(1, 2, 4, 5, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 3
-    l = new TGLabel(fConfigFrame, "Ring 3 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 5, 6, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing3Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing3Voltage, new TGTableLayoutHints(1, 2, 5, 6, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 4
-    l = new TGLabel(fConfigFrame, "Ring 4 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 6, 7, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing4Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing4Voltage, new TGTableLayoutHints(1, 2, 6, 7, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 5
-    l = new TGLabel(fConfigFrame, "Ring 5 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 7, 8, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing5Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing5Voltage, new TGTableLayoutHints(1, 2, 7, 8, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 6
-    l = new TGLabel(fConfigFrame, "Ring 6 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 8, 9, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing6Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing6Voltage, new TGTableLayoutHints(1, 2, 8, 9, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 7
-    l = new TGLabel(fConfigFrame, "Ring 7 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 9, 10, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing7Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing7Voltage, new TGTableLayoutHints(1, 2, 9, 10, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 8
-    l = new TGLabel(fConfigFrame, "Ring 8 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 10, 11, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing8Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing8Voltage, new TGTableLayoutHints(1, 2, 10, 11, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 9
-    l = new TGLabel(fConfigFrame, "Ring 9 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 11, 12, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing9Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing9Voltage, new TGTableLayoutHints(1, 2, 11, 12, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 10
-    l = new TGLabel(fConfigFrame, "Ring 10 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 12, 13, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing10Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing10Voltage, new TGTableLayoutHints(1, 2, 12, 13, kLHintsLeft, 5, 5, 2, 2));
-
-    // ring 11
-    l = new TGLabel(fConfigFrame, "Ring 11 Threshold [mV]:");
-    l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 13, 14, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
-    fRing11Voltage = new TGNumberEntry(fConfigFrame, 1100, 6);
-    fConfigFrame->AddFrame(fRing11Voltage, new TGTableLayoutHints(1, 2, 13, 14, kLHintsLeft, 5, 5, 2, 2));
-
+    fVoltageEntry = new TGNumberEntry(fConfigFrame, 30, 6);
+    fConfigFrame->AddFrame(fVoltageEntry, new TGTableLayoutHints(1, 2, 3, 4, kLHintsLeft, 5, 5, 2, 2));
 
     // x-Axis Range
     l = new TGLabel(fConfigFrame, "x-Axis Range:");
     l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 14, 15, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 4, 5, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
 
     fAxisRangeFrame = new TGHorizontalFrame(fConfigFrame);
     fXAxisStart = new TGTextEntry(fAxisRangeFrame, "0");
@@ -175,28 +105,31 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     fAxisRangeFrame->AddFrame(fXAxisStart, new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 5, 5, 2, 2));
     fAxisRangeFrame->AddFrame(new TGLabel(fAxisRangeFrame, "to"), new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
     fAxisRangeFrame->AddFrame(fXAxisEnd, new TGLayoutHints(kLHintsExpandY, 5, 5, 2, 2));
-    fConfigFrame->AddFrame(fAxisRangeFrame, new TGTableLayoutHints(1, 2, 14, 15, kLHintsLeft, 0, 0, 0, 0));
+    fConfigFrame->AddFrame(fAxisRangeFrame, new TGTableLayoutHints(1, 2, 4, 5, kLHintsLeft, 0, 0, 0, 0));
 
 
     // Rebin
     l = new TGLabel(fConfigFrame, "Rebin:");
     l->SetTextJustify(kTextRight);
-    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 15, 16, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->AddFrame(l, new TGTableLayoutHints(0, 1, 5, 6, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
 
     fRebinEntry = new TGTextEntry(fConfigFrame, "2");
     fRebinEntry->Resize(40, 22);
-    fConfigFrame->AddFrame(fRebinEntry, new TGTableLayoutHints(1, 2, 15, 16, kLHintsLeft, 5, 5, 2, 2));
+    fConfigFrame->AddFrame(fRebinEntry, new TGTableLayoutHints(1, 2, 5, 6, kLHintsLeft, 5, 5, 2, 2));
 
 
     // Batch mode
     fBatchMode = new TGCheckButton(fConfigFrame, "Batch mode");
-    fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 16, 17, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
+    fConfigFrame->AddFrame(fBatchMode, new TGTableLayoutHints(1, 2, 6, 7, kLHintsFillX | kLHintsRight, 5, 5, 5, 5));
 
     // needs to be called in every TMModule that uses a configuration dialog
     fConfigFrame->Layout();
 
     // select LED type
     fTypeCombo->Select(kLED_Calib_Type_LG_LED1, kTRUE);
+
+    // divide canvas
+    fCanvas->Divide(2, 1);
 }
 
 //______________________________________________________________________________
@@ -205,6 +138,8 @@ TMCalibLED::~TMCalibLED()
     // Destructor.
 
     if (fHClone) delete fHClone;
+    if (fHDeriv) delete fHDeriv;
+    if (fFunc) delete fFunc;
     if (fLine) delete fLine;
 }
 
@@ -229,22 +164,13 @@ void TMCalibLED::Init()
 }
 
 //______________________________________________________________________________
-void TMCalibLED::Redo()
-{
-    // Read the threshold value from the line.
-
-    SetResult(fCurrentElement, 0, fLine->GetX1());
-    Info("Redo", "Corrected threshold of element %d to %f", fCurrentElement+1, fLine->GetX1());
-}
-
-//______________________________________________________________________________
 void TMCalibLED::Process(Int_t index, Bool_t redo)
 {
     // Fit LED spectrum of the element 'index'.
 
     Char_t name[256];
-    TH1F* h1;
-    TH1F* h2;
+    TH1* h1;
+    TH1* h2;
 
     // check if previous element was corrected
     if (!redo && fPreviousElement != -1)
@@ -256,13 +182,17 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
         }
     }
 
+    // clear canvas
+    fCanvas->cd(1)->Clear();
+    fCanvas->cd(2)->Clear();
+
     // load raw spectrum
     sprintf(name, fUncutHName, index + 1);
-    h1 = (TH1F*) fFile->Get(name);
+    h1 = (TH1*) fFile->Get(name);
 
     // load LED spectrum
     sprintf(name, fCutHName, index + 1);
-    h2 = (TH1F*) fFile->Get(name);
+    h2 = (TH1*) fFile->Get(name);
 
     // check if spectra could be loaded
     if (!h1)
@@ -283,7 +213,7 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
 
     // clone spectrum
     if (fHClone) delete fHClone;
-    fHClone = (TH1F*) h2->Clone();
+    fHClone = (TH1*) h2->Clone();
 
     // divide LED spectrum
     fHClone->Divide(h1);
@@ -301,8 +231,35 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
         }
     }
 
+    //
     // find LED threshold position
-    fThreshold = FindThreshold(fHClone);
+    //
+
+    // check histo
+    if (fHClone->Integral() < 10)
+    {
+        fThreshold = 0;
+        if (fHDeriv) delete fHDeriv;
+        fHDeriv = 0;
+    }
+    else
+    {
+        // derive histogram
+        if (fHDeriv) delete fHDeriv;
+        fHDeriv = TMUtils::DeriveHistogram(fHClone);
+        TMUtils::ZeroBins(fHDeriv);
+
+        // get maximum value
+        fThreshold = redo ? fLine->GetX1() : fHDeriv->GetBinCenter(fHDeriv->GetMaximumBin());
+
+        // fit
+        if (fFunc) delete fFunc;
+        fFunc = new TF1("func", "gaus", fThreshold-20, fThreshold+20);
+        fFunc->SetLineColor(kRed);
+        fFunc->SetParameters(1, fThreshold, 1);
+        fHDeriv->Fit(fFunc, "RQ0");
+        fThreshold = fFunc->GetParameter(1);
+    }
 
     // correct bad values
     if (fThreshold != 0 && (fThreshold < fXStart || fThreshold > fXEnd))
@@ -312,6 +269,7 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
     SetResult(index, 0, fThreshold);
 
     // draw spectrum
+    fCanvas->cd(1);
     fHClone->Draw("hist");
     fHClone->GetXaxis()->SetRangeUser(fXStart, fXEnd);
     fHClone->GetYaxis()->SetRangeUser(0, 1.1);
@@ -330,6 +288,21 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
     fLine->SetY1(0);
     fLine->SetY2(1);
     fLine->Draw();
+
+    // draw derivative
+    if (fHDeriv)
+    {
+        fCanvas->cd(2);
+        fHDeriv->Draw("hist");
+        fFunc->Draw("same");
+        fHDeriv->GetXaxis()->SetRangeUser(fThreshold-50, fThreshold+50);
+        fHDeriv->GetXaxis()->SetTitle("ADC Channel");
+        fHDeriv->GetYaxis()->SetTitle("Derivative");
+        fLine->Draw();
+    }
+
+    // update the canvas
+    fCanvas->Update();
 }
 
 //______________________________________________________________________________
@@ -352,7 +325,7 @@ void TMCalibLED::SaveResults(const Char_t* filename)
     for (Int_t i = 0; i < GetCurrentDetectorSize(); i++)
     {
         // get element threshold voltage
-        Int_t thresVol = (Int_t)fRingVoltages[TMUtils::GetRingNumber(i)-1];
+        Int_t thresVol = (Int_t)fVoltage;
 
         fprintf(fout, "%3d  %5d  %7.3f\n", i+1, thresVol, results[i][0]);
     }
@@ -375,34 +348,6 @@ void TMCalibLED::Quit()
 
     // emit Finished() signal
     Finished();
-}
-
-//______________________________________________________________________________
-Double_t TMCalibLED::FindThreshold(TH1F* h)
-{
-    // Find the threshold position.
-
-    // check histo
-    if (h->Integral() < 10) return 0;
-
-    // derive histogram
-    TH1* deriv = TMUtils::DeriveHistogram(h);
-    TMUtils::ZeroBins(deriv);
-
-    // get maximum value
-    Double_t pos = deriv->GetBinCenter(deriv->GetMaximumBin());
-
-    // fit
-    TF1* func = new TF1("func", "gaus", pos-20, pos+20);
-    func->SetParameters(1, pos, 1);
-    deriv->Fit(func, "RQ0");
-    pos = func->GetParameter(1);
-
-    // clean-up
-    delete deriv;
-    delete func;
-
-    return pos;
 }
 
 //______________________________________________________________________________
@@ -473,16 +418,6 @@ void TMCalibLED::ReadConfig()
     fRebin = atoi(fRebinEntry->GetText());
 
     // read ring threshold voltages
-    fRingVoltages[0] = fRing1Voltage->GetNumber();
-    fRingVoltages[1] = fRing2Voltage->GetNumber();
-    fRingVoltages[2] = fRing3Voltage->GetNumber();
-    fRingVoltages[3] = fRing4Voltage->GetNumber();
-    fRingVoltages[4] = fRing5Voltage->GetNumber();
-    fRingVoltages[5] = fRing6Voltage->GetNumber();
-    fRingVoltages[6] = fRing7Voltage->GetNumber();
-    fRingVoltages[7] = fRing8Voltage->GetNumber();
-    fRingVoltages[8] = fRing9Voltage->GetNumber();
-    fRingVoltages[9] = fRing10Voltage->GetNumber();
-    fRingVoltages[10] = fRing11Voltage->GetNumber();
+    fVoltage = fVoltageEntry->GetNumber();
 }
 
