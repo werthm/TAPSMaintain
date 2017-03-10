@@ -63,8 +63,7 @@ TMCalibTDC::TMCalibTDC(const Char_t* name, UInt_t id)
     }
 
     // graph
-    fGraph = new TGraphErrors(fNfit);
-    fGraph->SetMarkerStyle(20);
+    fGraph = 0;
 
     // Detector type
     TGLabel* l = new TGLabel(fConfigFrame, "Detector Type:");
@@ -152,15 +151,12 @@ void TMCalibTDC::Init()
         {
             sprintf(name, "Could not open ROOT file '%s'!", fname[i]);
             ModuleError(name);
-            Finished();
-            return;
         }
         if (fFiles[i]->IsZombie())
         {
             sprintf(name, "Could not open ROOT file '%s'!", fname[i]);
             ModuleError(name);
-            Finished();
-            return;
+            fFiles[i] = 0;
         }
     }
 
@@ -203,19 +199,32 @@ void TMCalibTDC::Process(Int_t index, Bool_t redo)
     const Char_t* tname[7] = { "no cable", "Cable 0", "Cables 0,1", "Cables 0,1,2",
                                "Cables 0,1,2,3", "Cables 0,1,2,3,4", "Cables 0,1,2,3,4,5" };
 
+    // graph variables
+    Int_t nG = 0;
+    Double_t xG[fNfit];
+    Double_t xeG[fNfit];
+    Double_t yG[fNfit];
+    Double_t yeG[fNfit];
+
     // load raw spectra
     sprintf(name, fHName, index + 1);
     for (Int_t i = 0; i < fNfit; i++)
     {
+        // check for empty file
+        if (!fFiles[i])
+        {
+            h[i] = 0;
+            continue;
+        }
+
+        // try to load spectrum
         h[i] = (TH1*) fFiles[i]->Get(name);
 
         // check if spectra could be loaded
         if (!h[i])
         {
-            sprintf(name, "Spectrum '%s' was not found in ROOT file!", fHName);
-            ModuleError(name);
-            Finished();
-            return;
+            Error("Process", "Spectrum '%s' was not found in ROOT file!", fHName);
+            continue;
         }
 
         // set title
@@ -228,6 +237,9 @@ void TMCalibTDC::Process(Int_t index, Bool_t redo)
     Double_t pos0_e = 0;
     for (Int_t i = 0; i < fNfit; i++)
     {
+        // skip empty histograms
+        if (!h[i]) continue;
+
         // fit pulser
         Double_t pos = h[i]->GetXaxis()->GetBinCenter(h[i]->GetMaximumBin());
         fPeakFunc[i]->SetParameters(h[i]->GetMaximum(), pos, 0.55);
@@ -263,9 +275,16 @@ void TMCalibTDC::Process(Int_t index, Bool_t redo)
         Double_t tdc_shift_e = TMath::Sqrt(pos_e*pos_e + pos0_e*pos0_e);
 
         // set graph point
-        fGraph->SetPoint(i, tdc_shift, kTDC_Cable_Delay[i]);
-        fGraph->SetPointError(i, tdc_shift_e, kTDC_Cable_Delay_Error[i]);
+        xG[nG] = tdc_shift;
+        yG[nG] = kTDC_Cable_Delay[i];
+        xeG[nG] = tdc_shift_e;
+        yeG[nG] = kTDC_Cable_Delay_Error[i];
+        nG++;
     }
+
+    // create graph
+    fGraph = new TGraphErrors(nG, xG, yG, xeG, yeG);
+    fGraph->SetMarkerStyle(20);
 
     // draw graph
     fCanvas->cd(8);
@@ -274,7 +293,7 @@ void TMCalibTDC::Process(Int_t index, Bool_t redo)
     fGraph->Draw("ap");
 
     // fit graph
-    fLinFunc->SetRange((fGraph->GetX())[0], (fGraph->GetX())[fNfit-1]);
+    fLinFunc->SetRange((fGraph->GetX())[0], (fGraph->GetX())[fGraph->GetN()-1]);
     fGraph->Fit(fLinFunc, "RB0Q");
     fLinFunc->Draw("same");
 
