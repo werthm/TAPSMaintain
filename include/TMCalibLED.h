@@ -57,6 +57,8 @@ private:
     TGCheckButton* fBatchMode;                  // batch mode check box
     TGNumberEntry* fVoltageEntry;               // threshold voltage
 
+    Double_t EstimateThreshold(TH1* h, TH1* hDeriv);
+
 public:
     TMCalibLED() : TMSeqCalibModule() { }
     TMCalibLED(const Char_t* name, UInt_t id);

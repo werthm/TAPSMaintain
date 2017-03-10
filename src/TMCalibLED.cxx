@@ -47,7 +47,7 @@ TMCalibLED::TMCalibLED(const Char_t* name, UInt_t id)
     // marker line
     fLine = new TLine();
     fLine->SetLineStyle(1);
-    fLine->SetLineWidth(2);
+    fLine->SetLineWidth(3);
     fLine->SetLineColor(kBlue);
 
     // create configuration dialog
@@ -250,7 +250,7 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
         TMUtils::ZeroBins(fHDeriv);
 
         // get maximum value
-        fThreshold = redo ? fLine->GetX1() : fHDeriv->GetBinCenter(fHDeriv->GetMaximumBin());
+        fThreshold = redo ? fLine->GetX1() : EstimateThreshold(fHClone, fHDeriv);
 
         // fit
         if (fFunc) delete fFunc;
@@ -303,6 +303,42 @@ void TMCalibLED::Process(Int_t index, Bool_t redo)
 
     // update the canvas
     fCanvas->Update();
+}
+
+//______________________________________________________________________________
+Double_t TMCalibLED::EstimateThreshold(TH1* h, TH1* hDeriv)
+{
+    // Estimate the threshold in the histogram 'h'.
+
+    Double_t thr = 0;
+
+    // loop over bins
+    for (Int_t i = 1; i <= h->GetNbinsX(); i++)
+    {
+        // position
+        Double_t pos = h->GetBinCenter(i);
+
+        // calculate integral range
+        Int_t binLow = h->GetXaxis()->FindBin(pos-15);
+        Int_t binHigh = h->GetXaxis()->FindBin(pos+15);
+
+        // calculate integrals on both sides
+        Double_t intLow = h->Integral(binLow, i-1);
+        Double_t intHigh = (binHigh-i) - h->Integral(i+1, binHigh);
+
+        // leave if difference crosses zero
+        if (intHigh - intLow < 0)
+        {
+            thr = pos;
+            break;
+        }
+    }
+
+    // check result of search
+    if (thr == 0)
+        return hDeriv->GetBinCenter(hDeriv->GetMaximumBin());
+    else
+        return thr;
 }
 
 //______________________________________________________________________________
