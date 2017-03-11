@@ -32,6 +32,7 @@
 
 class TRootEmbeddedCanvas;
 class TGLabel;
+class TGNumberEntry;
 
 class TMSeqCalibModule : public TMModule
 {
@@ -49,6 +50,8 @@ protected:
     TGTextButton* fPrev;                            // "Previous" button
     TGTextButton* fNext;                            // "Next" button
     TGTextButton* fRedo;                            // "Redo" button
+    TGNumberEntry* fElemEntry;                      // element entry
+    TGTextButton* fGoto;                            // "Goto" button
     TGTextButton* fQuit;                            // "Quit" button
 
     TGLabel* fInfo;                                 // Info label
@@ -74,6 +77,7 @@ public:
     }
 
     virtual void Redo() { Process(fCurrentElement, kTRUE); }
+    virtual void GotoElement();
     virtual void Process(Int_t index, Bool_t redo) = 0;  // Process the element 'index'
     virtual void Quit() = 0;                        // Save results and quit
 

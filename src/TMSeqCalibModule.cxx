@@ -25,6 +25,7 @@
 #include "TRootEmbeddedCanvas.h"
 #include "TGButton.h"
 #include "TGLabel.h"
+#include "TGNumberEntry.h"
 
 #include "TMSeqCalibModule.h"
 
@@ -89,6 +90,15 @@ TMSeqCalibModule::TMSeqCalibModule(const Char_t* name, UInt_t id, UInt_t inNresu
     fRedo->Connect("Clicked()", "TMSeqCalibModule", this, "Redo()");
     fControlFrame->AddFrame(fRedo, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
 
+    fGoto = new TGTextButton(fControlFrame, "Goto element");
+    fGoto->Connect("Clicked()", "TMSeqCalibModule", this, "GotoElement()");
+    fControlFrame->AddFrame(fGoto, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
+
+    fElemEntry = new TGNumberEntry(fControlFrame, 1, 3, -1, TGNumberFormat::kNESInteger,
+                                   TGNumberFormat::kNEAPositive,
+                                   TGNumberFormat::kNELLimitMinMax, 1, 1);
+    fControlFrame->AddFrame(fElemEntry, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
+
     fQuit = new TGTextButton(fControlFrame, "Save && Quit");
     fQuit->Connect("Clicked()", "TMSeqCalibModule", this, "Quit()");
     fControlFrame->AddFrame(fQuit, new TGLayoutHints(kLHintsTop, 8, 8, 8, 8));
@@ -143,5 +153,17 @@ void TMSeqCalibModule::ProcessPreviousElement()
 
     // process the previous element if index is within bounds
     if (fCurrentElement > 0) ProcessElement(fCurrentElement - 1);
+}
+
+//______________________________________________________________________________
+void TMSeqCalibModule::GotoElement()
+{
+    // Process the specified element.
+
+    // get element index (internal numbering)
+    Int_t elem = fElemEntry->GetNumber() - 1;
+
+    // process the previous element if index is within bounds
+    if (elem >= 0 && elem <= GetCurrentDetectorSize()-1) ProcessElement(elem);
 }
 

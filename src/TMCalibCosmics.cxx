@@ -19,6 +19,7 @@
 #include "TGLabel.h"
 #include "TGComboBox.h"
 #include "TGTextEntry.h"
+#include "TGNumberEntry.h"
 #include "TLine.h"
 #include "TFile.h"
 
@@ -139,6 +140,10 @@ void TMCalibCosmics::Init()
 
     // Clear results array
     ClearResults();
+
+    // set limit in element entry
+    fElemEntry->SetLimitValues(1, GetCurrentDetectorSize()) ;
+    fElemEntry->SetIntNumber(1);
 
     // check if batch mode was selected
     if (fBatchMode->IsOn())

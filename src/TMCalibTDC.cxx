@@ -18,6 +18,7 @@
 #include "TGTableLayout.h"
 #include "TGComboBox.h"
 #include "TGTextEntry.h"
+#include "TGNumberEntry.h"
 #include "TGLabel.h"
 #include "TSystem.h"
 #include "TFile.h"
@@ -136,6 +137,10 @@ void TMCalibTDC::Init()
 
     // Clear results array
     ClearResults();
+
+    // set limit in element entry
+    fElemEntry->SetLimitValues(1, GetCurrentDetectorSize()) ;
+    fElemEntry->SetIntNumber(1);
 
     // load ROOT files
     const Char_t* fname[7] = { "none.root", "0.root", "01.root", "012.root",

@@ -151,6 +151,10 @@ void TMCalibLED::Init()
     // Clear results array
     ClearResults();
 
+    // set limit in element entry
+    fElemEntry->SetLimitValues(1, GetCurrentDetectorSize()) ;
+    fElemEntry->SetIntNumber(1);
+
     // check if batch mode was selected
     if (fBatchMode->IsOn())
     {
